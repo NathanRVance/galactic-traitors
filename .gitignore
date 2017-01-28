@@ -1,0 +1,9 @@
+android/build/
+core/build/
+html/build/
+html/war/
+ios/build/
+build/
+.idea/
+*.class
+*.log

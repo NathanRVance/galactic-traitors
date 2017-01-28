@@ -1,0 +1,231 @@
+package net.traitors.player;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import net.traitors.item.Item;
+import net.traitors.util.AbstractDrawable;
+import net.traitors.util.Controls;
+import net.traitors.util.Point;
+
+public class Player extends AbstractDrawable {
+
+    private static final float BASE_ANIMATION_LENGTH = 1; //seconds
+    private static final float BASE_MOVE_SPEED = 1.4f; //meters per second
+    private final int cycleLength = 200;
+    private float rotation = 0f;
+    private TextureRegion[] animation;
+    private TextureRegion[] animationHolding;
+    private Item holding;
+    private float animationPoint = 0;
+    //Time, in seconds, it takes to run through the animation
+    private float animationLength = 1;
+
+    public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
+        super(.5f, .5f);
+        animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
+        animationHolding = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, true);
+    }
+
+    public void rotateToFace(Point point) {
+        float distance = (float) Math.sqrt(Math.pow(point.x - getPoint().x, 2) + Math.pow(point.y - getPoint().y, 2));
+        //Player starts facing downward
+        float rotation = (float) (Math.asin((point.x - getPoint().x) / distance) * 180 / Math.PI);
+        if (point.y > getPoint().y) rotation = 180 - rotation;
+        this.rotation = rotation;
+    }
+
+    private void setAnimationLength(float animationLength) {
+        animationPoint = animationPoint / this.animationLength * animationLength;
+        this.animationLength = animationLength;
+    }
+
+    private void incAnimation(float delta) {
+        animationPoint += delta;
+        animationPoint %= animationLength;
+    }
+
+    private void resetAnimation() {
+        animationPoint = 0;
+    }
+
+    private int getAnimationIndex() {
+        int ret = (int) (animationPoint / animationLength * cycleLength);
+        if (ret >= cycleLength) ret = cycleLength - 1;
+        return ret;
+    }
+
+    public void move(float delta) {
+        Point d = new Point();
+        float speedMult = 1;
+        if (Controls.isKeyPressed(Controls.Key.UP)) {
+            d.y += BASE_MOVE_SPEED * delta;
+        }
+        if (Controls.isKeyPressed(Controls.Key.DOWN)) {
+            d.y -= BASE_MOVE_SPEED * delta;
+        }
+        if (Controls.isKeyPressed(Controls.Key.RIGHT)) {
+            d.x += BASE_MOVE_SPEED * delta;
+        }
+        if (Controls.isKeyPressed(Controls.Key.LEFT)) {
+            d.x -= BASE_MOVE_SPEED * delta;
+        }
+        if (Controls.isKeyPressed(Controls.Key.SPRINT)) {
+            speedMult = 3;
+        }
+        double totMove = Math.sqrt(Math.pow(d.x, 2) + Math.pow(d.y, 2));
+        if (totMove != 0) {
+            setAnimationLength(BASE_ANIMATION_LENGTH / speedMult);
+            d.x *= BASE_MOVE_SPEED * delta * speedMult / totMove;
+            d.y *= BASE_MOVE_SPEED * delta * speedMult / totMove;
+            Point direction = new Point();
+            direction.x = getPoint().x + d.x;
+            direction.y = getPoint().y + d.y;
+            rotateToFace(direction);
+            getPoint().x += d.x;
+            getPoint().y += d.y;
+            incAnimation(delta);
+        } else {
+            resetAnimation();
+        }
+    }
+
+    public void setHolding(Item item) {
+        holding = item;
+    }
+
+    @Override
+    public void draw(Batch batch) {
+        if (holding == null) {
+            batch.draw(animation[getAnimationIndex()], getPoint().x, getPoint().y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+        } else {
+            batch.draw(animationHolding[getAnimationIndex()], getPoint().x, getPoint().y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+            Texture inHand = holding.getHandImage();
+            Point itemp = new Point();
+            itemp.x = getPoint().x + getWidth() / 22;
+            itemp.y = getPoint().y - getHeight() / 3;
+            float width = getWidth() / 10;
+            //keep ratio
+            float height = width * inHand.getHeight() / inHand.getWidth();
+            batch.draw(new TextureRegion(inHand), itemp.x, itemp.y, getPoint().x - itemp.x + getWidth() / 2, getPoint().y - itemp.y + getHeight() / 2, width, height, 1, 1, rotation);
+        }
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    private TextureRegion[] getAnimation(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, boolean armExtended) {
+        TextureRegion[] anim = new TextureRegion[cycleLength];
+        int torsoWidth = 100;
+        int torsoDepth = torsoWidth / 4;
+        int armWidth = torsoWidth / 5;
+        int handWidth = armWidth * 3 / 4;
+        int legWidth = torsoWidth * 3 / 10;
+        int maxExtension = armWidth * 2;
+        int backswingExtension = maxExtension / 2;
+
+        Appendage arms = new Appendage();
+        arms.colors = new Color[]{bodyColor, skinColor};
+        arms.widths = new int[]{armWidth, handWidth};
+        arms.maxForExt = new int[]{maxExtension / 3, maxExtension / 9};
+        arms.maxBackExt = new int[]{backswingExtension / 3, backswingExtension / 9};
+
+        Appendage legs = new Appendage();
+        legs.colors = new Color[]{pantsColor, shoesColor};
+        legs.widths = new int[]{legWidth, legWidth};
+        legs.maxForExt = new int[]{maxExtension * 3 / 4, maxExtension / 4};
+        legs.maxBackExt = new int[]{backswingExtension * 3 / 4, backswingExtension / 4};
+
+
+        for (int i = 0; i < cycleLength; i++) {
+            Pixmap pixmap = new Pixmap(torsoWidth, torsoDepth + maxExtension + backswingExtension, Pixmap.Format.RGBA4444);
+            //Torso
+            pixmap.setColor(bodyColor);
+            pixmap.fillRectangle(0, backswingExtension, torsoWidth, torsoDepth);
+
+            //Swinging appendages
+            boolean rightForward = i < cycleLength / 2;
+            int j = (i < cycleLength / 2) ? i : cycleLength - i;
+            j = (j < cycleLength / 4) ? j : cycleLength / 2 - j;
+            float fracToFullyExtended = j * 1.0f / (cycleLength / 4);
+
+            //Forearms
+            if (armExtended) {
+                int armLength = torsoWidth * 3 / 10;
+                int slitLength = armLength / 20;
+                int numSlits = 10;
+                for (int k = 0; k < numSlits; k++) {
+                    Color c = new Color(bodyColor);
+                    float darken = (float) (.5 + ((float) k) / (numSlits * 2));
+                    c.mul(darken, darken, darken, 1);
+                    pixmap.setColor(c);
+                    pixmap.fillRectangle(0, backswingExtension + torsoDepth + slitLength * k, armWidth, slitLength);
+                }
+                pixmap.fillRectangle(0, backswingExtension + torsoDepth + numSlits * slitLength, armWidth, armLength - numSlits * slitLength);
+                pixmap.setColor(skinColor);
+                pixmap.fillRectangle((armWidth - handWidth) / 2, backswingExtension + torsoDepth + armLength, handWidth, handWidth);
+            } else {
+                addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, arms, 0, fracToFullyExtended, rightForward);
+            }
+            addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, arms, torsoWidth - armWidth, fracToFullyExtended, !rightForward);
+
+            //Legs
+            addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, legs, armWidth, fracToFullyExtended, !rightForward);
+            addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, legs, torsoWidth - armWidth * 2, fracToFullyExtended, rightForward);
+
+            //Hair
+            pixmap.setColor(hairColor);
+            int hairWidth = torsoWidth * 4 / 9;
+            int hairDepth = torsoDepth * 3 / 2;
+            pixmap.fillRectangle((torsoWidth - hairWidth) / 2, backswingExtension, hairWidth, hairDepth);
+
+            //Nose
+            pixmap.setColor(skinColor);
+            int noseWidth = torsoWidth / 10;
+            int noseDepth = noseWidth / 2;
+            pixmap.fillRectangle((torsoWidth - noseWidth) / 2, backswingExtension + hairDepth, noseWidth, noseDepth);
+
+            anim[i] = new TextureRegion(new Texture(pixmap));
+        }
+        return anim;
+    }
+
+    private void addAppendage(Pixmap pixmap, int forStart, int backStart, Appendage appendage, int startX, float fracToFullyExtended, boolean forward) {
+        for (int i = 0; i < appendage.colors.length; i++) {
+            Color c = new Color(appendage.colors[i]);
+            float darken = fracToFullyExtended * .5f;
+            c.mul(darken, darken, darken, 1);
+            pixmap.setColor(c);
+
+            int width = appendage.widths[i];
+            if (i > 0) {
+                //center it on the previous width
+                startX += (appendage.widths[i - 1] - width) / 2;
+            }
+            int maxForExt = appendage.maxForExt[i];
+            int maxBackExt = appendage.maxBackExt[i];
+            backStart -= maxBackExt * fracToFullyExtended - 1; //That 1 pixel can make a big difference
+
+            if (forward) {
+                pixmap.fillRectangle(startX, forStart, width, (int) (maxForExt * fracToFullyExtended));
+                //pixmap.fillRectangle(pixmap.getWidth() - startX - width, backStart, width, (int) (maxBackExt * fracToFullyExtended));
+            } else {
+                pixmap.fillRectangle(startX, backStart, width, (int) (maxBackExt * fracToFullyExtended));
+                //pixmap.fillRectangle(pixmap.getWidth() - startX - width, forStart, width, (int) (maxForExt * fracToFullyExtended));
+            }
+            forStart += maxForExt * fracToFullyExtended;
+        }
+    }
+
+    private static class Appendage {
+        Color[] colors;
+        int[] widths;
+        int[] maxForExt;
+        int[] maxBackExt;
+    }
+}
