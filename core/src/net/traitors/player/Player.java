@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import net.traitors.item.Item;
-import net.traitors.util.AbstractDrawable;
 import net.traitors.util.Controls;
 import net.traitors.util.Point;
+import net.traitors.util.Thing;
 
-public class Player extends AbstractDrawable {
+public class Player implements Thing {
 
     private static final float BASE_ANIMATION_LENGTH = 1; //seconds
     private static final float BASE_MOVE_SPEED = 1.4f; //meters per second
@@ -23,9 +23,9 @@ public class Player extends AbstractDrawable {
     private float animationPoint = 0;
     //Time, in seconds, it takes to run through the animation
     private float animationLength = 1;
+    private Point point = new Point();
 
     public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
-        super(.5f, .5f);
         animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
         animationHolding = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, true);
     }
@@ -97,23 +97,48 @@ public class Player extends AbstractDrawable {
     }
 
     @Override
+    public Point getPoint() {
+        return point;
+    }
+
+    @Override
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+
+    @Override
+    public float getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+    @Override
+    public float getWidth() {
+        return .5f;
+    }
+
+    @Override
+    public float getHeight() {
+        return .5f;
+    }
+
+    @Override
     public void draw(Batch batch) {
         if (holding == null) {
-            batch.draw(animation[getAnimationIndex()], getPoint().x, getPoint().y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+            batch.draw(animation[getAnimationIndex()], getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
         } else {
-            batch.draw(animationHolding[getAnimationIndex()], getPoint().x, getPoint().y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+            batch.draw(animationHolding[getAnimationIndex()], getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
             Texture inHand = holding.getHandImage();
             Point itemp = new Point(getPoint().x + getWidth() / 22, getPoint().y - getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();
-            batch.draw(new TextureRegion(inHand), itemp.x, itemp.y, getPoint().x - itemp.x + getWidth() / 2, getPoint().y - itemp.y + getHeight() / 2, width, height, 1, 1, rotation);
+            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, getPoint().x - itemp.x + getWidth() / 2, getPoint().y - itemp.y + getHeight() / 2, width, height, 1, 1, rotation);
         }
-    }
-
-    @Override
-    public void dispose() {
-
     }
 
     private TextureRegion[] getAnimation(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, boolean armExtended) {
