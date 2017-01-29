@@ -30,11 +30,9 @@ public class GameScreen implements Screen {
     GameScreen(GalacticTraitors game) {
         this.game = game;
         player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
-        player.getPoint().x = 2;
-        player.getPoint().y = 2;
+        player.setPoint(new Point(2, 2));
         tiles = new TileGrid(30, 20);
-        tiles.getPoint().x = 1;
-        tiles.getPoint().y = 1;
+        tiles.setPoint(new Point(1, 1));
         camera = new OrthographicCamera();
         uiControls = new TouchControls();
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new Input(camera)));
@@ -46,19 +44,15 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        doMoves(delta);
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //Happens first to catch all input this render cycle
-        uiControls.act();
-
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
         textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
         tiles.draw(game.batch);
-        player.move(delta);
-        camera.translate(player.getPoint().x - camera.position.x, player.getPoint().y - camera.position.y);
+
         List<Point> touchesInWorld = Controls.getWorldTouches(camera);
         if (!touchesInWorld.isEmpty()) {
             player.rotateToFace(touchesInWorld.get(0));
@@ -70,6 +64,14 @@ public class GameScreen implements Screen {
         game.batch.end();
         textView.draw();
         uiControls.draw();
+    }
+
+    private void doMoves(float delta) {
+        uiControls.act();
+        player.move(delta);
+        camera.translate(player.getPoint().x - camera.position.x, player.getPoint().y - camera.position.y);
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
     }
 
     @Override

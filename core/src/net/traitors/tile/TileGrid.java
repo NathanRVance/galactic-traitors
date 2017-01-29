@@ -24,7 +24,7 @@ public class TileGrid extends AbstractDrawable implements Drawable {
     public void draw(Batch batch) {
         for (int column = 0; column < grid.length; column++) {
             for (int row = 0; row < grid[column].length; row++) {
-                grid[column][row].draw(batch, getPoint().x + column, getPoint().y + row, 1, 1);
+                batch.draw(grid[column][row].getTexture(), getPoint().x + column, getPoint().y + row, 1, 1);
             }
         }
     }

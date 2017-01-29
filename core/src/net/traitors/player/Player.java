@@ -59,34 +59,33 @@ public class Player extends AbstractDrawable {
     }
 
     public void move(float delta) {
-        Point d = new Point();
+        float x = 0;
+        float y = 0;
         float speedMult = 1;
         if (Controls.isKeyPressed(Controls.Key.UP)) {
-            d.y += BASE_MOVE_SPEED * delta;
+            y += BASE_MOVE_SPEED * delta;
         }
         if (Controls.isKeyPressed(Controls.Key.DOWN)) {
-            d.y -= BASE_MOVE_SPEED * delta;
+            y -= BASE_MOVE_SPEED * delta;
         }
         if (Controls.isKeyPressed(Controls.Key.RIGHT)) {
-            d.x += BASE_MOVE_SPEED * delta;
+            x += BASE_MOVE_SPEED * delta;
         }
         if (Controls.isKeyPressed(Controls.Key.LEFT)) {
-            d.x -= BASE_MOVE_SPEED * delta;
+            x -= BASE_MOVE_SPEED * delta;
         }
         if (Controls.isKeyPressed(Controls.Key.SPRINT)) {
             speedMult = 3;
         }
-        double totMove = Math.sqrt(Math.pow(d.x, 2) + Math.pow(d.y, 2));
+        Point d = new Point(x, y);
+        float totMove = d.distanceFromZero();
         if (totMove != 0) {
             setAnimationLength(BASE_ANIMATION_LENGTH / speedMult);
-            d.x *= BASE_MOVE_SPEED * delta * speedMult / totMove;
-            d.y *= BASE_MOVE_SPEED * delta * speedMult / totMove;
-            Point direction = new Point();
-            direction.x = getPoint().x + d.x;
-            direction.y = getPoint().y + d.y;
+            d = new Point(d.x * BASE_MOVE_SPEED * delta * speedMult / totMove,
+                    d.y * BASE_MOVE_SPEED * delta * speedMult / totMove);
+            Point direction = new Point(getPoint().x + d.x, getPoint().y + d.y);
             rotateToFace(direction);
-            getPoint().x += d.x;
-            getPoint().y += d.y;
+            setPoint(new Point(getPoint().x + d.x, getPoint().y + d.y));
             incAnimation(delta);
         } else {
             resetAnimation();
@@ -104,9 +103,7 @@ public class Player extends AbstractDrawable {
         } else {
             batch.draw(animationHolding[getAnimationIndex()], getPoint().x, getPoint().y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
             Texture inHand = holding.getHandImage();
-            Point itemp = new Point();
-            itemp.x = getPoint().x + getWidth() / 22;
-            itemp.y = getPoint().y - getHeight() / 3;
+            Point itemp = new Point(getPoint().x + getWidth() / 22, getPoint().y - getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();

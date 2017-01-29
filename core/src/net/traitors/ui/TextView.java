@@ -28,10 +28,10 @@ public class TextView extends Stage {
             case left:
                 break;
             case right:
-                p.x -= width;
+                p = new Point(p.x - width, p.y);
                 break;
             case center:
-                p.x -= width / 2;
+                p = new Point(p.x - width / 2, p.y);
                 break;
 
         }
@@ -51,9 +51,8 @@ public class TextView extends Stage {
      */
     public void drawStringInWorld(Camera camera, BitmapFont font, CharSequence text, Point pos, Align align, float width) {
         Point p = new Point(pos.x, pos.y);
-        p.project(camera);
-        p.x /= getWidth();
-        p.y /= getHeight();
+        p = p.project(camera);
+        p = new Point(p.x / getWidth(), p.y / getHeight());
 
         drawStringOnScreen(font, text, p, align, width);
     }

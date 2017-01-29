@@ -9,9 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class TextureCreator {
 
-    private static Texture tileTexture;
+    private static TextureRegion tileTexture;
 
-    public static Texture getTileTexture() {
+    public static TextureRegion getTileTexture() {
         if (tileTexture == null) {
             int width = 100;
             int height = 100;
@@ -28,7 +28,7 @@ public class TextureCreator {
             pixmap.setColor(centerColor);
             pixmap.fillRectangle(edgeThickness + splashThickness, edgeThickness + splashThickness,
                     width - (edgeThickness + splashThickness) * 2, height - (edgeThickness + splashThickness) * 2);
-            tileTexture = new Texture(pixmap);
+            tileTexture = new TextureRegion(new Texture(pixmap));
         }
         return tileTexture;
     }

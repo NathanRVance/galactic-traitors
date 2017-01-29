@@ -27,8 +27,6 @@ public abstract class AbstractDrawable implements Drawable, Disposable {
 
     @Override
     public void draw(Batch batch, float x, float y, float width, float height) {
-        point.x = x;
-        point.y = y;
         draw(batch);
     }
 
@@ -36,6 +34,10 @@ public abstract class AbstractDrawable implements Drawable, Disposable {
 
     public Point getPoint() {
         return point;
+    }
+
+    public void setPoint(Point point) {
+        this.point = point;
     }
 
     @Override
