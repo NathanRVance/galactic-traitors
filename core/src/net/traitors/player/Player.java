@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import net.traitors.item.Item;
+import net.traitors.tile.Platform;
 import net.traitors.util.Controls;
 import net.traitors.util.Point;
 import net.traitors.util.Thing;
@@ -24,6 +25,7 @@ public class Player implements Thing {
     //Time, in seconds, it takes to run through the animation
     private float animationLength = 1;
     private Point point = new Point();
+    private Platform platform = null;
 
     public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
         animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
@@ -127,17 +129,24 @@ public class Player implements Thing {
     }
 
     @Override
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
+    @Override
     public void draw(Batch batch) {
+        Point worldPoint = (platform == null)? point : platform.convertToWorldCoordinates(point);
+        float worldRotation = (platform == null)? rotation : platform.convertToWorldRotation(rotation);
         if (holding == null) {
-            batch.draw(animation[getAnimationIndex()], getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+            batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation);
         } else {
-            batch.draw(animationHolding[getAnimationIndex()], getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+            batch.draw(animationHolding[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation);
             Texture inHand = holding.getHandImage();
-            Point itemp = new Point(getPoint().x + getWidth() / 22, getPoint().y - getHeight() / 3);
+            Point itemp = new Point(worldPoint.x + getWidth() / 22, worldPoint.y - getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();
-            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, getPoint().x - itemp.x + getWidth() / 2, getPoint().y - itemp.y + getHeight() / 2, width, height, 1, 1, rotation);
+            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, worldPoint.x - itemp.x + getWidth() / 2, worldPoint.y - itemp.y + getHeight() / 2, width, height, 1, 1, worldRotation);
         }
     }
 

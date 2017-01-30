@@ -13,6 +13,7 @@ public class Tile implements Thing {
 
     private Point point = new Point();
     private float rotation = 0f;
+    private Platform platform;
 
     public Tile() {
         texture = TextureCreator.getTileTexture();
@@ -49,8 +50,15 @@ public class Tile implements Thing {
     }
 
     @Override
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
+    @Override
     public void draw(Batch batch) {
-        batch.draw(texture, getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (rotation / Math.PI * 180));
+        Point worldPoint = (platform == null)? point : platform.convertToWorldCoordinates(point);
+        float worldRotation = (platform == null)? rotation : platform.convertToWorldRotation(rotation);
+        batch.draw(texture, worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (worldRotation / Math.PI * 180));
     }
 
 }

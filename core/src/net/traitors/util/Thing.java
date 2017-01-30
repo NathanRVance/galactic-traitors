@@ -2,6 +2,8 @@ package net.traitors.util;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.tile.Platform;
+
 public interface Thing {
 
     /**
@@ -37,7 +39,15 @@ public interface Thing {
     float getHeight();
 
     /**
-     * Draw this thing using its point, rotation, width, and height
+     * Register this thing with a platform that will allow keeping track of points and rotations
+     * relative to the platform
+     *
+     * @param platform the platform this thing is on
+     */
+    void setPlatform(Platform platform);
+
+    /**
+     * Draw this thing using its point, rotation, width, height, and platform
      *
      * @param batch batch used to draw this thing
      */

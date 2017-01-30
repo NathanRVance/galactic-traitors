@@ -3,7 +3,6 @@ package net.traitors.tile;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.util.Point;
-import net.traitors.util.Thing;
 
 public class TileGrid implements Platform {
 
@@ -20,8 +19,8 @@ public class TileGrid implements Platform {
             grid[column] = new Tile[height];
             for (int row = 0; row < height; row++) {
                 grid[column][row] = new Tile();
-                grid[column][row].setPoint(new Point(column - (width-1f) / 2, row - (height-1f) / 2));
-                platform.addThing(grid[column][row]);
+                grid[column][row].setPlatform(this);
+                grid[column][row].setPoint(new Point(column - (width - 1f) / 2, row - (height - 1f) / 2));
             }
         }
     }
@@ -57,6 +56,11 @@ public class TileGrid implements Platform {
     }
 
     @Override
+    public void setPlatform(Platform platform) {
+        this.platform.setPlatform(platform);
+    }
+
+    @Override
     public void draw(Batch batch) {
         for (Tile[] column : grid) {
             for (Tile tile : column) {
@@ -66,18 +70,13 @@ public class TileGrid implements Platform {
     }
 
     @Override
-    public void setTranslationalVelocity(Point velocity) {
-        platform.setTranslationalVelocity(velocity);
-    }
-
-    @Override
     public Point getTranslationalVelocity() {
         return platform.getTranslationalVelocity();
     }
 
     @Override
-    public void setRotationalVelocity(float velocity) {
-        platform.setRotationalVelocity(velocity);
+    public void setTranslationalVelocity(Point velocity) {
+        platform.setTranslationalVelocity(velocity);
     }
 
     @Override
@@ -86,17 +85,22 @@ public class TileGrid implements Platform {
     }
 
     @Override
-    public void addThing(Thing thing) {
-        platform.addThing(thing);
-    }
-
-    @Override
-    public void removeThing(Thing thing) {
-        platform.removeThing(thing);
+    public void setRotationalVelocity(float velocity) {
+        platform.setRotationalVelocity(velocity);
     }
 
     @Override
     public void move(float delta) {
         platform.move(delta);
+    }
+
+    @Override
+    public Point convertToWorldCoordinates(Point point) {
+        return platform.convertToWorldCoordinates(point);
+    }
+
+    @Override
+    public float convertToWorldRotation(float rotation) {
+        return platform.convertToWorldRotation(rotation);
     }
 }

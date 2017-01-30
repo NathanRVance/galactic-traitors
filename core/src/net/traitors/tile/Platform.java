@@ -13,10 +13,10 @@ public interface Platform extends Thing {
 
     float getRotationalVelocity();
 
-    void addThing(Thing thing);
-
-    void removeThing(Thing thing);
-
     void move(float delta);
+
+    Point convertToWorldCoordinates(Point point);
+
+    float convertToWorldRotation(float rotation);
 
 }
