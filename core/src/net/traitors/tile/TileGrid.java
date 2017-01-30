@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import net.traitors.util.Point;
 import net.traitors.util.Thing;
 
-public class TileGrid implements Thing {
+public class TileGrid implements Platform {
 
     private final float width;
     private final float height;
     private Tile[][] grid;
-    private Point point = new Point();
     private float rotation = 0f;
+    private Platform platform = new DelegatablePlatform();
 
     public TileGrid(int width, int height) {
         this.width = width;
@@ -21,29 +21,29 @@ public class TileGrid implements Thing {
             grid[column] = new Tile[height];
             for (int row = 0; row < height; row++) {
                 grid[column][row] = new Tile();
-                grid[column][row].setPoint(new Point(point.x + column + .5f, point.y + row + .5f));
+                grid[column][row].setPoint(new Point(platform.getPoint().x + column + .5f, platform.getPoint().y + row + .5f));
             }
         }
     }
 
     @Override
     public Point getPoint() {
-        return point;
+        return platform.getPoint();
     }
 
     @Override
     public void setPoint(Point point) {
-        this.point = point;
+        platform.setPoint(point);
     }
 
     @Override
     public float getRotation() {
-        return rotation;
+        return platform.getRotation();
     }
 
     @Override
     public void setRotation(float rotation) {
-        this.rotation = rotation;
+        platform.setRotation(rotation);
     }
 
     @Override
@@ -63,5 +63,40 @@ public class TileGrid implements Thing {
                 tile.draw(batch);
             }
         }
+    }
+
+    @Override
+    public void setTranslationalVelocity(Point velocity) {
+        platform.setTranslationalVelocity(velocity);
+    }
+
+    @Override
+    public Point getTranslationalVelocity() {
+        return platform.getTranslationalVelocity();
+    }
+
+    @Override
+    public void setRotationalVelocity(float velocity) {
+
+    }
+
+    @Override
+    public float getRotationalVelocity() {
+        return 0;
+    }
+
+    @Override
+    public void addThing(Thing thing) {
+
+    }
+
+    @Override
+    public void removeThing(Thing thing) {
+
+    }
+
+    @Override
+    public void move(float delta) {
+
     }
 }
