@@ -7,32 +7,46 @@ import net.traitors.tile.Platform;
 public interface Thing {
 
     /**
-     * Get the center of mass of this thing
+     * Get the center of mass of this thing relative to the platform it is on
      *
      * @return center of mass
      */
     Point getPoint();
 
     /**
-     * Set the center fo mass of this thing
+     * Set the center of mass of this thing relative to the platform it is on
      *
      * @param point center of mass
      */
     void setPoint(Point point);
 
     /**
-     * Get the current rotation of this thing
+     * Get the center of mass of this thing relative to world coordinates
+     *
+     * @return center of mass
+     */
+    Point getWorldPoint();
+
+    /**
+     * Get the current rotation of this thing relative to the platform it is on
      *
      * @return rotation in radians
      */
     float getRotation();
 
     /**
-     * Set the current rotation of this thing
+     * Set the current rotation of this thing relative to the platform it is on
      *
      * @param rotation rotation in radians
      */
     void setRotation(float rotation);
+
+    /**
+     * Get the current rotation of this thing relative to the world
+     *
+     * @return rotation in radians
+     */
+    float getWorldRotation();
 
     float getWidth();
 

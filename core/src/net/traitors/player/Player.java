@@ -35,9 +35,9 @@ public class Player implements Thing {
     public void rotateToFace(Point point) {
         float distance = (float) Math.sqrt(Math.pow(point.x - getPoint().x, 2) + Math.pow(point.y - getPoint().y, 2));
         //Player starts facing downward
-        float rotation = (float) (Math.asin((point.x - getPoint().x) / distance) * 180 / Math.PI);
-        if (point.y > getPoint().y) rotation = 180 - rotation;
-        this.rotation = rotation;
+        float rotation = (float) (Math.asin((point.x - getPoint().x) / distance));
+        if (point.y > getPoint().y) rotation = (float) Math.PI - rotation;
+        setRotation(rotation);
     }
 
     private void setAnimationLength(float animationLength) {
@@ -109,6 +109,11 @@ public class Player implements Thing {
     }
 
     @Override
+    public Point getWorldPoint() {
+        return (platform == null) ? getPoint() : platform.convertToWorldCoordinates(getPoint());
+    }
+
+    @Override
     public float getRotation() {
         return rotation;
     }
@@ -116,6 +121,15 @@ public class Player implements Thing {
     @Override
     public void setRotation(float rotation) {
         this.rotation = rotation;
+    }
+
+    @Override
+    public float getWorldRotation() {
+        return (platform == null) ? getRotation() : platform.convertToWorldRotation(getRotation());
+    }
+
+    public float getPlatformRotation() {
+        return (platform == null) ? 0f : platform.getWorldRotation();
     }
 
     @Override
@@ -135,18 +149,18 @@ public class Player implements Thing {
 
     @Override
     public void draw(Batch batch) {
-        Point worldPoint = (platform == null)? point : platform.convertToWorldCoordinates(point);
-        float worldRotation = (platform == null)? rotation : platform.convertToWorldRotation(rotation);
+        Point worldPoint = getWorldPoint();
+        float worldRotation = getWorldRotation();
         if (holding == null) {
-            batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation);
+            batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (worldRotation / Math.PI * 180));
         } else {
-            batch.draw(animationHolding[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation);
+            batch.draw(animationHolding[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (worldRotation / Math.PI * 180));
             Texture inHand = holding.getHandImage();
             Point itemp = new Point(worldPoint.x + getWidth() / 22, worldPoint.y - getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();
-            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, worldPoint.x - itemp.x + getWidth() / 2, worldPoint.y - itemp.y + getHeight() / 2, width, height, 1, 1, worldRotation);
+            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, worldPoint.x - itemp.x + getWidth() / 2, worldPoint.y - itemp.y + getHeight() / 2, width, height, 1, 1, (float) (worldRotation / Math.PI * 180));
         }
     }
 

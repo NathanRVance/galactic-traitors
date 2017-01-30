@@ -18,12 +18,25 @@ public class Point {
         this.y = y;
     }
 
+    public Point(Vector3 vector) {
+        this.x = vector.x;
+        this.y = vector.y;
+    }
+
     public float distance(Point other) {
         return (float) Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));
     }
 
     public float distanceFromZero() {
         return (float) Math.sqrt(x * x + y * y);
+    }
+
+    public Point add(Point other) {
+        return new Point(x + other.x, y + other.y);
+    }
+
+    public Point subtract(Point other) {
+        return new Point(x - other.x, y - other.y);
     }
 
     public Point unproject(Camera camera) {

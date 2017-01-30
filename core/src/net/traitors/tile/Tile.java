@@ -30,6 +30,11 @@ public class Tile implements Thing {
     }
 
     @Override
+    public Point getWorldPoint() {
+        return (platform == null) ? getPoint() : platform.convertToWorldCoordinates(getPoint());
+    }
+
+    @Override
     public float getRotation() {
         return rotation;
     }
@@ -37,6 +42,11 @@ public class Tile implements Thing {
     @Override
     public void setRotation(float rotation) {
         this.rotation = rotation;
+    }
+
+    @Override
+    public float getWorldRotation() {
+        return (platform == null) ? getRotation() : platform.convertToWorldRotation(getRotation());
     }
 
     @Override
@@ -56,8 +66,8 @@ public class Tile implements Thing {
 
     @Override
     public void draw(Batch batch) {
-        Point worldPoint = (platform == null)? point : platform.convertToWorldCoordinates(point);
-        float worldRotation = (platform == null)? rotation : platform.convertToWorldRotation(rotation);
+        Point worldPoint = getWorldPoint();
+        float worldRotation = getWorldRotation();
         batch.draw(texture, worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (worldRotation / Math.PI * 180));
     }
 

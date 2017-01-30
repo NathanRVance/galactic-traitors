@@ -9,7 +9,7 @@ public class DelegatablePlatform implements Platform {
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
 
-    private Point position = new Point();
+    private Point point = new Point();
     private float rotation = 0f;
 
     private Platform platform = null;
@@ -37,8 +37,8 @@ public class DelegatablePlatform implements Platform {
     @Override
     public void move(float delta) {
         //These methods handle moving the things in stuff
-        setPoint(new Point(position.x + translationalVelocity.x * delta, position.y + translationalVelocity.y * delta));
-        setRotation((rotation + rotationalVelocity * delta) % (float) (Math.PI * 2));
+        setPoint(new Point(getPoint().x + translationalVelocity.x * delta, getPoint().y + translationalVelocity.y * delta));
+        setRotation((getRotation() + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
 
     @Override
@@ -46,14 +46,14 @@ public class DelegatablePlatform implements Platform {
         //First convert to the coordinates of the platform one level up (if there is one)
         //Resolve rotation induced differences
         if (!point.equals(new Point())) {
-            float d = point.distance(new Point());
+            float d = point.distanceFromZero();
             float angle = (float) Math.asin((point.y) / d);
             if (point.x < 0) angle = (float) Math.PI - angle;
-            angle += rotation;
+            angle += getRotation();
             point = new Point((float) Math.cos(angle) * d, (float) Math.sin(angle) * d);
         }
         //And translation
-        point = new Point(point.x + position.x, point.y + position.y);
+        point = new Point(point.x + getPoint().x, point.y + getPoint().y);
 
         //Then, convert from that platform's coordinates
         if (platform != null) {
@@ -65,8 +65,8 @@ public class DelegatablePlatform implements Platform {
 
     @Override
     public float convertToWorldRotation(float rotation) {
-        rotation = (rotation + this.rotation) % (float) (Math.PI * 2);
-        if(platform != null) {
+        rotation = (rotation + getRotation()) % (float) (Math.PI * 2);
+        if (platform != null) {
             return platform.convertToWorldRotation(rotation);
         } else {
             return rotation;
@@ -75,12 +75,17 @@ public class DelegatablePlatform implements Platform {
 
     @Override
     public Point getPoint() {
-        return position;
+        return point;
     }
 
     @Override
     public void setPoint(Point point) {
-        this.position = point;
+        this.point = point;
+    }
+
+    @Override
+    public Point getWorldPoint() {
+        return (platform == null) ? getPoint() : platform.convertToWorldCoordinates(getPoint());
     }
 
     @Override
@@ -91,6 +96,11 @@ public class DelegatablePlatform implements Platform {
     @Override
     public void setRotation(float rotation) {
         this.rotation = rotation;
+    }
+
+    @Override
+    public float getWorldRotation() {
+        return (platform == null) ? getRotation() : platform.convertToWorldRotation(getRotation());
     }
 
     @Override

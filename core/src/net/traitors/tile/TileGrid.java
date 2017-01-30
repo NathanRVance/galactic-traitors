@@ -36,6 +36,11 @@ public class TileGrid implements Platform {
     }
 
     @Override
+    public Point getWorldPoint() {
+        return platform.getWorldPoint();
+    }
+
+    @Override
     public float getRotation() {
         return platform.getRotation();
     }
@@ -43,6 +48,11 @@ public class TileGrid implements Platform {
     @Override
     public void setRotation(float rotation) {
         platform.setRotation(rotation);
+    }
+
+    @Override
+    public float getWorldRotation() {
+        return platform.getWorldRotation();
     }
 
     @Override

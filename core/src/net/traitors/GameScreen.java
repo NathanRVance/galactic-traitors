@@ -3,9 +3,11 @@ package net.traitors;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.traitors.player.Player;
@@ -30,9 +32,10 @@ public class GameScreen implements Screen {
         this.game = game;
         player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
         player.setPoint(new Point(2, 2));
-        tiles = new TileGrid(2, 2);
+        tiles = new TileGrid(3, 3);
         tiles.setPoint(new Point(1, 1));
         tiles.setRotationalVelocity(1);
+        player.setPlatform(tiles);
         camera = new OrthographicCamera();
         uiControls = new TouchControls();
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new Input(camera)));
@@ -70,9 +73,18 @@ public class GameScreen implements Screen {
         uiControls.act();
         player.move(delta);
         tiles.move(delta);
-        camera.translate(player.getPoint().x - camera.position.x, player.getPoint().y - camera.position.y);
+        Point playerWorldPoint = player.getWorldPoint();
+        camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
+        float playerAngle = player.getPlatformRotation() * MathUtils.radiansToDegrees;
+        float cameraAngle = -getCameraCurrentXYAngle(camera) + 180;
+        camera.rotate((cameraAngle-playerAngle)+180);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+    }
+
+    private float getCameraCurrentXYAngle(Camera cam)
+    {
+        return (float)Math.atan2(cam.up.x, cam.up.y)*MathUtils.radiansToDegrees;
     }
 
     @Override
