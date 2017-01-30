@@ -50,7 +50,7 @@ public class Tile implements Thing {
 
     @Override
     public void draw(Batch batch) {
-        batch.draw(texture, getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation);
+        batch.draw(texture, getPoint().x - getWidth() / 2, getPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (rotation / Math.PI * 180));
     }
 
 }

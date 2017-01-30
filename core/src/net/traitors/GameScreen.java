@@ -30,8 +30,9 @@ public class GameScreen implements Screen {
         this.game = game;
         player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
         player.setPoint(new Point(2, 2));
-        tiles = new TileGrid(30, 20);
+        tiles = new TileGrid(2, 2);
         tiles.setPoint(new Point(1, 1));
+        tiles.setRotationalVelocity(1);
         camera = new OrthographicCamera();
         uiControls = new TouchControls();
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new Input(camera)));
@@ -68,6 +69,7 @@ public class GameScreen implements Screen {
     private void doMoves(float delta) {
         uiControls.act();
         player.move(delta);
+        tiles.move(delta);
         camera.translate(player.getPoint().x - camera.position.x, player.getPoint().y - camera.position.y);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);

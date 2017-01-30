@@ -19,23 +19,23 @@ public class DelegatablePlatform implements Platform {
     private float rotation = 0f;
 
     @Override
-    public void setTranslationalVelocity(Point velocity) {
-        translationalVelocity = velocity;
-    }
-
-    @Override
     public Point getTranslationalVelocity() {
         return translationalVelocity;
     }
 
     @Override
-    public void setRotationalVelocity(float velocity) {
-        rotationalVelocity = velocity;
+    public void setTranslationalVelocity(Point velocity) {
+        translationalVelocity = velocity;
     }
 
     @Override
     public float getRotationalVelocity() {
         return rotationalVelocity;
+    }
+
+    @Override
+    public void setRotationalVelocity(float velocity) {
+        rotationalVelocity = velocity;
     }
 
     @Override
@@ -50,23 +50,9 @@ public class DelegatablePlatform implements Platform {
 
     @Override
     public void move(float delta) {
-        position = new Point(position.x + translationalVelocity.x * delta, position.y + translationalVelocity.y * delta);
-        rotation = (rotation + rotationalVelocity * delta) % (float) (Math.PI * 2);
-
-        //Move stuff
-        for (Thing thing : stuff) {
-            Point thingp = thing.getPoint();
-            //Translation
-            thingp = new Point(thingp.x + translationalVelocity.x * delta,
-                    thingp.y + translationalVelocity.y * delta);
-            //Rotation
-            float d = thingp.distance(position);
-            float angle = (float) Math.asin(thingp.y / d);
-            angle += rotationalVelocity * delta;
-            thingp = new Point((float) Math.cos(angle) * d, (float) Math.sin(angle) * d);
-
-            thing.setPoint(thingp);
-        }
+        //These methods handle moving the things in stuff
+        setPoint(new Point(position.x + translationalVelocity.x * delta, position.y + translationalVelocity.y * delta));
+        setRotation((rotation + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
 
     @Override
@@ -76,7 +62,11 @@ public class DelegatablePlatform implements Platform {
 
     @Override
     public void setPoint(Point point) {
+        Point change = new Point(point.x - position.x, point.y - position.y);
         this.position = point;
+        for (Thing thing : stuff) {
+            thing.setPoint(new Point(thing.getPoint().x + change.x, thing.getPoint().y + change.y));
+        }
     }
 
     @Override
@@ -86,7 +76,20 @@ public class DelegatablePlatform implements Platform {
 
     @Override
     public void setRotation(float rotation) {
+        float change = rotation - this.rotation;
         this.rotation = rotation;
+        for (Thing thing : stuff) {
+            Point thingp = thing.getPoint();
+            if(thingp.equals(position)) continue;
+            float d = thingp.distance(position);
+            float angle = (float) Math.asin((thingp.y - position.y) / d);
+            if(thingp.x < position.x) angle = (float) Math.PI - angle;
+            angle += change;
+            thingp = new Point((float) Math.cos(angle) * d + position.x, (float) Math.sin(angle) * d + position.y);
+
+            thing.setPoint(thingp);
+            thing.setRotation(thing.getRotation() + change);
+        }
     }
 
     //We don't care about methods below here. The class that delegates to this class should handle them.

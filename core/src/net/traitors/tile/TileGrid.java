@@ -10,7 +10,6 @@ public class TileGrid implements Platform {
     private final float width;
     private final float height;
     private Tile[][] grid;
-    private float rotation = 0f;
     private Platform platform = new DelegatablePlatform();
 
     public TileGrid(int width, int height) {
@@ -21,7 +20,8 @@ public class TileGrid implements Platform {
             grid[column] = new Tile[height];
             for (int row = 0; row < height; row++) {
                 grid[column][row] = new Tile();
-                grid[column][row].setPoint(new Point(platform.getPoint().x + column + .5f, platform.getPoint().y + row + .5f));
+                grid[column][row].setPoint(new Point(column - (width-1f) / 2, row - (height-1f) / 2));
+                platform.addThing(grid[column][row]);
             }
         }
     }
@@ -77,26 +77,26 @@ public class TileGrid implements Platform {
 
     @Override
     public void setRotationalVelocity(float velocity) {
-
+        platform.setRotationalVelocity(velocity);
     }
 
     @Override
     public float getRotationalVelocity() {
-        return 0;
+        return platform.getRotationalVelocity();
     }
 
     @Override
     public void addThing(Thing thing) {
-
+        platform.addThing(thing);
     }
 
     @Override
     public void removeThing(Thing thing) {
-
+        platform.removeThing(thing);
     }
 
     @Override
     public void move(float delta) {
-
+        platform.move(delta);
     }
 }
