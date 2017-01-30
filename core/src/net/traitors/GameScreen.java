@@ -12,7 +12,6 @@ import net.traitors.player.Player;
 import net.traitors.tile.TileGrid;
 import net.traitors.ui.TextView;
 import net.traitors.ui.TouchControls;
-import net.traitors.util.AbstractDrawable;
 import net.traitors.util.Controls;
 import net.traitors.util.Point;
 
@@ -20,7 +19,7 @@ import java.util.List;
 
 public class GameScreen implements Screen {
     private static Player player;
-    private AbstractDrawable tiles;
+    private TileGrid tiles;
     private OrthographicCamera camera;
     private GalacticTraitors game;
     private int numTaps = 0;
@@ -106,8 +105,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        tiles.dispose();
-        player.dispose();
         uiControls.dispose();
     }
 }

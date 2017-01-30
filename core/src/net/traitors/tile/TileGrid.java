@@ -20,7 +20,8 @@ public class TileGrid implements Thing {
         for (int column = 0; column < width; column++) {
             grid[column] = new Tile[height];
             for (int row = 0; row < height; row++) {
-                grid[column][row] = new AbstractTile();
+                grid[column][row] = new Tile();
+                grid[column][row].setPoint(new Point(point.x + column + .5f, point.y + row + .5f));
             }
         }
     }
@@ -57,9 +58,9 @@ public class TileGrid implements Thing {
 
     @Override
     public void draw(Batch batch) {
-        for (int column = 0; column < grid.length; column++) {
-            for (int row = 0; row < grid[column].length; row++) {
-                batch.draw(grid[column][row].getTexture(), getPoint().x + column, getPoint().y + row, 1, 1);
+        for (Tile[] column : grid) {
+            for (Tile tile : column) {
+                tile.draw(batch);
             }
         }
     }
