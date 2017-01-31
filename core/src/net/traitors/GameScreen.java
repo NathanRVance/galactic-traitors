@@ -6,64 +6,46 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.traitors.player.Player;
-import net.traitors.tile.AbstractPlatform;
 import net.traitors.tile.Platform;
 import net.traitors.tile.TileGrid;
+import net.traitors.tile.UniverseTile;
 import net.traitors.ui.TextView;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.Controls;
 import net.traitors.util.Overlapper;
 import net.traitors.util.Point;
 import net.traitors.util.Thing;
+import net.traitors.util.TreeNode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class GameScreen implements Screen {
+    public static final float WORLD_DIM = 1000;
     private static Player player;
     private static OrthographicCamera camera;
-    private Map<Thing, Set<Thing>> overlaps = new HashMap<Thing, Set<Thing>>();
     private GalacticTraitors game;
     private int numTaps = 0;
     private Stage uiControls;
     private TextView textView;
     private List<Thing> stuff = new ArrayList<Thing>();
 
-    public static final float WORLD_DIM = 1000;
-
     GameScreen(GalacticTraitors game) {
         this.game = game;
 
-        Platform world = new AbstractPlatform() {
-            @Override
-            public float getWidth() {
-                return WORLD_DIM;
-            }
-
-            @Override
-            public float getHeight() {
-                return WORLD_DIM;
-            }
-
-            @Override
-            public void draw(Batch batch) {
-                //Do nothing
-            }
-        };
+        Platform world = new UniverseTile();
         world.setPoint(new Point(0, 0));
         stuff.add(world);
 
-        //TileGrid t = new TileGrid(50, 2);
-        //t.setPoint(new Point(0, -20));
-        //t.setRotationalVelocity(-.5f);
-        //stuff.add(t);
+        TileGrid t = new TileGrid(50, 2);
+        t.setPoint(new Point(0, -20));
+        t.setRotationalVelocity(-.3f);
+        stuff.add(t);
 
         TileGrid tiles = new TileGrid(4, 3);
         tiles.setPoint(new Point(1, 2));
@@ -73,18 +55,28 @@ public class GameScreen implements Screen {
         TileGrid moreTiles = new TileGrid(3, 3);
         moreTiles.setPoint(new Point(1, 1));
         moreTiles.setRotationalVelocity(-1);
-        moreTiles.setPlatform(tiles);
         stuff.add(moreTiles);
 
         tiles = new TileGrid(1, 1);
         tiles.setPoint(new Point(1, 2));
-        tiles.setRotation(1);
+        tiles.setRotationalVelocity(1);
         stuff.add(tiles);
 
         player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
         player.setPoint(new Point(-2, 2));
         player.setPlatform(moreTiles);
         stuff.add(player);
+
+        Collections.sort(stuff, new Comparator<Thing>() {
+            @Override
+            public int compare(Thing thing1, Thing thing2) {
+                float surfaceArea1 = thing1.getHeight() * thing1.getWidth();
+                float surfaceArea2 = thing2.getHeight() * thing2.getWidth();
+                if (surfaceArea1 > surfaceArea2) return -1;
+                if (surfaceArea1 < surfaceArea2) return 1;
+                return 0;
+            }
+        });
 
         camera = new OrthographicCamera();
         uiControls = new TouchControls();
@@ -124,18 +116,8 @@ public class GameScreen implements Screen {
             thing.act(delta);
         }
 
-        System.out.println("Doing overlap stuff");
-        //Interpret as "set of values is on key"
-        overlaps = Overlapper.getOverlaps(stuff, overlaps);
-        for (Thing thing : stuff) {
-            if (thing instanceof Platform) {
-                for (Thing overlapped : overlaps.get(thing)) {
-                    //We don't want cycles of stuff on stuff on the first stuff, so put small stuff on big stuff
-                    if (thing.getWidth() * thing.getHeight() > overlapped.getWidth() * overlapped.getHeight()) {
-                        overlapped.setPlatform((Platform) thing);
-                    }
-                }
-            }
+        for (TreeNode tree : Overlapper.getOverlaps(stuff)) {
+            placeThings(null, tree);
         }
 
         Point playerWorldPoint = player.getWorldPoint();
@@ -150,6 +132,13 @@ public class GameScreen implements Screen {
         }
         if (Gdx.input.justTouched()) {
             numTaps++;
+        }
+    }
+
+    private void placeThings(Platform parent, TreeNode child) {
+        child.getThing().setPlatform(parent);
+        for (TreeNode treeNode : child.getChildren()) {
+            placeThings((Platform) child.getThing(), treeNode);
         }
     }
 

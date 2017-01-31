@@ -1,45 +1,49 @@
 package net.traitors.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class Overlapper {
 
-    private static float OVERLAP_BUFFER = .1f;
-
     /**
-     * Pairs every thing with the other things it overlaps with
+     * Puts stuff in trees
      *
-     * @param stuff        all the things we're dealing with
-     * @param lastOverlaps previous overlaps will have a little buffer in the calculation
-     * @return Mapping of every thing in stuff to every thing it's touching.
+     * @param stuff all the things we're dealing with, sorted by stacking
+     *              precedence (earlier in the list ends up on bottom of stacks)
+     * @return Set of trees of things where the root is at the bottom
      */
-    public static Map<Thing, Set<Thing>> getOverlaps(List<Thing> stuff, Map<Thing, Set<Thing>> lastOverlaps) {
-        List<RotRec> recs = new ArrayList<RotRec>(stuff.size());
-        Map<Thing, Set<Thing>> overlaps = new HashMap<Thing, Set<Thing>>();
-        for (Thing thing : stuff) {
-            recs.add(new RotRec(thing.getWorldPoint(), thing.getWidth(), thing.getHeight(), thing.getWorldRotation(), thing));
-            overlaps.put(thing, new HashSet<Thing>());
+    public static Set<TreeNode> getOverlaps(List<Thing> stuff) {
+        Set<TreeNode> thingTrees = new HashSet<TreeNode>();
+
+        //Turn the things into unassembled tree nodes, but reverse the order.
+        List<TreeNode> nodes = new ArrayList<TreeNode>(stuff.size());
+        for (int i = stuff.size() - 1; i >= 0; i--) {
+            nodes.add(new TreeNode(new RotRec(stuff.get(i))));
         }
 
-        //"Premature optimization is the root of all evil" - Donald Knuth
-        //TODO: Optimize this
-        for (RotRec r1 : recs) {
-            for (RotRec r2 : recs) {
-                if (r1 != r2 && r1.contains(r2.point, lastOverlaps.containsKey(r1.thing) && lastOverlaps.get(r1.thing).contains(r2.thing))) {
-                    overlaps.get(r1.thing).add(r2.thing);
+        //Instead, go through stuff in reverse and add each thing to the smallest platform that it overlaps with.
+
+        for (int i = 0; i < nodes.size(); i++) {
+            TreeNode node = nodes.get(i);
+            boolean placed = false;
+            for (int j = i + 1; j < nodes.size(); j++) {
+                if (nodes.get(j).getRotRet().contains(node.getRotRet().point)) {
+                    nodes.get(j).addChild(node);
+                    placed = true;
+                    break;
                 }
+            }
+            if (!placed) {
+                thingTrees.add(node);
             }
         }
 
-        return overlaps;
+        return thingTrees;
     }
 
-    private static class RotRec {
+    static class RotRec {
 
         Point point;
         float width;
@@ -48,20 +52,18 @@ public class Overlapper {
         Thing thing;
 
         //As always, rotation is in radians
-        RotRec(Point point, float width, float height, float rotation, Thing thing) {
-            this.point = point;
-            this.width = width;
-            this.height = height;
-            this.rotation = rotation;
+        RotRec(Thing thing) {
+            this.point = thing.getWorldPoint();
+            this.width = thing.getWidth();
+            this.height = thing.getHeight();
+            this.rotation = thing.getWorldRotation();
             this.thing = thing;
         }
 
-        boolean contains(Point p, boolean useBuffer) {
+        boolean contains(Point p) {
             //Rotate p to be easier to compare to this rectangle
-            float buffer = (useBuffer) ? OVERLAP_BUFFER : 0;
-            if(useBuffer) System.out.println("Using buffer!");
             p = p.subtract(point).rotate(-rotation);
-            return Math.abs(p.x) <= width / 2 + buffer && Math.abs(p.y) <= height / 2 + buffer;
+            return Math.abs(p.x) <= width / 2 && Math.abs(p.y) <= height / 2;
         }
     }
 
