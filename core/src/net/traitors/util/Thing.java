@@ -61,6 +61,13 @@ public interface Thing {
     void setPlatform(Platform platform);
 
     /**
+     * Do whatever this thing does
+     *
+     * @param delta time since last call to act
+     */
+    void act(float delta);
+
+    /**
      * Draw this thing using its point, rotation, width, height, and platform
      *
      * @param batch batch used to draw this thing

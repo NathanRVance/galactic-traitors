@@ -1,10 +1,8 @@
 package net.traitors.tile;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-
 import net.traitors.util.Point;
 
-public class DelegatablePlatform implements Platform {
+public abstract class AbstractPlatform implements Platform {
 
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
@@ -35,8 +33,7 @@ public class DelegatablePlatform implements Platform {
     }
 
     @Override
-    public void move(float delta) {
-        //These methods handle moving the things in stuff
+    public void act(float delta) {
         setPoint(new Point(getPoint().x + translationalVelocity.x * delta, getPoint().y + translationalVelocity.y * delta));
         setRotation((getRotation() + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
@@ -45,15 +42,11 @@ public class DelegatablePlatform implements Platform {
     public Point convertToWorldCoordinates(Point point) {
         //First convert to the coordinates of the platform one level up (if there is one)
         //Resolve rotation induced differences
-        if (!point.equals(new Point())) {
-            float d = point.distanceFromZero();
-            float angle = (float) Math.asin((point.y) / d);
-            if (point.x < 0) angle = (float) Math.PI - angle;
-            angle += getRotation();
-            point = new Point((float) Math.cos(angle) * d, (float) Math.sin(angle) * d);
+        if (!point.isZero()) {
+            point = point.rotate(getRotation());
         }
         //And translation
-        point = new Point(point.x + getPoint().x, point.y + getPoint().y);
+        point = point.add(getPoint());
 
         //Then, convert from that platform's coordinates
         if (platform != null) {
@@ -61,6 +54,24 @@ public class DelegatablePlatform implements Platform {
         } else {
             return point;
         }
+    }
+
+    @Override
+    public Point convertToPlatformCoordinates(Point point) {
+        //First, convert from world coordinates to the platform one level up (if there is one)
+        if (platform != null) {
+            point = platform.convertToPlatformCoordinates(point);
+        }
+
+        //Then, convert to our coordinates
+        //Resolve translation
+        point = point.subtract(getPoint());
+        //And rotation
+        if (!point.isZero()) {
+            point = point.rotate(-getRotation());
+        }
+
+        return point;
     }
 
     @Override
@@ -105,23 +116,9 @@ public class DelegatablePlatform implements Platform {
 
     @Override
     public void setPlatform(Platform platform) {
+        setPoint(getWorldPoint());
+        if (platform != null)
+            setPoint(platform.convertToPlatformCoordinates(getPoint()));
         this.platform = platform;
-    }
-
-    //We don't care about stuff below here. The class that delegates to this class should handle them.
-
-    @Override
-    public float getWidth() {
-        return 0;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0;
-    }
-
-    @Override
-    public void draw(Batch batch) {
-
     }
 }

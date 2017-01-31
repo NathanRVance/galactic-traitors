@@ -31,12 +31,40 @@ public class Point {
         return (float) Math.sqrt(x * x + y * y);
     }
 
+    /**
+     * Computes the angle of this point as it would be in polar coordinates
+     *
+     * @return angle in radians
+     */
+    public float angle() {
+        float angle = (float) Math.asin((y) / distanceFromZero());
+        if (x < 0) angle = (float) Math.PI - angle;
+        return angle;
+    }
+
+    /**
+     * Rotate this point around (0, 0) by the specified amount
+     *
+     * @param rotation amount to rotate, in radians
+     * @return rotated point
+     */
+    public Point rotate(float rotation) {
+        if(isZero()) return this;
+        float angle = angle() + rotation;
+        float distance = distanceFromZero();
+        return new Point((float) Math.cos(angle) * distance, (float) Math.sin(angle) * distance);
+    }
+
     public Point add(Point other) {
         return new Point(x + other.x, y + other.y);
     }
 
     public Point subtract(Point other) {
         return new Point(x - other.x, y - other.y);
+    }
+
+    public boolean isZero() {
+        return x == 0 && y == 0;
     }
 
     public Point unproject(Camera camera) {
@@ -53,7 +81,7 @@ public class Point {
 
     @Override
     public boolean equals(Object other) {
-        if(! (other instanceof Point)) return false;
+        if (!(other instanceof Point)) return false;
         Point o = (Point) other;
         return x == o.x && y == o.y;
     }

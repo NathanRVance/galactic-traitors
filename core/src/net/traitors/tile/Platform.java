@@ -13,9 +13,9 @@ public interface Platform extends Thing {
 
     float getRotationalVelocity();
 
-    void move(float delta);
-
     Point convertToWorldCoordinates(Point point);
+
+    Point convertToPlatformCoordinates(Point point);
 
     float convertToWorldRotation(float rotation);
 

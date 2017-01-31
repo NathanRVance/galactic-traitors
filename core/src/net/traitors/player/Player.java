@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GameScreen;
 import net.traitors.item.Item;
 import net.traitors.tile.Platform;
 import net.traitors.util.Controls;
@@ -60,7 +62,8 @@ public class Player implements Thing {
         return ret;
     }
 
-    public void move(float delta) {
+    @Override
+    public void act(float delta) {
         float x = 0;
         float y = 0;
         float speedMult = 1;
@@ -80,6 +83,8 @@ public class Player implements Thing {
             speedMult = 3;
         }
         Point d = new Point(x, y);
+        d = d.rotate(GameScreen.getCameraAngle() - getPlatformRotation());
+
         float totMove = d.distanceFromZero();
         if (totMove != 0) {
             setAnimationLength(BASE_ANIMATION_LENGTH / speedMult);
@@ -132,6 +137,10 @@ public class Player implements Thing {
         return (platform == null) ? 0f : platform.getWorldRotation();
     }
 
+    public Point convertToPlatformCoordinates(Point point) {
+        return (platform == null) ? point : platform.convertToPlatformCoordinates(point);
+    }
+
     @Override
     public float getWidth() {
         return .5f;
@@ -144,23 +153,26 @@ public class Player implements Thing {
 
     @Override
     public void setPlatform(Platform platform) {
+        setPoint(getWorldPoint());
+        if (platform != null)
+            setPoint(platform.convertToPlatformCoordinates(getPoint()));
         this.platform = platform;
     }
 
     @Override
     public void draw(Batch batch) {
         Point worldPoint = getWorldPoint();
-        float worldRotation = getWorldRotation();
+        float worldRotation = getRotation();//getWorldRotation();
         if (holding == null) {
-            batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (worldRotation / Math.PI * 180));
+            batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation * MathUtils.radiansToDegrees);
         } else {
-            batch.draw(animationHolding[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (float) (worldRotation / Math.PI * 180));
+            batch.draw(animationHolding[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation * MathUtils.radiansToDegrees);
             Texture inHand = holding.getHandImage();
             Point itemp = new Point(worldPoint.x + getWidth() / 22, worldPoint.y - getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();
-            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, worldPoint.x - itemp.x + getWidth() / 2, worldPoint.y - itemp.y + getHeight() / 2, width, height, 1, 1, (float) (worldRotation / Math.PI * 180));
+            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, worldPoint.x - itemp.x + getWidth() / 2, worldPoint.y - itemp.y + getHeight() / 2, width, height, 1, 1, worldRotation * MathUtils.radiansToDegrees);
         }
     }
 
