@@ -116,6 +116,10 @@ public class GameScreen implements Screen {
             thing.act(delta);
         }
 
+        for (Thing thing : stuff) {
+            thing.setPlatform(null);
+        }
+
         for (TreeNode tree : Overlapper.getOverlaps(stuff)) {
             placeThings(null, tree);
         }

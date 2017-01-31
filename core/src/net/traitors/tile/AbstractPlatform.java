@@ -85,6 +85,14 @@ public abstract class AbstractPlatform implements Platform {
     }
 
     @Override
+    public float convertToPlatformRotation(float rotation) {
+        if (platform != null) {
+            rotation = platform.convertToPlatformRotation(rotation);
+        }
+        return (rotation - getRotation()) % (float) (Math.PI * 2);
+    }
+
+    @Override
     public Point getPoint() {
         return point;
     }
@@ -117,8 +125,11 @@ public abstract class AbstractPlatform implements Platform {
     @Override
     public void setPlatform(Platform platform) {
         setPoint(getWorldPoint());
-        if (platform != null)
+        setRotation(getWorldRotation());
+        if (platform != null) {
             setPoint(platform.convertToPlatformCoordinates(getPoint()));
+            setRotation(platform.convertToPlatformRotation(rotation));
+        }
         this.platform = platform;
     }
 }

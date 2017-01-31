@@ -19,4 +19,6 @@ public interface Platform extends Thing {
 
     float convertToWorldRotation(float rotation);
 
+    float convertToPlatformRotation(float rotation);
+
 }
