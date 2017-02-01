@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import net.traitors.thing.platform.Platform;
 import net.traitors.util.Point;
 
-public interface Thing {
+public interface Thing extends Actor {
 
     /**
      * Get the center of mass of this thing relative to the platform it is on
@@ -60,13 +60,6 @@ public interface Thing {
      * @param platform the platform this thing is on
      */
     void setPlatform(Platform platform);
-
-    /**
-     * Do whatever this thing does
-     *
-     * @param delta time since last call to act
-     */
-    void act(float delta);
 
     /**
      * Draw this thing using its point, rotation, width, height, and platform

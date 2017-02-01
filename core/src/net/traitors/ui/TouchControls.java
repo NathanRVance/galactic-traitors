@@ -6,10 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import net.traitors.thing.item.Gun;
+import net.traitors.thing.player.Player;
 import net.traitors.ui.touchable.Inventory;
+import net.traitors.ui.touchable.SyncCameraButton;
 import net.traitors.ui.touchable.Touchable;
 import net.traitors.ui.touchable.TouchableTouchpad;
 import net.traitors.controls.Controls;
+import net.traitors.util.BetterCamera;
 import net.traitors.util.TextureCreator;
 
 import java.util.HashSet;
@@ -28,7 +31,7 @@ public class TouchControls extends Stage implements Touchable {
 
     private TouchableTouchpad touchpad;
 
-    public TouchControls() {
+    public TouchControls(Player player, BetterCamera camera) {
         super(new ExtendViewport(arbitraryNumber, arbitraryNumber));
         float height = getHeight();
         float width = getWidth();
@@ -41,9 +44,14 @@ public class TouchControls extends Stage implements Touchable {
         addTouchable(touchpad);
 
         float slotWidth = height / 5;
-        Inventory inventory = new Inventory(this, 4, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4);
+        Inventory inventory = new Inventory(this, 5, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4, player);
         addTouchable(inventory);
         inventory.addItem(new Gun());
+
+        float buttonDim = height / 6;
+        SyncCameraButton button = new SyncCameraButton(camera);
+        button.setBounds(0, height - buttonDim, buttonDim, buttonDim);
+        addTouchable(button);
 
         Controls.registerTouchControls(this);
     }

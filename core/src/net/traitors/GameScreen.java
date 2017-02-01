@@ -5,20 +5,20 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import net.traitors.controls.*;
-import net.traitors.thing.player.Player;
+import net.traitors.controls.Controls;
+import net.traitors.thing.Actor;
+import net.traitors.thing.Thing;
 import net.traitors.thing.platform.Platform;
 import net.traitors.thing.platform.TileGrid;
 import net.traitors.thing.platform.UniverseTile;
+import net.traitors.thing.player.Player;
 import net.traitors.ui.TextView;
 import net.traitors.ui.TouchControls;
+import net.traitors.util.BetterCamera;
 import net.traitors.util.Overlapper;
 import net.traitors.util.Point;
-import net.traitors.thing.Thing;
 import net.traitors.util.TreeNode;
 
 import java.util.ArrayList;
@@ -27,12 +27,13 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GameScreen implements Screen {
-    private static Player player;
-    private static OrthographicCamera camera;
+    private Player player;
+    private BetterCamera camera;
     private GalacticTraitors game;
     private int numTaps = 0;
     private Stage uiControls;
     private TextView textView;
+    private List<Actor> actors = new ArrayList<Actor>();
     private List<Thing> stuff = new ArrayList<Thing>();
 
     GameScreen(GalacticTraitors game) {
@@ -78,17 +79,17 @@ public class GameScreen implements Screen {
             }
         });
 
-        camera = new OrthographicCamera();
-        uiControls = new TouchControls();
+        camera = new BetterCamera();
+        player.setCamera(camera);
+        uiControls = new TouchControls(player, camera);
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(camera)));
-    }
 
-    public static Player getPlayer() {
-        return player;
-    }
-
-    public static float getCameraAngle() {
-        return -(float) Math.atan2(camera.up.x, camera.up.y);
+        for(Thing thing : stuff) {
+            actors.add(thing);
+        }
+        actors.remove(player);
+        actors.add(camera);
+        actors.add(player);
     }
 
     @Override
@@ -99,7 +100,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.begin();
-        textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
+        //textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
         for (Thing thing : stuff) {
             thing.draw(game.batch);
         }
@@ -112,23 +113,13 @@ public class GameScreen implements Screen {
     private void doMoves(float delta) {
         uiControls.act();
 
-        for (Thing thing : stuff) {
-            thing.act(delta);
-        }
-
-        for (Thing thing : stuff) {
-            thing.setPlatform(null);
+        for (Actor actor : actors) {
+            actor.act(delta);
         }
 
         for (TreeNode tree : Overlapper.getOverlaps(stuff)) {
             placeThings(null, tree);
         }
-
-        Point playerWorldPoint = player.getWorldPoint();
-        camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
-        rotateTo(camera, player.getPlatformRotation());
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
 
         List<Point> touchesInWorld = Controls.getWorldTouches(camera);
         if (!touchesInWorld.isEmpty()) {
@@ -137,6 +128,13 @@ public class GameScreen implements Screen {
         if (Gdx.input.justTouched()) {
             numTaps++;
         }
+
+        Point playerWorldPoint = player.getWorldPoint();
+        camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
+        camera.rotateWith(player.getPlatform());
+        //camera.act(delta);
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
     }
 
     private void placeThings(Platform parent, TreeNode child) {
@@ -144,11 +142,6 @@ public class GameScreen implements Screen {
         for (TreeNode treeNode : child.getChildren()) {
             placeThings((Platform) child.getThing(), treeNode);
         }
-    }
-
-    //Direction is in radians
-    private void rotateTo(OrthographicCamera camera, float direction) {
-        camera.rotate((getCameraAngle() - direction) * MathUtils.radiansToDegrees);
     }
 
     @Override
@@ -160,7 +153,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
         camera.setToOrtho(false, 5 * aspectRatio, 5);
-        uiControls = new TouchControls();
+        uiControls = new TouchControls(player, camera);
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(camera)));
 
         textView = new TextView();

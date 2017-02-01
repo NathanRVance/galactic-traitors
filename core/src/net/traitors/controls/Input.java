@@ -1,13 +1,14 @@
 package net.traitors.controls;
 
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+
+import net.traitors.util.BetterCamera;
 
 public class Input implements InputProcessor {
 
-    private OrthographicCamera camera;
+    private BetterCamera camera;
 
-    public Input(OrthographicCamera camera) {
+    public Input(BetterCamera camera) {
         this.camera = camera;
     }
 

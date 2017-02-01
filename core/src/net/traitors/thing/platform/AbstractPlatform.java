@@ -2,7 +2,7 @@ package net.traitors.thing.platform;
 
 import net.traitors.util.Point;
 
-public abstract class AbstractPlatform implements Platform {
+abstract class AbstractPlatform implements Platform {
 
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
