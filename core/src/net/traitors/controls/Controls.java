@@ -1,10 +1,11 @@
-package net.traitors.util;
+package net.traitors.controls;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 
 import net.traitors.ui.TouchControls;
+import net.traitors.util.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;

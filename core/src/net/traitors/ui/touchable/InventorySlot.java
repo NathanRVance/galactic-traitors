@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
-import net.traitors.item.Item;
+import net.traitors.thing.item.Item;
 
 class InventorySlot extends Widget implements Touchable {
 

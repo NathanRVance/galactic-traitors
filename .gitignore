@@ -5,6 +5,7 @@ html/war/
 ios/build/
 build/
 .idea/
+.gradle/
 *.class
 *.log
 /bin/

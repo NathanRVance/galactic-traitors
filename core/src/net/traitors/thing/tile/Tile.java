@@ -1,4 +1,4 @@
-package net.traitors.tile;
+package net.traitors.thing.tile;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
-import net.traitors.util.Thing;
+import net.traitors.thing.Thing;
 
 public class Tile implements Thing {
 
@@ -14,7 +14,7 @@ public class Tile implements Thing {
 
     private Point point = new Point();
     private float rotation = 0f;
-    private Platform platform;
+    private net.traitors.thing.platform.Platform platform;
 
     public Tile() {
         texture = TextureCreator.getTileTexture();
@@ -61,7 +61,7 @@ public class Tile implements Thing {
     }
 
     @Override
-    public void setPlatform(Platform platform) {
+    public void setPlatform(net.traitors.thing.platform.Platform platform) {
         this.platform = platform;
     }
 

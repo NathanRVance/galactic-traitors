@@ -3,7 +3,7 @@ package net.traitors.ui.touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
 import net.traitors.GameScreen;
-import net.traitors.item.Item;
+import net.traitors.thing.item.Item;
 import net.traitors.ui.TouchControls;
 
 import java.util.ArrayList;

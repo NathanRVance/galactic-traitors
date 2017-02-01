@@ -24,7 +24,7 @@ public class TreeNode {
         return rotRet;
     }
 
-    public Thing getThing() {
+    public net.traitors.thing.Thing getThing() {
         return rotRet.thing;
     }
 

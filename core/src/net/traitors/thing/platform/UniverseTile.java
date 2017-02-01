@@ -1,4 +1,4 @@
-package net.traitors.tile;
+package net.traitors.thing.platform;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 

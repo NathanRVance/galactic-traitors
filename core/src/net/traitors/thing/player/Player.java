@@ -1,4 +1,4 @@
-package net.traitors.player;
+package net.traitors.thing.player;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -8,11 +8,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GameScreen;
-import net.traitors.item.Item;
-import net.traitors.tile.Platform;
-import net.traitors.util.Controls;
+import net.traitors.thing.item.Item;
+import net.traitors.thing.platform.Platform;
+import net.traitors.controls.Controls;
 import net.traitors.util.Point;
-import net.traitors.util.Thing;
+import net.traitors.thing.Thing;
 
 public class Player implements Thing {
 
@@ -35,11 +35,7 @@ public class Player implements Thing {
     }
 
     public void rotateToFace(Point point) {
-        float distance = (float) Math.sqrt(Math.pow(point.x - getPoint().x, 2) + Math.pow(point.y - getPoint().y, 2));
-        //Player starts facing downward
-        float rotation = (float) (Math.asin((point.x - getPoint().x) / distance));
-        if (point.y > getPoint().y) rotation = (float) Math.PI - rotation;
-        setRotation(rotation);
+        setRotation(point.subtract(getPoint()).angle() + (float) Math.PI / 2);
     }
 
     private void setAnimationLength(float animationLength) {
@@ -95,6 +91,9 @@ public class Player implements Thing {
             setPoint(new Point(getPoint().x + d.x, getPoint().y + d.y));
             incAnimation(delta);
         } else {
+            if(platform != null) {
+                setRotation(rotation + platform.getRotationalVelocity() * delta);
+            }
             resetAnimation();
         }
     }

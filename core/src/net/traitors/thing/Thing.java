@@ -1,8 +1,9 @@
-package net.traitors.util;
+package net.traitors.thing;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
-import net.traitors.tile.Platform;
+import net.traitors.thing.platform.Platform;
+import net.traitors.util.Point;
 
 public interface Thing {
 

@@ -1,4 +1,4 @@
-package net.traitors.item;
+package net.traitors.thing.item;
 
 import com.badlogic.gdx.graphics.Texture;
 

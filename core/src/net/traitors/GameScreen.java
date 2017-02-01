@@ -6,18 +6,19 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import net.traitors.player.Player;
-import net.traitors.tile.Platform;
-import net.traitors.tile.TileGrid;
-import net.traitors.tile.UniverseTile;
+import net.traitors.controls.*;
+import net.traitors.thing.player.Player;
+import net.traitors.thing.platform.Platform;
+import net.traitors.thing.platform.TileGrid;
+import net.traitors.thing.platform.UniverseTile;
 import net.traitors.ui.TextView;
 import net.traitors.ui.TouchControls;
-import net.traitors.util.Controls;
 import net.traitors.util.Overlapper;
 import net.traitors.util.Point;
-import net.traitors.util.Thing;
+import net.traitors.thing.Thing;
 import net.traitors.util.TreeNode;
 
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GameScreen implements Screen {
-    public static final float WORLD_DIM = 1000;
     private static Player player;
     private static OrthographicCamera camera;
     private GalacticTraitors game;
@@ -80,7 +80,7 @@ public class GameScreen implements Screen {
 
         camera = new OrthographicCamera();
         uiControls = new TouchControls();
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new Input(camera)));
+        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(camera)));
     }
 
     public static Player getPlayer() {
@@ -148,7 +148,7 @@ public class GameScreen implements Screen {
 
     //Direction is in radians
     private void rotateTo(OrthographicCamera camera, float direction) {
-        //camera.rotate((getCameraAngle() - direction) * MathUtils.radiansToDegrees);
+        camera.rotate((getCameraAngle() - direction) * MathUtils.radiansToDegrees);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class GameScreen implements Screen {
         float aspectRatio = (float) width / (float) height;
         camera.setToOrtho(false, 5 * aspectRatio, 5);
         uiControls = new TouchControls();
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new Input(camera)));
+        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(camera)));
 
         textView = new TextView();
     }

@@ -1,4 +1,4 @@
-package net.traitors.tile;
+package net.traitors.thing.platform;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
@@ -8,16 +8,16 @@ public class TileGrid extends AbstractPlatform {
 
     private final float width;
     private final float height;
-    private Tile[][] grid;
+    private net.traitors.thing.tile.Tile[][] grid;
 
     public TileGrid(int width, int height) {
         this.width = width;
         this.height = height;
-        grid = new Tile[width][];
+        grid = new net.traitors.thing.tile.Tile[width][];
         for (int column = 0; column < width; column++) {
-            grid[column] = new Tile[height];
+            grid[column] = new net.traitors.thing.tile.Tile[height];
             for (int row = 0; row < height; row++) {
-                grid[column][row] = new Tile();
+                grid[column][row] = new net.traitors.thing.tile.Tile();
                 grid[column][row].setPlatform(this);
                 grid[column][row].setPoint(new Point(column - (width - 1f) / 2, row - (height - 1f) / 2));
             }
@@ -36,8 +36,8 @@ public class TileGrid extends AbstractPlatform {
 
     @Override
     public void draw(Batch batch) {
-        for (Tile[] column : grid) {
-            for (Tile tile : column) {
+        for (net.traitors.thing.tile.Tile[] column : grid) {
+            for (net.traitors.thing.tile.Tile tile : column) {
                 tile.draw(batch);
             }
         }

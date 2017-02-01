@@ -5,11 +5,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import net.traitors.item.Gun;
+import net.traitors.thing.item.Gun;
 import net.traitors.ui.touchable.Inventory;
 import net.traitors.ui.touchable.Touchable;
 import net.traitors.ui.touchable.TouchableTouchpad;
-import net.traitors.util.Controls;
+import net.traitors.controls.Controls;
 import net.traitors.util.TextureCreator;
 
 import java.util.HashSet;

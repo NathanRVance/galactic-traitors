@@ -14,7 +14,7 @@ public class Overlapper {
      *              precedence (earlier in the list ends up on bottom of stacks)
      * @return Set of trees of things where the root is at the bottom
      */
-    public static Set<TreeNode> getOverlaps(List<Thing> stuff) {
+    public static Set<TreeNode> getOverlaps(List<net.traitors.thing.Thing> stuff) {
         Set<TreeNode> thingTrees = new HashSet<TreeNode>();
 
         //Turn the things into unassembled tree nodes, but reverse the order.
@@ -49,10 +49,10 @@ public class Overlapper {
         float width;
         float height;
         float rotation;
-        Thing thing;
+        net.traitors.thing.Thing thing;
 
         //As always, rotation is in radians
-        RotRec(Thing thing) {
+        RotRec(net.traitors.thing.Thing thing) {
             this.point = thing.getWorldPoint();
             this.width = thing.getWidth();
             this.height = thing.getHeight();

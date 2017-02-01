@@ -1,4 +1,4 @@
-package net.traitors.tile;
+package net.traitors.thing.platform;
 
 import net.traitors.util.Point;
 
