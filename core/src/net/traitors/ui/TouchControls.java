@@ -46,7 +46,7 @@ public class TouchControls extends Stage implements Touchable {
         float slotWidth = height / 5;
         Inventory inventory = new Inventory(this, 5, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4, player);
         addTouchable(inventory);
-        inventory.addItem(new Gun());
+        inventory.addItem(new Gun(.1f, .1f));
 
         float buttonDim = height / 6;
         SyncCameraButton button = new SyncCameraButton(camera);

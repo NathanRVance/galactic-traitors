@@ -61,6 +61,8 @@ public interface Thing extends Actor {
      */
     void setPlatform(Platform platform);
 
+    Platform getPlatform();
+
     /**
      * Draw this thing using its point, rotation, width, height, and platform
      *

@@ -16,6 +16,7 @@ public class Inventory extends Widget implements Touchable {
 
     public Inventory(TouchControls stage, int numSlots, float x, float y, float width, float height, Player player) {
         this.player = player;
+        player.setInventory(this);
         slots = new ArrayList<InventorySlot>(numSlots);
         float itemHeight = height / numSlots;
         for (int s = 0; s < numSlots; s++) {
@@ -43,9 +44,14 @@ public class Inventory extends Widget implements Touchable {
         for (InventorySlot s : slots) {
             if (s.getItem() == null) {
                 s.setItem(item);
+                if(s.isSelected()) player.setHolding(item);
                 break;
             }
         }
+    }
+
+    Player getPlayer() {
+        return player;
     }
 
     @Override

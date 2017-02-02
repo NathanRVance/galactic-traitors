@@ -1,16 +1,16 @@
 package net.traitors.thing.platform;
 
+import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
 
-abstract class AbstractPlatform implements Platform {
+abstract class AbstractPlatform extends AbstractThing implements Platform {
 
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
 
-    private Point point = new Point();
-    private float rotation = 0f;
-
-    private Platform platform = null;
+    AbstractPlatform() {
+        super(0, 0);
+    }
 
     @Override
     public Point getTranslationalVelocity() {
@@ -49,8 +49,8 @@ abstract class AbstractPlatform implements Platform {
         point = point.add(getPoint());
 
         //Then, convert from that platform's coordinates
-        if (platform != null) {
-            return platform.convertToWorldCoordinates(point);
+        if (getPlatform() != null) {
+            return getPlatform().convertToWorldCoordinates(point);
         } else {
             return point;
         }
@@ -59,8 +59,8 @@ abstract class AbstractPlatform implements Platform {
     @Override
     public Point convertToPlatformCoordinates(Point point) {
         //First, convert from world coordinates to the platform one level up (if there is one)
-        if (platform != null) {
-            point = platform.convertToPlatformCoordinates(point);
+        if (getPlatform() != null) {
+            point = getPlatform().convertToPlatformCoordinates(point);
         }
 
         //Then, convert to our coordinates
@@ -68,7 +68,7 @@ abstract class AbstractPlatform implements Platform {
         point = point.subtract(getPoint());
         //And rotation
         if (!point.isZero()) {
-            point = point.rotate(-getRotation());
+            point = point.rotate(-1 * getRotation());
         }
 
         return point;
@@ -77,8 +77,8 @@ abstract class AbstractPlatform implements Platform {
     @Override
     public float convertToWorldRotation(float rotation) {
         rotation = (rotation + getRotation()) % (float) (Math.PI * 2);
-        if (platform != null) {
-            return platform.convertToWorldRotation(rotation);
+        if (getPlatform() != null) {
+            return getPlatform().convertToWorldRotation(rotation);
         } else {
             return rotation;
         }
@@ -86,50 +86,9 @@ abstract class AbstractPlatform implements Platform {
 
     @Override
     public float convertToPlatformRotation(float rotation) {
-        if (platform != null) {
-            rotation = platform.convertToPlatformRotation(rotation);
+        if (getPlatform() != null) {
+            rotation = getPlatform().convertToPlatformRotation(rotation);
         }
         return (rotation - getRotation()) % (float) (Math.PI * 2);
-    }
-
-    @Override
-    public Point getPoint() {
-        return point;
-    }
-
-    @Override
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public Point getWorldPoint() {
-        return (platform == null) ? getPoint() : platform.convertToWorldCoordinates(getPoint());
-    }
-
-    @Override
-    public float getRotation() {
-        return rotation;
-    }
-
-    @Override
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
-    }
-
-    @Override
-    public float getWorldRotation() {
-        return (platform == null) ? getRotation() : platform.convertToWorldRotation(getRotation());
-    }
-
-    @Override
-    public void setPlatform(Platform platform) {
-        setPoint(getWorldPoint());
-        setRotation(getWorldRotation());
-        if (platform != null) {
-            setPoint(platform.convertToPlatformCoordinates(getPoint()));
-            setRotation(platform.convertToPlatformRotation(rotation));
-        }
-        this.platform = platform;
     }
 }

@@ -16,7 +16,7 @@ public class BetterCamera extends OrthographicCamera implements Actor{
      *
      * @param direction angle in radians
      */
-    public void rotateTo(float direction) {
+    private void rotateTo(float direction) {
         rotate((getCameraAngle() - direction) * MathUtils.radiansToDegrees);
     }
 
@@ -26,7 +26,7 @@ public class BetterCamera extends OrthographicCamera implements Actor{
      * @return angle in radians
      */
     public float getCameraAngle() {
-        return -(float) Math.atan2(up.x, up.y);
+        return -1 * (float) Math.atan2(up.x, up.y);
     }
 
     public void rotateWith(Thing thing) {

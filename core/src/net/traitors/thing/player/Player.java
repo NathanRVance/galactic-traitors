@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
-import net.traitors.thing.Thing;
+import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
-import net.traitors.thing.platform.Platform;
-import net.traitors.util.BetterCamera;
+import net.traitors.ui.touchable.Inventory;
 import net.traitors.util.Point;
 
-public class Player implements Thing {
+public class Player extends AbstractThing {
 
     //Animation stuff
     private static final float BASE_ANIMATION_LENGTH = 1; //seconds
@@ -25,25 +25,32 @@ public class Player implements Thing {
     private float animationLength = 1; //Time, in seconds, it takes to run through the animation
     private float animationPoint = 0;
 
-    //Thing stuff
-    private float rotation = 0f;
-    private Point point = new Point();
-    private Platform platform = null;
-
     private Item holding;
-    private BetterCamera camera;
+    private Inventory inventory;
 
     public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
+        super(.5f, .5f);
         animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
         animationHolding = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, true);
     }
 
-    public void setCamera(BetterCamera camera) {
-        this.camera = camera;
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
-    public void rotateToFace(Point point) {
+    private void rotateToFace(Point point) {
         setRotation(point.subtract(getPoint()).angle() + (float) Math.PI / 2);
+    }
+
+    public void worldTouched(Point point) {
+        rotateToFace(point);
+        if (getPoint().distance(point) < getWidth()) {
+            Item item = GameScreen.getStuff().getItemAt(getPlatform().convertToWorldCoordinates(point));
+            if (item != null) {
+                GameScreen.getStuff().removeActor(item);
+                inventory.addItem(item);
+            }
+        }
     }
 
     private void setAnimationLength(float animationLength) {
@@ -64,6 +71,23 @@ public class Player implements Thing {
         int ret = (int) (animationPoint / animationLength * cycleLength);
         if (ret >= cycleLength) ret = cycleLength - 1;
         return ret;
+    }
+
+    public void setHolding(Item item) {
+        holding = item;
+    }
+
+    public Point convertToPlatformCoordinates(Point point) {
+        return (getPlatform() == null) ? point : getPlatform().convertToPlatformCoordinates(point);
+    }
+
+    public void dropItem(Item item) {
+        if (holding == item) { //If we're holding the same instance of the item
+            holding = null;
+        }
+        item.setPlatform(getPlatform());
+        item.setPoint(getPoint());
+        GameScreen.getStuff().addActor(item);
     }
 
     @Override
@@ -87,7 +111,7 @@ public class Player implements Thing {
             speedMult = 3;
         }
         Point d = new Point(x, y);
-        d = d.rotate(camera.getCameraAngle() - platform.getWorldRotation());
+        d = d.rotate(GameScreen.getStuff().getCamera().getCameraAngle() - getPlatform().getWorldRotation());
 
         float totMove = d.distanceFromZero();
         if (totMove != 0) {
@@ -103,70 +127,10 @@ public class Player implements Thing {
         }
     }
 
-    public void setHolding(Item item) {
-        holding = item;
-    }
-
-    @Override
-    public Point getPoint() {
-        return point;
-    }
-
-    @Override
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public Point getWorldPoint() {
-        return (platform == null) ? getPoint() : platform.convertToWorldCoordinates(getPoint());
-    }
-
-    @Override
-    public float getRotation() {
-        return rotation;
-    }
-
-    @Override
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
-    }
-
-    @Override
-    public float getWorldRotation() {
-        return (platform == null) ? getRotation() : platform.convertToWorldRotation(getRotation());
-    }
-
-    public Point convertToPlatformCoordinates(Point point) {
-        return (platform == null) ? point : platform.convertToPlatformCoordinates(point);
-    }
-
-    @Override
-    public float getWidth() {
-        return .5f;
-    }
-
-    @Override
-    public float getHeight() {
-        return .5f;
-    }
-
-    public Platform getPlatform() {
-        return platform;
-    }
-
-    @Override
-    public void setPlatform(Platform platform) {
-        //Convert the current point to the new platform's coordinates
-        setPoint(platform.convertToPlatformCoordinates(getWorldPoint()));
-        //Switch platforms
-        this.platform = platform;
-    }
-
     @Override
     public void draw(Batch batch) {
         Point worldPoint = getWorldPoint();
-        float cameraRotation = platform.getWorldRotation() + getRotation();
+        float cameraRotation = getPlatform().getWorldRotation() + getRotation();
         if (holding == null) {
             batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, cameraRotation * MathUtils.radiansToDegrees);
         } else {

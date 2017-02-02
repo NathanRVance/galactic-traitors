@@ -1,5 +1,8 @@
 package net.traitors.util;
 
+import net.traitors.thing.Thing;
+import net.traitors.thing.platform.Platform;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +32,7 @@ public class Overlapper {
             TreeNode node = nodes.get(i);
             boolean placed = false;
             for (int j = i + 1; j < nodes.size(); j++) {
-                if (nodes.get(j).getRotRet().contains(node.getRotRet().point)) {
+                if (nodes.get(j).getRotRet().contains(node.getRotRet().point) && nodes.get(j).getThing() instanceof Platform) {
                     nodes.get(j).addChild(node);
                     placed = true;
                     break;
@@ -43,13 +46,13 @@ public class Overlapper {
         return thingTrees;
     }
 
-    static class RotRec {
+    public static class RotRec {
 
         Point point;
         float width;
         float height;
         float rotation;
-        net.traitors.thing.Thing thing;
+        Thing thing;
 
         //As always, rotation is in radians
         RotRec(net.traitors.thing.Thing thing) {
@@ -60,7 +63,7 @@ public class Overlapper {
             this.thing = thing;
         }
 
-        boolean contains(Point p) {
+        public boolean contains(Point p) {
             //Rotate p to be easier to compare to this rectangle
             p = p.subtract(point).rotate(-rotation);
             return Math.abs(p.x) <= width / 2 && Math.abs(p.y) <= height / 2;

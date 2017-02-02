@@ -2,7 +2,9 @@ package net.traitors.thing.item;
 
 import com.badlogic.gdx.graphics.Texture;
 
-public interface Item {
+import net.traitors.thing.Thing;
+
+public interface Item extends Thing {
 
     Texture getInventoryImage();
 
