@@ -22,6 +22,8 @@ public class Stuff {
 
     private List<Actor> actors = new ArrayList<Actor>();
     private List<Thing> stuff = new ArrayList<Thing>();
+    private List<Actor> removeBuffer = new ArrayList<Actor>();
+    private List<Actor> addBuffer = new ArrayList<Actor>();
     private BetterCamera camera;
     private Player player;
     private Map<Platform, Set<TreeNode>> stuffOnPlatforms = new HashMap<Platform, Set<TreeNode>>();
@@ -32,9 +34,29 @@ public class Stuff {
     }
 
     public void addActor(Actor actor) {
-        actors.add(actor);
-        if (actor instanceof Thing) {
-            stuff.add((Thing) actor);
+        addBuffer.add(actor);
+    }
+
+    public void removeActor(Actor actor) {
+        removeBuffer.add(actor);
+    }
+
+    private void resolveBuffers() {
+        for (Actor actor : removeBuffer) {
+            actors.remove(actor);
+            if (actor instanceof Thing) {
+                stuff.remove(actor);
+            }
+        }
+        boolean addedThing = false;
+        for (Actor actor : addBuffer) {
+            actors.add(actor);
+            if (actor instanceof Thing) {
+                stuff.add((Thing) actor);
+                addedThing = true;
+            }
+        }
+        if(addedThing) {
             Collections.sort(stuff, new Comparator<Thing>() {
                 @Override
                 public int compare(Thing thing1, Thing thing2) {
@@ -46,13 +68,9 @@ public class Stuff {
                 }
             });
         }
-    }
 
-    public void removeActor(Actor actor) {
-        actors.remove(actor);
-        if (actor instanceof Thing) {
-            stuff.remove(actor);
-        }
+        addBuffer.clear();
+        removeBuffer.clear();
     }
 
     public List<Thing> getStuff() {
@@ -68,13 +86,13 @@ public class Stuff {
     }
 
     public void doStuff(float delta) {
-        for (Actor actor : actors) {
-            actor.act(delta);
-        }
-
         stuffOnPlatforms.clear();
         for (TreeNode tree : Overlapper.getOverlaps(stuff)) {
             placeThings(null, tree);
+        }
+
+        for (Actor actor : actors) {
+            actor.act(delta);
         }
 
         Point playerWorldPoint = player.getWorldPoint();
@@ -86,6 +104,8 @@ public class Stuff {
         if (touchesInWorld.size() == 1) {
             player.worldTouched(player.convertToPlatformCoordinates(touchesInWorld.get(0)));
         }
+
+        resolveBuffers();
     }
 
     public Item getItemAt(Point point) {

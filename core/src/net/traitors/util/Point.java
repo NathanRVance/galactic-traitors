@@ -63,6 +63,10 @@ public class Point {
         return new Point(x - other.x, y - other.y);
     }
 
+    public Point scale(float amnt) {
+        return new Point(x * amnt, y * amnt);
+    }
+
     public boolean isZero() {
         return x == 0 && y == 0;
     }

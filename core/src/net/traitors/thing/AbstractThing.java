@@ -2,16 +2,18 @@ package net.traitors.thing;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
 import net.traitors.util.Point;
 
 public abstract class AbstractThing implements Thing {
 
+    private final float width;
+    private final float height;
     private Point point = new Point();
     private float rotation = 0;
     private Platform platform;
-    private final float width;
-    private final float height;
+    private Platform nullPlatform = new NullPlatform();
 
     public AbstractThing(float width, float height) {
         this.width = width;
@@ -34,6 +36,11 @@ public abstract class AbstractThing implements Thing {
     }
 
     @Override
+    public void setWorldPoint(Point point) {
+        this.point = getPlatform().convertToPlatformCoordinates(point);
+    }
+
+    @Override
     public float getRotation() {
         return rotation;
     }
@@ -45,7 +52,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public float getWorldRotation() {
-        return (platform == null) ? getRotation() : platform.convertToWorldRotation(getRotation());
+        return getPlatform().convertToWorldRotation(getRotation());
     }
 
     @Override
@@ -59,6 +66,11 @@ public abstract class AbstractThing implements Thing {
     }
 
     @Override
+    public Platform getPlatform() {
+        return (platform == null) ? nullPlatform : platform;
+    }
+
+    @Override
     public void setPlatform(Platform platform) {
         setPoint(getWorldPoint());
         setRotation(getWorldRotation());
@@ -67,11 +79,6 @@ public abstract class AbstractThing implements Thing {
             setRotation(platform.convertToPlatformRotation(rotation));
         }
         this.platform = platform;
-    }
-
-    @Override
-    public Platform getPlatform() {
-        return platform;
     }
 
     @Override

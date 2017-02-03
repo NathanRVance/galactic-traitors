@@ -29,6 +29,13 @@ public interface Thing extends Actor {
     Point getWorldPoint();
 
     /**
+     * Set the center of mass of this thing relative to world coordinates
+     *
+     * @param point center of mass
+     */
+    void setWorldPoint(Point point);
+
+    /**
      * Get the current rotation of this thing relative to the platform it is on
      *
      * @return rotation in radians
@@ -53,6 +60,8 @@ public interface Thing extends Actor {
 
     float getHeight();
 
+    Platform getPlatform();
+
     /**
      * Register this thing with a platform that will allow keeping track of points and rotations
      * relative to the platform
@@ -60,8 +69,6 @@ public interface Thing extends Actor {
      * @param platform the platform this thing is on
      */
     void setPlatform(Platform platform);
-
-    Platform getPlatform();
 
     /**
      * Draw this thing using its point, rotation, width, height, and platform

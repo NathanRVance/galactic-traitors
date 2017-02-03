@@ -7,8 +7,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GameScreen;
 import net.traitors.thing.AbstractThing;
+import net.traitors.thing.projectile.Projectile;
 import net.traitors.util.PixmapRotateRec;
+import net.traitors.util.Point;
 
 public class Gun extends AbstractThing implements Item {
 
@@ -48,6 +51,14 @@ public class Gun extends AbstractThing implements Item {
             handImage = new Texture(pixmap);
         }
         return handImage;
+    }
+
+    @Override
+    public void use() {
+        //Make a plasma blast
+        Point velocity = new Point(3, 0).rotate(GameScreen.getStuff().getPlayer().getWorldRotation());
+        Projectile projectile = new Projectile(.1f, 1, Color.RED, GameScreen.getStuff().getPlayer().getWorldPoint(), velocity, 1);
+        GameScreen.getStuff().addActor(projectile);
     }
 
     @Override

@@ -10,4 +10,6 @@ public interface Item extends Thing {
 
     Texture getHandImage();
 
+    void use();
+
 }

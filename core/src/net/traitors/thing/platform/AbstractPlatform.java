@@ -34,7 +34,7 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
 
     @Override
     public void act(float delta) {
-        setPoint(new Point(getPoint().x + translationalVelocity.x * delta, getPoint().y + translationalVelocity.y * delta));
+        setPoint(getPoint().add(translationalVelocity.scale(delta)));
         setRotation((getRotation() + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
 
