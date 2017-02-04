@@ -2,22 +2,20 @@ package net.traitors.thing.platform;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.thing.tile.FloorTile;
+import net.traitors.thing.tile.Tile;
 import net.traitors.util.Point;
 
 public class TileGrid extends AbstractPlatform {
 
-    private final float width;
-    private final float height;
-    private net.traitors.thing.tile.Tile[][] grid;
+    private Tile[][] grid;
 
     public TileGrid(int width, int height) {
-        this.width = width;
-        this.height = height;
-        grid = new net.traitors.thing.tile.Tile[width][];
+        super(width, height);
+        grid = new Tile[width][height];
         for (int column = 0; column < width; column++) {
-            grid[column] = new net.traitors.thing.tile.Tile[height];
             for (int row = 0; row < height; row++) {
-                grid[column][row] = new net.traitors.thing.tile.Tile();
+                grid[column][row] = new FloorTile();
                 grid[column][row].setPlatform(this);
                 grid[column][row].setPoint(new Point(column - (width - 1f) / 2, row - (height - 1f) / 2));
             }
@@ -25,19 +23,9 @@ public class TileGrid extends AbstractPlatform {
     }
 
     @Override
-    public float getWidth() {
-        return width;
-    }
-
-    @Override
-    public float getHeight() {
-        return height;
-    }
-
-    @Override
     public void draw(Batch batch) {
-        for (net.traitors.thing.tile.Tile[] column : grid) {
-            for (net.traitors.thing.tile.Tile tile : column) {
+        for (Tile[] column : grid) {
+            for (Tile tile : column) {
                 tile.draw(batch);
             }
         }

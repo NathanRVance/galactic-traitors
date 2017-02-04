@@ -31,6 +31,7 @@ public class SyncCameraButton extends Widget implements Touchable {
                 if (touched) return false;
                 touched = true;
                 camera.syncRotations();
+                camera.zoom = 1;
                 return true;
             }
 

@@ -1,5 +1,7 @@
 package net.traitors.thing;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
+
 import net.traitors.controls.Controls;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.Platform;
@@ -73,9 +75,9 @@ public class Stuff {
         removeBuffer.clear();
     }
 
-    public List<Thing> getStuff() {
+    /*public List<Thing> getStuff() {
         return stuff;
-    }
+    }*/
 
     public BetterCamera getCamera() {
         return camera;
@@ -83,6 +85,12 @@ public class Stuff {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public void drawStuff(Batch batch) {
+        for (Thing thing : stuff) {
+            thing.draw(batch);
+        }
     }
 
     public void doStuff(float delta) {

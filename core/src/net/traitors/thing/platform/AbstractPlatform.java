@@ -12,6 +12,10 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
         super(0, 0);
     }
 
+    AbstractPlatform(int width, int height) {
+        super(width, height);
+    }
+
     @Override
     public Point getTranslationalVelocity() {
         return translationalVelocity;

@@ -8,8 +8,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.traitors.thing.Stuff;
-import net.traitors.thing.Thing;
 import net.traitors.thing.platform.Platform;
+import net.traitors.thing.platform.Ship;
+import net.traitors.thing.platform.ShipFactory;
 import net.traitors.thing.platform.TileGrid;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.player.Player;
@@ -21,7 +22,6 @@ import net.traitors.util.Point;
 public class GameScreen implements Screen {
     private static Stuff stuff;
     private GalacticTraitors game;
-    private int numTaps = 0;
     private Stage uiControls;
     private TextView textView;
 
@@ -31,6 +31,9 @@ public class GameScreen implements Screen {
         Player player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
         stuff = new Stuff(camera, player);
 
+        Ship ship = new ShipFactory().buildStandardShip();
+        ship.setPoint(new Point(-5, 10));
+        stuff.addActor(ship);
 
         Platform world = new UniverseTile();
         world.setPoint(new Point(0, 0));
@@ -79,9 +82,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(stuff.getCamera().combined);
         game.batch.begin();
         //textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
-        for (Thing thing : stuff.getStuff()) {
-            thing.draw(game.batch);
-        }
+        stuff.drawStuff(game.batch);
         game.batch.end();
 
         textView.draw();
