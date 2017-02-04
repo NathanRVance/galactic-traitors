@@ -84,4 +84,12 @@ public interface Thing extends Actor {
      */
     void draw(Batch batch);
 
+    /**
+     * Checks if the point is contained within this thing
+     *
+     * @param point point to consider, in world coordinates
+     * @return whether or not the point falls within this thing
+     */
+    boolean contains(Point point);
+
 }

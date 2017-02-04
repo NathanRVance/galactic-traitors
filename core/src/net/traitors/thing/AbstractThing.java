@@ -96,4 +96,10 @@ public abstract class AbstractThing implements Thing {
         velocity = getWorldPoint().subtract(lastWorldPoint).scale(1 / delta);
         lastWorldPoint = getWorldPoint();
     }
+
+    @Override
+    public boolean contains(Point point) {
+        point = point.subtract(getWorldPoint()).rotate(-1 * getWorldRotation());
+        return Math.abs(point.x) <= getWidth() / 2 && Math.abs(point.y) <= getHeight() / 2;
+    }
 }

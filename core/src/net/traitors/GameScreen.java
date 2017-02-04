@@ -60,7 +60,6 @@ public class GameScreen implements Screen {
         stuff.addActor(tiles);
 
         player.setPoint(new Point(-2, 2));
-        player.setPlatform(moreTiles);
         stuff.addActor(camera); //must happen before player
         stuff.addActor(player);
 

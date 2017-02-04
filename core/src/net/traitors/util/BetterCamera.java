@@ -56,7 +56,7 @@ public class BetterCamera extends OrthographicCamera implements Actor{
      * Rotate with the thing set to rotate with. This should be called after the act call to thing
      * so that the camera doesn't lag behind.
      *
-     * @param delta time in second since last call to act
+     * @param delta time in seconds since last call to act
      */
     @Override
     public void act(float delta) {

@@ -7,21 +7,20 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
-import net.traitors.GameScreen;
 import net.traitors.thing.AbstractThing;
-import net.traitors.thing.projectile.Projectile;
+import net.traitors.thing.player.Player;
+import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
-import net.traitors.util.Point;
 
 public class Gun extends AbstractThing implements Item {
 
-    private final float cooldown = 1;
     private Texture inventoryImage;
     private Texture handImage;
-    private float timeToNextFire = 0;
+    private ProjectileFactory projectileFactory;
 
-    public Gun(float width, float height) {
+    public Gun(float width, float height, ProjectileFactory projectileFactory) {
         super(width, height);
+        this.projectileFactory = projectileFactory;
     }
 
     @Override
@@ -56,16 +55,8 @@ public class Gun extends AbstractThing implements Item {
     }
 
     @Override
-    public void use() {
-        if (timeToNextFire <= 0) {
-            //Make a plasma blast
-            float rotation = GameScreen.getStuff().getPlayer().getWorldRotation();
-            Point velocity = new Point(20, 0).rotate(rotation).add(GameScreen.getStuff().getPlayer().getWorldVelocity());
-            Point startPoint = GameScreen.getStuff().getPlayer().getWorldPoint().add(new Point(.4f, -.25f).rotate(rotation));
-            Projectile projectile = new Projectile(.5f, .1f, Color.RED, startPoint, velocity, 2);
-            GameScreen.getStuff().addActor(projectile);
-            timeToNextFire = cooldown;
-        }
+    public void use(Player player) {
+        projectileFactory.use(player);
     }
 
     @Override
@@ -76,14 +67,11 @@ public class Gun extends AbstractThing implements Item {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (timeToNextFire > 0)
-            timeToNextFire -= delta;
+        projectileFactory.updateCooldown(delta);
     }
 
     @Override
     public float getCooldownPercent() {
-        if (timeToNextFire <= 0)
-            return 1;
-        return 1 - timeToNextFire / cooldown;
+        return projectileFactory.getCooldownPercent();
     }
 }

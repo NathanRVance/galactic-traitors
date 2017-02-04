@@ -28,7 +28,7 @@ public class Stuff {
     private List<Actor> addBuffer = new ArrayList<Actor>();
     private BetterCamera camera;
     private Player player;
-    private Map<Platform, Set<TreeNode>> stuffOnPlatforms = new HashMap<Platform, Set<TreeNode>>();
+    private Map<Platform, Set<TreeNode<Thing>>> stuffOnPlatforms = new HashMap<Platform, Set<TreeNode<Thing>>>();
 
     public Stuff(BetterCamera camera, Player player) {
         this.camera = camera;
@@ -58,7 +58,7 @@ public class Stuff {
                 addedThing = true;
             }
         }
-        if(addedThing) {
+        if (addedThing) {
             Collections.sort(stuff, new Comparator<Thing>() {
                 @Override
                 public int compare(Thing thing1, Thing thing2) {
@@ -74,10 +74,6 @@ public class Stuff {
         addBuffer.clear();
         removeBuffer.clear();
     }
-
-    /*public List<Thing> getStuff() {
-        return stuff;
-    }*/
 
     public BetterCamera getCamera() {
         return camera;
@@ -95,7 +91,7 @@ public class Stuff {
 
     public void doStuff(float delta) {
         stuffOnPlatforms.clear();
-        for (TreeNode tree : Overlapper.getOverlaps(stuff)) {
+        for (TreeNode<Thing> tree : Overlapper.getOverlaps(stuff)) {
             placeThings(null, tree);
         }
 
@@ -117,26 +113,26 @@ public class Stuff {
     }
 
     public Item getItemAt(Point point) {
-        for (Set<TreeNode> platformContents : stuffOnPlatforms.values()) {
-            for (TreeNode node : platformContents) {
-                if (node.getThing() instanceof Item && node.getRotRet().contains(point)) {
-                    return (Item) node.getThing();
+        for (Set<TreeNode<Thing>> platformContents : stuffOnPlatforms.values()) {
+            for (TreeNode<Thing> node : platformContents) {
+                if (node.getPayload() instanceof Item && node.getPayload().contains(point)) {
+                    return (Item) node.getPayload();
                 }
             }
         }
         return null;
     }
 
-    private void placeThings(Platform parent, TreeNode child) {
-        child.getThing().setPlatform(parent);
+    private void placeThings(Platform parent, TreeNode<Thing> child) {
+        child.getPayload().setPlatform(parent);
         if (parent != null) {
             stuffOnPlatforms.get(parent).add(child);
         }
         if (!child.getChildren().isEmpty()) {
-            stuffOnPlatforms.put((Platform) child.getThing(), new HashSet<TreeNode>());
+            stuffOnPlatforms.put((Platform) child.getPayload(), new HashSet<TreeNode<Thing>>());
         }
-        for (TreeNode treeNode : child.getChildren()) {
-            placeThings((Platform) child.getThing(), treeNode);
+        for (TreeNode<Thing> treeNode : child.getChildren()) {
+            placeThings((Platform) child.getPayload(), treeNode);
         }
     }
 

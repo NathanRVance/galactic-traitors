@@ -17,22 +17,22 @@ public class Overlapper {
      *              precedence (earlier in the list ends up on bottom of stacks)
      * @return Set of trees of things where the root is at the bottom
      */
-    public static Set<TreeNode> getOverlaps(List<net.traitors.thing.Thing> stuff) {
-        Set<TreeNode> thingTrees = new HashSet<TreeNode>();
+    public static Set<TreeNode<Thing>> getOverlaps(List<Thing> stuff) {
+        Set<TreeNode<Thing>> thingTrees = new HashSet<TreeNode<Thing>>();
 
         //Turn the things into unassembled tree nodes, but reverse the order.
-        List<TreeNode> nodes = new ArrayList<TreeNode>(stuff.size());
+        List<TreeNode<Thing>> nodes = new ArrayList<TreeNode<Thing>>(stuff.size());
         for (int i = stuff.size() - 1; i >= 0; i--) {
-            nodes.add(new TreeNode(new RotRec(stuff.get(i))));
+            nodes.add(new TreeNode<Thing>(stuff.get(i)));
         }
 
         //Instead, go through stuff in reverse and add each thing to the smallest platform that it overlaps with.
 
         for (int i = 0; i < nodes.size(); i++) {
-            TreeNode node = nodes.get(i);
+            TreeNode<Thing> node = nodes.get(i);
             boolean placed = false;
             for (int j = i + 1; j < nodes.size(); j++) {
-                if (nodes.get(j).getRotRet().contains(node.getRotRet().point) && nodes.get(j).getThing() instanceof Platform) {
+                if (nodes.get(j).getPayload().contains(node.getPayload().getWorldPoint()) && nodes.get(j).getPayload() instanceof Platform) {
                     nodes.get(j).addChild(node);
                     placed = true;
                     break;
@@ -44,30 +44,6 @@ public class Overlapper {
         }
 
         return thingTrees;
-    }
-
-    public static class RotRec {
-
-        Point point;
-        float width;
-        float height;
-        float rotation;
-        Thing thing;
-
-        //As always, rotation is in radians
-        RotRec(net.traitors.thing.Thing thing) {
-            this.point = thing.getWorldPoint();
-            this.width = thing.getWidth();
-            this.height = thing.getHeight();
-            this.rotation = thing.getWorldRotation();
-            this.thing = thing;
-        }
-
-        public boolean contains(Point p) {
-            //Rotate p to be easier to compare to this rectangle
-            p = p.subtract(point).rotate(-rotation);
-            return Math.abs(p.x) <= width / 2 && Math.abs(p.y) <= height / 2;
-        }
     }
 
 }

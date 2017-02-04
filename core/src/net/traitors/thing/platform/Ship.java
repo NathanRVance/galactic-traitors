@@ -4,11 +4,17 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.thing.tile.FloorTile;
 import net.traitors.thing.tile.Tile;
+import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ship extends AbstractPlatform {
 
+
     private Tile[][] grid;
+    private List<Tile> usables = new ArrayList<Tile>(); //Guaranteed to also be usable
 
     private Ship(int width, int height) {
         super(width, height);
@@ -18,13 +24,16 @@ public class Ship extends AbstractPlatform {
     public void draw(Batch batch) {
         for (Tile[] column : grid) {
             for (Tile tile : column) {
-                if(tile != null) {
+                if (tile != null) {
                     tile.draw(batch);
                 }
             }
         }
     }
 
+    public Usable getUsableAt(Point point) {
+        return null;
+    }
 
     static class ShipBuilder {
 
@@ -39,24 +48,28 @@ public class Ship extends AbstractPlatform {
 
         /**
          * Add a tile to the ship, which replaces floor tiles
+         *
          * @param tile tile to be added
-         * @param x x position for the lower left corner of this tile
-         * @param y y position for the lower left corner of this tile
+         * @param x    x position for the lower left corner of this tile
+         * @param y    y position for the lower left corner of this tile
          */
         void addTile(Tile tile, int x, int y) {
             ship.grid[x][y] = tile;
             prepTile(tile, x, y);
-            for(int ox = x; ox < x + tile.getWidth(); ox++) {
+            for (int ox = x; ox < x + tile.getWidth(); ox++) {
                 for (int oy = y; oy < y + tile.getHeight(); oy++) {
                     occupied[ox][oy] = true;
                 }
             }
+            if (tile instanceof Usable) {
+                ship.usables.add(tile);
+            }
         }
 
         Ship getShip() {
-            for(int x = 0; x < ship.grid.length; x++) {
-                for(int y = 0; y < ship.grid[x].length; y++) {
-                    if(! occupied[x][y]) {
+            for (int x = 0; x < ship.grid.length; x++) {
+                for (int y = 0; y < ship.grid[x].length; y++) {
+                    if (!occupied[x][y]) {
                         ship.grid[x][y] = new FloorTile();
                         prepTile(ship.grid[x][y], x, y);
                     }

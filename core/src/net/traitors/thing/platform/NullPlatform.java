@@ -79,7 +79,7 @@ public class NullPlatform implements Platform {
 
     @Override
     public float getWorldRotation() {
-        throw new NotImplementedException();
+        return 0;
     }
 
     @Override
@@ -110,6 +110,11 @@ public class NullPlatform implements Platform {
     @Override
     public void draw(Batch batch) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean contains(Point point) {
+        return true;
     }
 
     @Override

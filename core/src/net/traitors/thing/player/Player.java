@@ -52,7 +52,7 @@ public class Player extends AbstractThing {
             }
         }
         if(holding != null) {
-            holding.use();
+            holding.use(this);
         }
     }
 
@@ -134,18 +134,23 @@ public class Player extends AbstractThing {
 
     @Override
     public void draw(Batch batch) {
-        Point worldPoint = getWorldPoint();
+        Point worldPointLowLeft = getWorldPoint().subtract(new Point(getWidth() / 2, getHeight() / 2));
         float rotation = getPlatform().getWorldRotation() + getRotation() + (float) Math.PI / 2;
         if (holding == null) {
-            batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
+            batch.draw(animation[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
         } else {
-            batch.draw(animationHolding[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
+            batch.draw(animationHolding[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
             Texture inHand = holding.getHandImage();
-            Point itemp = new Point(worldPoint.x + getWidth() / 22, worldPoint.y - getHeight() / 3);
+            Point itemp = new Point(getWidth() / 22, - getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();
-            batch.draw(new TextureRegion(inHand), itemp.x - getWidth() / 2, itemp.y - getHeight() / 2, worldPoint.x - itemp.x + getWidth() / 2, worldPoint.y - itemp.y + getHeight() / 2, width, height, 1, 1, rotation * MathUtils.radiansToDegrees);
+            batch.draw(new TextureRegion(inHand),
+                    worldPointLowLeft.x + itemp.x,
+                    worldPointLowLeft.y + itemp.y,
+                    getWidth() / 2 - itemp.x,
+                    getHeight() / 2 - itemp.y,
+                    width, height, 1, 1, rotation * MathUtils.radiansToDegrees);
         }
     }
 

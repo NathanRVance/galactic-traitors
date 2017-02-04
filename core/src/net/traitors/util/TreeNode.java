@@ -3,29 +3,25 @@ package net.traitors.util;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TreeNode {
+public class TreeNode<T> {
 
-    private Set<TreeNode> nodes = new HashSet<TreeNode>();
-    private Overlapper.RotRec rotRet;
+    private Set<TreeNode<T>> nodes = new HashSet<TreeNode<T>>();
+    private T payload;
 
-    public TreeNode(Overlapper.RotRec rotRec) {
-        this.rotRet = rotRec;
+    TreeNode(T payload) {
+        this.payload = payload;
     }
 
-    public void addChild(TreeNode child) {
+    void addChild(TreeNode<T> child) {
         nodes.add(child);
     }
 
-    public Set<TreeNode> getChildren() {
+    public Set<TreeNode<T>> getChildren() {
         return nodes;
     }
 
-    public Overlapper.RotRec getRotRet() {
-        return rotRet;
-    }
-
-    public net.traitors.thing.Thing getThing() {
-        return rotRet.thing;
+    public T getPayload() {
+        return payload;
     }
 
 }
