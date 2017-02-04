@@ -83,6 +83,11 @@ public class NullPlatform implements Platform {
     }
 
     @Override
+    public Point getWorldVelocity() {
+        return new Point();
+    }
+
+    @Override
     public float getWidth() {
         throw new NotImplementedException();
     }

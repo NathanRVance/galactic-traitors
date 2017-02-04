@@ -32,12 +32,12 @@ public class Point {
     }
 
     /**
-     * Computes the angle of this point as it would be in polar coordinates
+     * Computes the angle of this point. 0 is to the right.
      *
      * @return angle in radians
      */
     public float angle() {
-        float angle = (float) Math.asin((y) / distanceFromZero());
+        float angle = (float) Math.asin(y / distanceFromZero());
         if (x < 0) angle = (float) Math.PI - angle;
         return angle;
     }

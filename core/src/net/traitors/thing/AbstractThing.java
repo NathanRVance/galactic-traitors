@@ -11,6 +11,8 @@ public abstract class AbstractThing implements Thing {
     private final float width;
     private final float height;
     private Point point = new Point();
+    private Point lastWorldPoint = new Point();
+    private Point velocity = new Point();
     private float rotation = 0;
     private Platform platform;
     private Platform nullPlatform = new NullPlatform();
@@ -32,7 +34,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public Point getWorldPoint() {
-        return (platform == null) ? getPoint() : platform.convertToWorldCoordinates(getPoint());
+        return getPlatform().convertToWorldCoordinates(getPoint());
     }
 
     @Override
@@ -53,6 +55,11 @@ public abstract class AbstractThing implements Thing {
     @Override
     public float getWorldRotation() {
         return getPlatform().convertToWorldRotation(getRotation());
+    }
+
+    @Override
+    public Point getWorldVelocity() {
+        return velocity;
     }
 
     @Override
@@ -85,5 +92,8 @@ public abstract class AbstractThing implements Thing {
     public abstract void draw(Batch batch);
 
     @Override
-    public abstract void act(float delta);
+    public void act(float delta) {
+        velocity = getWorldPoint().subtract(lastWorldPoint).scale(1 / delta);
+        lastWorldPoint = getWorldPoint();
+    }
 }

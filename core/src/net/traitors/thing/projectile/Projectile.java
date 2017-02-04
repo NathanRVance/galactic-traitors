@@ -16,10 +16,12 @@ public class Projectile extends AbstractThing {
     private Point velocity;
     private TextureRegion texture;
     private float longevity;
+    private Point location;
 
     public Projectile(float width, float height, Color color, Point start, Point velocity, float longevity) {
         super(width, height);
         setPoint(start);
+        location = null;
         this.velocity = velocity;
         this.longevity = longevity;
 
@@ -32,14 +34,17 @@ public class Projectile extends AbstractThing {
 
     @Override
     public void draw(Batch batch) {
-        batch.draw(texture, getPoint().x + getWidth() / 2, getPoint().y + getHeight() / 2,
-                getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1,
+        Point drawLocation = (location == null)? getWorldPoint() : location;
+        batch.draw(texture, drawLocation.x, drawLocation.y,
+                0, 0, getWidth(), getHeight(), 1, 1,
                 velocity.angle() * MathUtils.radiansToDegrees);
     }
 
     @Override
     public void act(float delta) {
-        setWorldPoint(getWorldPoint().add(velocity.scale(delta)));
+        super.act(delta);
+        if(location == null) location = getWorldPoint();
+        location = location.add(velocity.scale(delta));
         longevity -= delta;
         if(longevity < 0) {
             GameScreen.getStuff().removeActor(this);

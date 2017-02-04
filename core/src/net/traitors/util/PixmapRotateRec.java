@@ -13,4 +13,11 @@ public class PixmapRotateRec extends Pixmap {
         fillTriangle(x1, y1, x2, y2, x3, y3);
         fillTriangle(x1, y1, x3, y3, x4, y4);
     }
+
+    public void drawRectangle(int x, int y, int width, int height, int boarderWidth) {
+        fillRectangle(x, y, boarderWidth, height);
+        fillRectangle(x + width - boarderWidth, y, boarderWidth, height);
+        fillRectangle(x, y, width, boarderWidth);
+        fillRectangle(x, y + height - boarderWidth, width, boarderWidth);
+    }
 }

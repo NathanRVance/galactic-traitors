@@ -54,6 +54,14 @@ public class Inventory extends Widget implements Touchable {
         return player;
     }
 
+    public void updateCooldowns(float delta) {
+        for(InventorySlot s : slots) {
+            if(s.getItem() != null) {
+                s.getItem().act(delta);
+            }
+        }
+    }
+
     @Override
     public boolean isTouched() {
         for (InventorySlot slot : slots) {

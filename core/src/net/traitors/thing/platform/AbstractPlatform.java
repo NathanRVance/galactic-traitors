@@ -34,6 +34,7 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
 
     @Override
     public void act(float delta) {
+        super.act(delta);
         setPoint(getPoint().add(translationalVelocity.scale(delta)));
         setRotation((getRotation() + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
@@ -49,19 +50,13 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
         point = point.add(getPoint());
 
         //Then, convert from that platform's coordinates
-        if (getPlatform() != null) {
-            return getPlatform().convertToWorldCoordinates(point);
-        } else {
-            return point;
-        }
+        return getPlatform().convertToWorldCoordinates(point);
     }
 
     @Override
     public Point convertToPlatformCoordinates(Point point) {
-        //First, convert from world coordinates to the platform one level up (if there is one)
-        if (getPlatform() != null) {
-            point = getPlatform().convertToPlatformCoordinates(point);
-        }
+        //First, convert from world coordinates to the platform one level up
+        point = getPlatform().convertToPlatformCoordinates(point);
 
         //Then, convert to our coordinates
         //Resolve translation
@@ -77,18 +72,12 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
     @Override
     public float convertToWorldRotation(float rotation) {
         rotation = (rotation + getRotation()) % (float) (Math.PI * 2);
-        if (getPlatform() != null) {
-            return getPlatform().convertToWorldRotation(rotation);
-        } else {
-            return rotation;
-        }
+        return getPlatform().convertToWorldRotation(rotation);
     }
 
     @Override
     public float convertToPlatformRotation(float rotation) {
-        if (getPlatform() != null) {
-            rotation = getPlatform().convertToPlatformRotation(rotation);
-        }
+        rotation = getPlatform().convertToPlatformRotation(rotation);
         return (rotation - getRotation()) % (float) (Math.PI * 2);
     }
 }

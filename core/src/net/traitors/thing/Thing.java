@@ -56,6 +56,13 @@ public interface Thing extends Actor {
      */
     float getWorldRotation();
 
+    /**
+     * Gets the current world velocity
+     *
+     * @return the velocity we are moving at in the world
+     */
+    Point getWorldVelocity();
+
     float getWidth();
 
     float getHeight();

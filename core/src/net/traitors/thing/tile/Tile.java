@@ -18,11 +18,6 @@ public class Tile extends AbstractThing {
     }
 
     @Override
-    public void act(float delta) {
-        //Do nothing
-    }
-
-    @Override
     public void draw(Batch batch) {
         Point worldPoint = getWorldPoint();
         float worldRotation = getWorldRotation();

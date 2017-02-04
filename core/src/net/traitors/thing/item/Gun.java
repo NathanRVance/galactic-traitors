@@ -15,8 +15,10 @@ import net.traitors.util.Point;
 
 public class Gun extends AbstractThing implements Item {
 
+    private final float cooldown = 1;
     private Texture inventoryImage;
     private Texture handImage;
+    private float timeToNextFire = 0;
 
     public Gun(float width, float height) {
         super(width, height);
@@ -55,10 +57,15 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public void use() {
-        //Make a plasma blast
-        Point velocity = new Point(3, 0).rotate(GameScreen.getStuff().getPlayer().getWorldRotation());
-        Projectile projectile = new Projectile(.1f, 1, Color.RED, GameScreen.getStuff().getPlayer().getWorldPoint(), velocity, 1);
-        GameScreen.getStuff().addActor(projectile);
+        if (timeToNextFire <= 0) {
+            //Make a plasma blast
+            float rotation = GameScreen.getStuff().getPlayer().getWorldRotation();
+            Point velocity = new Point(20, 0).rotate(rotation).add(GameScreen.getStuff().getPlayer().getWorldVelocity());
+            Point startPoint = GameScreen.getStuff().getPlayer().getWorldPoint().add(new Point(.4f, -.25f).rotate(rotation));
+            Projectile projectile = new Projectile(.5f, .1f, Color.RED, startPoint, velocity, 2);
+            GameScreen.getStuff().addActor(projectile);
+            timeToNextFire = cooldown;
+        }
     }
 
     @Override
@@ -68,6 +75,15 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public void act(float delta) {
-        //Do nothing
+        super.act(delta);
+        if (timeToNextFire > 0)
+            timeToNextFire -= delta;
+    }
+
+    @Override
+    public float getCooldownPercent() {
+        if (timeToNextFire <= 0)
+            return 1;
+        return 1 - timeToNextFire / cooldown;
     }
 }

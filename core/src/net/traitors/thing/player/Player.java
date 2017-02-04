@@ -39,7 +39,7 @@ public class Player extends AbstractThing {
     }
 
     private void rotateToFace(Point point) {
-        setRotation(point.subtract(getPoint()).angle() + (float) Math.PI / 2);
+        setRotation(point.subtract(getPoint()).angle());
     }
 
     public void worldTouched(Point point) {
@@ -95,6 +95,7 @@ public class Player extends AbstractThing {
 
     @Override
     public void act(float delta) {
+        super.act(delta);
         float x = 0;
         float y = 0;
         float speedMult = 1;
@@ -127,12 +128,14 @@ public class Player extends AbstractThing {
         } else {
             resetAnimation();
         }
+
+        inventory.updateCooldowns(delta);
     }
 
     @Override
     public void draw(Batch batch) {
         Point worldPoint = getWorldPoint();
-        float rotation = getPlatform().getWorldRotation() + getRotation();
+        float rotation = getPlatform().getWorldRotation() + getRotation() + (float) Math.PI / 2;
         if (holding == null) {
             batch.draw(animation[getAnimationIndex()], worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
         } else {
@@ -240,10 +243,8 @@ public class Player extends AbstractThing {
 
             if (forward) {
                 pixmap.fillRectangle(startX, forStart, width, (int) (maxForExt * fracToFullyExtended));
-                //pixmap.fillRectangle(pixmap.getWidth() - startX - width, backStart, width, (int) (maxBackExt * fracToFullyExtended));
             } else {
                 pixmap.fillRectangle(startX, backStart, width, (int) (maxBackExt * fracToFullyExtended));
-                //pixmap.fillRectangle(pixmap.getWidth() - startX - width, forStart, width, (int) (maxForExt * fracToFullyExtended));
             }
             forStart += maxForExt * fracToFullyExtended;
         }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
 import net.traitors.thing.item.Item;
+import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
 class InventorySlot extends Widget implements Touchable {
@@ -18,20 +19,26 @@ class InventorySlot extends Widget implements Touchable {
     private boolean touched = false;
     private Texture backgroundTexture;
     private Texture selectedTexture;
+    private Texture cooldown;
     private Point drawImageAt = new Point();
 
     InventorySlot(final Inventory inventory) {
-        Pixmap pixmap = new Pixmap(100, 100, Pixmap.Format.RGBA4444);
+        PixmapRotateRec pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);
         pixmap.setColor(0, 0, 0, .7f);
         pixmap.fill();
         pixmap.setColor(Color.BLACK);
         pixmap.drawRectangle(0, 0, 100, 100);
         backgroundTexture = new Texture(pixmap);
 
-        pixmap = new Pixmap(100, 100, Pixmap.Format.RGBA4444);
+        pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);
         pixmap.setColor(Color.RED);
-        pixmap.drawRectangle(0, 0, 100, 100);
+        pixmap.drawRectangle(0, 0, 100, 100, 4);
         selectedTexture = new Texture(pixmap);
+
+        pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);
+        pixmap.setColor(Color.RED.r, Color.RED.g, Color.RED.b, .5f);
+        pixmap.fill();
+        cooldown = new Texture(pixmap);
 
         addListener(new InputListener() {
             @Override
@@ -81,6 +88,9 @@ class InventorySlot extends Widget implements Touchable {
             float scale = .9f;
             batch.draw(item.getInventoryImage(), drawImageAt.x + getWidth() * (1 - scale) / 2,
                     drawImageAt.y + getHeight() * (1 - scale) / 2, getWidth() * scale, getHeight() * scale);
+            if(item.getCooldownPercent() < 1) {
+                batch.draw(cooldown, getX(), getY(), getWidth() * item.getCooldownPercent(), getHeight());
+            }
         }
         if (selected) {
             batch.draw(selectedTexture, getX(), getY(), getWidth(), getHeight());
