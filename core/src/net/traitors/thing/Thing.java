@@ -57,6 +57,13 @@ public interface Thing extends Actor {
     float getWorldRotation();
 
     /**
+     * Set the current rotation of this thing relative to the world
+     *
+     * @param rotation rotation in radians
+     */
+    void setWorldRotation(float rotation);
+
+    /**
      * Gets the current world velocity
      *
      * @return the velocity we are moving at in the world

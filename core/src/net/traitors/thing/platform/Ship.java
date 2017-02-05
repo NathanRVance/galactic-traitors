@@ -31,8 +31,26 @@ public class Ship extends AbstractPlatform {
         }
     }
 
+    /**
+     * Get a usable that can be used from poin
+     * @param point point to get usable at, in world coordinates
+     * @return the usable usable, or null if there isn't one
+     */
     public Usable getUsableAt(Point point) {
+        for(Tile tile : usables) {
+            if(tile.contains(point)) {
+                return (Usable) tile;
+            }
+        }
         return null;
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        for(Tile tile : usables) {
+            tile.act(delta); //Updates cooldowns
+        }
     }
 
     static class ShipBuilder {

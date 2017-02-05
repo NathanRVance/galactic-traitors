@@ -58,6 +58,11 @@ public abstract class AbstractThing implements Thing {
     }
 
     @Override
+    public void setWorldRotation(float rotation) {
+        setRotation(getPlatform().convertToPlatformRotation(rotation));
+    }
+
+    @Override
     public Point getWorldVelocity() {
         return velocity;
     }

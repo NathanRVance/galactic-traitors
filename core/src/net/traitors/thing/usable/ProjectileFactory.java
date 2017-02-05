@@ -3,41 +3,42 @@ package net.traitors.thing.usable;
 import com.badlogic.gdx.graphics.Color;
 
 import net.traitors.GameScreen;
-import net.traitors.thing.player.Player;
+import net.traitors.thing.Thing;
 import net.traitors.thing.projectile.Projectile;
 import net.traitors.util.Point;
 
 public class ProjectileFactory implements Usable {
 
-    private final float cooldown;
-    private final Point originOffset;
-    private final float projectileThickness;
-    private final float projectileLength;
-    private final float projectileSpeed;
-    private final Color projectileColor;
-    private final float projectileLongevity;
+    //Start with some reasonable defaults
+    private float cooldown = 1;
+    private Point originOffset = new Point();
+    private Point rotationOffset = new Point();
+    private float thickness = .1f;
+    private float length = .5f;
+    private float speed = 20;
+    private Color color = Color.RED;
+    private float longevity = 2;
 
     private float timeToNextFire = 0;
 
-    public ProjectileFactory(float cooldown, Point originOffset, float projectileThickness, float projectileLength, float projectileSpeed, Color projectileColor, float projectileLongevity) {
-        this.cooldown = cooldown;
-        this.originOffset = originOffset;
-        this.projectileThickness = projectileThickness;
-        this.projectileLength = projectileLength;
-        this.projectileSpeed = projectileSpeed;
-        this.projectileColor = projectileColor;
-        this.projectileLongevity = projectileLongevity;
+    private ProjectileFactory() {
     }
 
     @Override
-    public void use(Player player) {
+    public void use(Thing user) {
+        use(user, user.getWorldRotation());
+    }
+
+    public void use(Thing user, float rotation) {
         if (timeToNextFire <= 0) {
             //Make a plasma blast
-            float rotation = player.getWorldRotation();
-            Point velocity = new Point(projectileSpeed, 0).rotate(rotation).add(player.getWorldVelocity());
-            Point startPoint = player.getWorldPoint().add(originOffset.rotate(rotation));
-            Projectile projectile = new Projectile(projectileLength, projectileThickness,
-                    projectileColor, startPoint, velocity, projectileLongevity);
+            float userRot = user.getWorldRotation();
+            Point velocity = new Point(speed, 0).rotate(rotation).add(user.getWorldVelocity());
+            Point rotOff = rotationOffset.rotate(userRot);
+            Point origOff = originOffset.rotate(userRot);
+            Point startPoint = user.getWorldPoint().add(origOff.subtract(rotOff).rotate(rotation - userRot).add(rotOff));
+            Projectile projectile = new Projectile(length, thickness,
+                    color, startPoint, velocity, longevity);
             GameScreen.getStuff().addActor(projectile);
             timeToNextFire = cooldown;
         }
@@ -53,5 +54,55 @@ public class ProjectileFactory implements Usable {
     public void updateCooldown(float delta) {
         if (timeToNextFire > 0)
             timeToNextFire -= delta;
+    }
+
+    public static class Builder {
+
+        ProjectileFactory factory = new ProjectileFactory();
+
+        public Builder setCooldown(float cooldown) {
+            factory.cooldown = cooldown;
+            return this;
+        }
+
+        public Builder setOriginOffset(Point originOffset) {
+            factory.originOffset = originOffset;
+            return this;
+        }
+
+        public Builder setRotationOffset(Point rotationOffset) {
+            factory.rotationOffset = rotationOffset;
+            return this;
+        }
+
+        public Builder setThickness(float thickness) {
+            factory.thickness = thickness;
+            return this;
+        }
+
+        public Builder setLength(float length) {
+            factory.length = length;
+            return this;
+        }
+
+        public Builder setSpeed(float speed) {
+            factory.speed = speed;
+            return this;
+        }
+
+        public Builder setColor(Color color) {
+            factory.color = color;
+            return this;
+        }
+
+        public Builder setLongevity(float longevity) {
+            factory.longevity = longevity;
+            return this;
+        }
+
+        public ProjectileFactory build() {
+            return factory;
+        }
+
     }
 }

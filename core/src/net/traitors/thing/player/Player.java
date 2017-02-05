@@ -11,6 +11,8 @@ import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
+import net.traitors.thing.platform.Ship;
+import net.traitors.thing.usable.Usable;
 import net.traitors.ui.touchable.Inventory;
 import net.traitors.util.Point;
 
@@ -51,8 +53,13 @@ public class Player extends AbstractThing {
                 inventory.addItem(item);
             }
         }
-        if(holding != null) {
+        if (holding != null) {
             holding.use(this);
+        } else if (getPlatform() instanceof Ship) {
+            Usable usable = ((Ship) getPlatform()).getUsableAt(getWorldPoint());
+            if (usable != null) {
+                usable.use(this);
+            }
         }
     }
 
@@ -141,7 +148,7 @@ public class Player extends AbstractThing {
         } else {
             batch.draw(animationHolding[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
             Texture inHand = holding.getHandImage();
-            Point itemp = new Point(getWidth() / 22, - getHeight() / 3);
+            Point itemp = new Point(getWidth() / 22, -getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
             float height = width * inHand.getHeight() / inHand.getWidth();

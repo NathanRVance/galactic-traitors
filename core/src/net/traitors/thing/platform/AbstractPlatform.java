@@ -75,13 +75,13 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
 
     @Override
     public float convertToWorldRotation(float rotation) {
-        rotation = (rotation + getRotation()) % (float) (Math.PI * 2);
+        rotation = (float) ((rotation + getRotation() + Math.PI * 2) % (Math.PI * 2));
         return getPlatform().convertToWorldRotation(rotation);
     }
 
     @Override
     public float convertToPlatformRotation(float rotation) {
         rotation = getPlatform().convertToPlatformRotation(rotation);
-        return (rotation - getRotation()) % (float) (Math.PI * 2);
+        return (float) ((rotation - getRotation() + Math.PI * 2) % (float) (Math.PI * 2));
     }
 }

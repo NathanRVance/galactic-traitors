@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.thing.AbstractThing;
-import net.traitors.thing.player.Player;
+import net.traitors.thing.Thing;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
 
@@ -55,8 +55,8 @@ public class Gun extends AbstractThing implements Item {
     }
 
     @Override
-    public void use(Player player) {
-        projectileFactory.use(player);
+    public void use(Thing thing) {
+        projectileFactory.use(thing);
     }
 
     @Override

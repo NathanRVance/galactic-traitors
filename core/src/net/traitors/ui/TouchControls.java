@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import net.traitors.controls.Controls;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.player.Player;
 import net.traitors.thing.usable.ProjectileFactory;
@@ -13,7 +14,6 @@ import net.traitors.ui.touchable.Inventory;
 import net.traitors.ui.touchable.SyncCameraButton;
 import net.traitors.ui.touchable.Touchable;
 import net.traitors.ui.touchable.TouchableTouchpad;
-import net.traitors.controls.Controls;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
@@ -49,7 +49,15 @@ public class TouchControls extends Stage implements Touchable {
         float slotWidth = height / 5;
         Inventory inventory = new Inventory(this, 5, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4, player);
         addTouchable(inventory);
-        ProjectileFactory factory = new ProjectileFactory(1, new Point(.4f, -.25f), .1f, .5f, 20, Color.RED, 2);
+        ProjectileFactory factory = new ProjectileFactory.Builder()
+                .setCooldown(1)
+                .setOriginOffset(new Point(.4f, -.25f))
+                .setThickness(.1f)
+                .setLength(.5f)
+                .setSpeed(20)
+                .setColor(Color.RED)
+                .setLongevity(1)
+                .build();
         inventory.addItem(new Gun(.1f, .1f, factory));
 
         float buttonDim = height / 6;
