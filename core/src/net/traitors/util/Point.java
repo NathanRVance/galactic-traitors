@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Point {
 
-    public final float x;
-    public final float y;
+    public float x;
+    public float y;
 
     public Point() {
         x = 0;
@@ -21,6 +21,10 @@ public class Point {
     public Point(Vector3 vector) {
         this.x = vector.x;
         this.y = vector.y;
+    }
+
+    public Point duplicate() {
+        return new Point(x, y);
     }
 
     public float distance(Point other) {
@@ -46,25 +50,34 @@ public class Point {
      * Rotate this point around (0, 0) by the specified amount
      *
      * @param rotation amount to rotate, in radians
-     * @return rotated point
+     * @return rotated point (this)
      */
     public Point rotate(float rotation) {
-        if(isZero()) return this;
-        float angle = angle() + rotation;
-        float distance = distanceFromZero();
-        return new Point((float) Math.cos(angle) * distance, (float) Math.sin(angle) * distance);
+        if (!isZero()) {
+            float angle = angle() + rotation;
+            float distance = distanceFromZero();
+            x = (float) Math.cos(angle) * distance;
+            y = (float) Math.sin(angle) * distance;
+        }
+        return this;
     }
 
     public Point add(Point other) {
-        return new Point(x + other.x, y + other.y);
+        x += other.x;
+        y += other.y;
+        return this;
     }
 
     public Point subtract(Point other) {
-        return new Point(x - other.x, y - other.y);
+        x -= other.x;
+        y -= other.y;
+        return this;
     }
 
     public Point scale(float amnt) {
-        return new Point(x * amnt, y * amnt);
+        x *= amnt;
+        y *= amnt;
+        return this;
     }
 
     public boolean isZero() {
@@ -74,13 +87,17 @@ public class Point {
     public Point unproject(Camera camera) {
         Vector3 v = new Vector3(x, y, 0);
         camera.unproject(v);
-        return new Point(v.x, v.y);
+        x = v.x;
+        y = v.y;
+        return this;
     }
 
     public Point project(Camera camera) {
         Vector3 v = new Vector3(x, y, 0);
         camera.project(v);
-        return new Point(v.x, v.y);
+        x = v.x;
+        y = v.y;
+        return this;
     }
 
     @Override

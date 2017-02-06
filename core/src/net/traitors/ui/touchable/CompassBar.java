@@ -12,7 +12,7 @@ import net.traitors.util.BetterCamera;
 public class CompassBar extends Widget implements Touchable {
 
     private TouchControls stage;
-    private SelectableSwitch<Compass> selectableSwitch = new SelectableSwitch<Compass>();
+    private SelectableSwitch<Compass> selectableSwitch = new SelectableSwitch<>();
     private Player player;
     private BetterCamera camera;
     private float x;

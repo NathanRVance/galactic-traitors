@@ -22,20 +22,21 @@ public class TextView extends Stage {
      * @param width between 0 and 1 (same units as x and y), will wrap text that extends beyond
      */
     public void drawStringOnScreen(BitmapFont font, CharSequence text, Point pos, Align align, float width) {
-        Point p = new Point(pos.x * getWidth(), pos.y * getHeight());
+        pos.x *= getWidth();
+        pos.y *= getHeight();
         width *= getWidth();
         switch (align) {
             case left:
                 break;
             case right:
-                p = new Point(p.x - width, p.y);
+                pos.x -= width;
                 break;
             case center:
-                p = new Point(p.x - width / 2, p.y);
+                pos.x -= width / 2;
                 break;
 
         }
-        DrawText t = new DrawText(font, text, p, align, width);
+        DrawText t = new DrawText(font, text, pos, align, width);
         addActor(t);
     }
 
@@ -50,11 +51,11 @@ public class TextView extends Stage {
      * @param width between 0 and 1 (same units as x and y), will wrap text that extends beyond
      */
     public void drawStringInWorld(Camera camera, BitmapFont font, CharSequence text, Point pos, Align align, float width) {
-        Point p = new Point(pos.x, pos.y);
-        p = p.project(camera);
-        p = new Point(p.x / getWidth(), p.y / getHeight());
+        pos.project(camera);
+        pos.x /= getWidth();
+        pos.y /= getHeight();
 
-        drawStringOnScreen(font, text, p, align, width);
+        drawStringOnScreen(font, text, pos, align, width);
     }
 
     @Override

@@ -16,7 +16,11 @@ public class ShipFactory {
         shipBuilder.addTile(new OverviewScreen(2, 3), 1, 1);
         shipBuilder.addTile(new GunTile(1, 1, 0, new FloorTile()), 3, 2);
         shipBuilder.addTile(new GunTile(1, 1, (float) Math.PI, new FloorTile()), 0, 2);
-        shipBuilder.addTile(new ThrusterTile(1, 1, (float) Math.PI * 3 / 2, new FloorTile()), 1, 0);
+        ThrusterTile t1 = new ThrusterTile(1, 1, (float) Math.PI * 3 / 2, new FloorTile());
+        ThrusterTile t2 = new ThrusterTile(1, 1, (float) Math.PI * 3 / 2, new FloorTile());
+        t1.lockUseWith(t2);
+        shipBuilder.addTile(t1, 1, 0);
+        shipBuilder.addTile(t2, 2, 0);
         return shipBuilder.getShip();
     }
 

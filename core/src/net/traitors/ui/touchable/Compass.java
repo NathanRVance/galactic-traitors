@@ -19,8 +19,8 @@ class Compass extends Widget implements Selectable {
     private BetterCamera camera;
     private boolean selected = false;
     private boolean touched = false;
-    private TextureRegion compassSelected;
-    private TextureRegion compassUnselected;
+    private static TextureRegion compassSelected;
+    private static TextureRegion compassUnselected;
     private Texture needle;
     private Thing trackThing;
 
@@ -30,8 +30,12 @@ class Compass extends Widget implements Selectable {
 
     Compass(final SelectableSwitch<Compass> selectableSwitch, final BetterCamera camera) {
         this.camera = camera;
-        compassSelected = getCompass(Color.BLUE);
-        compassUnselected = getCompass(Color.GRAY);
+        if(compassSelected == null) {
+            compassSelected = getCompass(Color.BLUE);
+        }
+        if(compassUnselected == null) {
+            compassUnselected = getCompass(Color.GRAY);
+        }
         needle = getNeedle();
 
         addListener(new InputListener() {

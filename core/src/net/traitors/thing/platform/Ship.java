@@ -14,7 +14,7 @@ public class Ship extends AbstractPlatform {
 
 
     private Tile[][] grid;
-    private List<Tile> usables = new ArrayList<Tile>(); //Guaranteed to also be usable
+    private List<Tile> usables = new ArrayList<>(); //Guaranteed to also be usable
 
     private Ship(int width, int height) {
         super(width, height);
@@ -32,13 +32,13 @@ public class Ship extends AbstractPlatform {
     }
 
     /**
-     * Get a usable that can be used from poin
+     * Get a usable that can be used from point
      * @param point point to get usable at, in world coordinates
      * @return the usable usable, or null if there isn't one
      */
     public Usable getUsableAt(Point point) {
         for(Tile tile : usables) {
-            if(tile.contains(point)) {
+            if(tile.contains(point.duplicate())) {
                 return (Usable) tile;
             }
         }

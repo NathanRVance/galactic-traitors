@@ -22,13 +22,13 @@ import java.util.Set;
 
 public class Stuff {
 
-    private List<Actor> actors = new ArrayList<Actor>();
-    private List<Thing> stuff = new ArrayList<Thing>();
-    private List<Actor> removeBuffer = new ArrayList<Actor>();
-    private List<Actor> addBuffer = new ArrayList<Actor>();
+    private List<Actor> actors = new ArrayList<>();
+    private List<Thing> stuff = new ArrayList<>();
+    private List<Actor> removeBuffer = new ArrayList<>();
+    private List<Actor> addBuffer = new ArrayList<>();
     private BetterCamera camera;
     private Player player;
-    private Map<Platform, Set<TreeNode<Thing>>> stuffOnPlatforms = new HashMap<Platform, Set<TreeNode<Thing>>>();
+    private Map<Platform, Set<TreeNode<Thing>>> stuffOnPlatforms = new HashMap<>();
 
     public Stuff(BetterCamera camera, Player player) {
         this.camera = camera;
@@ -101,7 +101,7 @@ public class Stuff {
 
         Point playerWorldPoint = player.getWorldPoint();
         camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
-        if(camera.getRotatingWith() == null)
+        if (camera.getRotatingWith() == null)
             camera.rotateWith(player.getPlatform());
         camera.update();
 

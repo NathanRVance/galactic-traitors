@@ -22,7 +22,7 @@ public class Projectile extends AbstractThing {
         super(width, height);
         setPoint(start);
         location = null;
-        this.velocity = velocity;
+        this.velocity = velocity.duplicate();
         this.longevity = longevity;
 
         int dim = 10;
@@ -44,9 +44,10 @@ public class Projectile extends AbstractThing {
     public void act(float delta) {
         super.act(delta);
         if(location == null) location = getWorldPoint();
-        location = location.add(velocity.scale(delta));
+        location.add(velocity.duplicate().scale(delta));
         longevity -= delta;
         if(longevity < 0) {
+            texture.getTexture().dispose();
             GameScreen.getStuff().removeActor(this);
         }
 

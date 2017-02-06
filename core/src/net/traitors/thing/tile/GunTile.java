@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
+import net.traitors.thing.usable.FloatStrategy;
+import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
@@ -45,14 +47,49 @@ public class GunTile extends AbstractThing implements Tile, Usable {
         this.barrelLength = getHeight() * 3 / 4;
 
         projectileFactory = new ProjectileFactory.Builder()
-                .setCooldown(.2f)
-                .setOriginOffset(new Point(getWidth() / 2 * 1.2f + barrelLength, -.1f))
-                .setRotationOffset(new Point(getWidth() / 2 * 1.2f, 0))
-                .setThickness(.2f)
-                .setLength(.7f)
-                .setSpeed(20)
+                .setCooldown(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .2f;
+                    }
+                })
+                .setOriginOffset(new PointStrategy() {
+                    @Override
+                    public Point getPoint() {
+                        return new Point(getWidth() / 2 * 1.2f + barrelLength, -.1f);
+                    }
+                })
+                .setRotationOffset(new PointStrategy() {
+                    @Override
+                    public Point getPoint() {
+                        return new Point(getWidth() / 2 * 1.2f, 0);
+                    }
+                })
+                .setThickness(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .2f;
+                    }
+                })
+                .setLength(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .7f;
+                    }
+                })
+                .setSpeed(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 20;
+                    }
+                })
                 .setColor(Color.RED)
-                .setLongevity(5)
+                .setLongevity(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 5;
+                    }
+                })
                 .build();
 
         rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 3);
@@ -71,7 +108,7 @@ public class GunTile extends AbstractThing implements Tile, Usable {
         float barrelWidth = barrelLength / 8;
         float drawLen = (projectileFactory.getCooldownPercent() * .1f + .9f) * barrelLength;
         Point barrelp = new Point(getWidth() / 2 * 1.2f, 0);
-        barrelp = barrelp.rotate(rot);
+        barrelp.rotate(rot);
         batch.draw(barrel,
                 worldPoint.x + barrelp.x,
                 worldPoint.y + barrelp.y - barrelWidth / 2,

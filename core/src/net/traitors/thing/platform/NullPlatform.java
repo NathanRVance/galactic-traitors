@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.util.Point;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class NullPlatform implements Platform {
     @Override
     public Point getTranslationalVelocity() {
@@ -49,22 +47,22 @@ public class NullPlatform implements Platform {
 
     @Override
     public Point getPoint() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setPoint(Point point) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Point getWorldPoint() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setWorldPoint(Point point) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class NullPlatform implements Platform {
 
     @Override
     public void setRotation(float rotation) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -84,7 +82,7 @@ public class NullPlatform implements Platform {
 
     @Override
     public void setWorldRotation(float rotation) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -94,27 +92,27 @@ public class NullPlatform implements Platform {
 
     @Override
     public float getWidth() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public float getHeight() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Platform getPlatform() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setPlatform(Platform platform) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void draw(Batch batch) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -124,6 +122,6 @@ public class NullPlatform implements Platform {
 
     @Override
     public void act(float delta) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

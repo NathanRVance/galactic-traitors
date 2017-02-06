@@ -10,14 +10,49 @@ import net.traitors.util.Point;
 public class ProjectileFactory implements Usable {
 
     //Start with some reasonable defaults
-    private float cooldown = 1;
-    private Point originOffset = new Point();
-    private Point rotationOffset = new Point();
-    private float thickness = .1f;
-    private float length = .5f;
-    private float speed = 20;
+    private FloatStrategy cooldown = new FloatStrategy() {
+                @Override
+                public float getFloat() {
+                    return 1;
+                }
+            };
+    private PointStrategy originOffset = new PointStrategy() {
+        @Override
+        public Point getPoint() {
+            return new Point();
+        }
+    };
+    private PointStrategy rotationOffset = new PointStrategy() {
+        @Override
+        public Point getPoint() {
+            return new Point();
+        }
+    };
+    private FloatStrategy thickness = new FloatStrategy() {
+        @Override
+        public float getFloat() {
+            return .1f;
+        }
+    };
+    private FloatStrategy length = new FloatStrategy() {
+        @Override
+        public float getFloat() {
+            return .5f;
+        }
+    };
+    private FloatStrategy speed = new FloatStrategy() {
+        @Override
+        public float getFloat() {
+            return 20;
+        }
+    };
     private Color color = Color.RED;
-    private float longevity = 2;
+    private FloatStrategy longevity = new FloatStrategy() {
+        @Override
+        public float getFloat() {
+            return 2;
+        }
+    };
 
     private float timeToNextFire = 0;
 
@@ -33,14 +68,14 @@ public class ProjectileFactory implements Usable {
         if (timeToNextFire <= 0) {
             //Make a plasma blast
             float userRot = user.getWorldRotation();
-            Point velocity = new Point(speed, 0).rotate(rotation).add(user.getWorldVelocity());
-            Point rotOff = rotationOffset.rotate(userRot);
-            Point origOff = originOffset.rotate(userRot);
+            Point velocity = new Point(speed.getFloat(), 0).rotate(rotation).add(user.getWorldVelocity());
+            Point rotOff = rotationOffset.getPoint().rotate(userRot);
+            Point origOff = originOffset.getPoint().rotate(userRot);
             Point startPoint = user.getWorldPoint().add(origOff.subtract(rotOff).rotate(rotation - userRot).add(rotOff));
-            Projectile projectile = new Projectile(length, thickness,
-                    color, startPoint, velocity, longevity);
+            Projectile projectile = new Projectile(length.getFloat(), thickness.getFloat(),
+                    color, startPoint, velocity, longevity.getFloat());
             GameScreen.getStuff().addActor(projectile);
-            timeToNextFire = cooldown;
+            timeToNextFire = cooldown.getFloat();
         }
     }
 
@@ -48,7 +83,7 @@ public class ProjectileFactory implements Usable {
     public float getCooldownPercent() {
         if (timeToNextFire <= 0)
             return 1;
-        return 1 - timeToNextFire / cooldown;
+        return 1 - timeToNextFire / cooldown.getFloat();
     }
 
     public void updateCooldown(float delta) {
@@ -60,32 +95,32 @@ public class ProjectileFactory implements Usable {
 
         ProjectileFactory factory = new ProjectileFactory();
 
-        public Builder setCooldown(float cooldown) {
+        public Builder setCooldown(FloatStrategy cooldown) {
             factory.cooldown = cooldown;
             return this;
         }
 
-        public Builder setOriginOffset(Point originOffset) {
+        public Builder setOriginOffset(PointStrategy originOffset) {
             factory.originOffset = originOffset;
             return this;
         }
 
-        public Builder setRotationOffset(Point rotationOffset) {
+        public Builder setRotationOffset(PointStrategy rotationOffset) {
             factory.rotationOffset = rotationOffset;
             return this;
         }
 
-        public Builder setThickness(float thickness) {
+        public Builder setThickness(FloatStrategy thickness) {
             factory.thickness = thickness;
             return this;
         }
 
-        public Builder setLength(float length) {
+        public Builder setLength(FloatStrategy length) {
             factory.length = length;
             return this;
         }
 
-        public Builder setSpeed(float speed) {
+        public Builder setSpeed(FloatStrategy speed) {
             factory.speed = speed;
             return this;
         }
@@ -95,7 +130,7 @@ public class ProjectileFactory implements Usable {
             return this;
         }
 
-        public Builder setLongevity(float longevity) {
+        public Builder setLongevity(FloatStrategy longevity) {
             factory.longevity = longevity;
             return this;
         }

@@ -41,7 +41,7 @@ public class Player extends AbstractThing {
     }
 
     private void rotateToFace(Point point) {
-        setRotation(point.subtract(getPoint()).angle());
+        setRotation(point.duplicate().subtract(getPoint()).angle());
     }
 
     public void worldTouched(Point point) {
@@ -122,12 +122,12 @@ public class Player extends AbstractThing {
             speedMult = 3;
         }
         Point d = new Point(x, y);
-        d = d.rotate(GameScreen.getStuff().getCamera().getCameraAngle() - getPlatform().getWorldRotation());
+        d.rotate(GameScreen.getStuff().getCamera().getCameraAngle() - getPlatform().getWorldRotation());
 
         float totMove = d.distanceFromZero();
         if (totMove != 0) {
             setAnimationLength(BASE_ANIMATION_LENGTH / speedMult);
-            d = d.scale(BASE_MOVE_SPEED * delta * speedMult / totMove);
+            d.scale(BASE_MOVE_SPEED * delta * speedMult / totMove);
             Point destination = getPoint().add(d);
             rotateToFace(destination);
             setPoint(destination);

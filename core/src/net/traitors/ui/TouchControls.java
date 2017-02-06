@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import net.traitors.controls.Controls;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.player.Player;
+import net.traitors.thing.usable.FloatStrategy;
+import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.ui.touchable.CompassBar;
 import net.traitors.ui.touchable.Inventory;
@@ -29,7 +31,7 @@ public class TouchControls extends Stage implements Touchable {
     //Finger touching the widget last render cycle. Index is finger, value is widget touched.
     private Touchable[] touched = new Touchable[maxFingers];
 
-    private Set<Touchable> touchables = new HashSet<Touchable>();
+    private Set<Touchable> touchables = new HashSet<>();
 
     private TouchableTouchpad touchpad;
     private CompassBar compassBar;
@@ -50,13 +52,43 @@ public class TouchControls extends Stage implements Touchable {
         Inventory inventory = new Inventory(this, 5, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4, player);
         addTouchable(inventory);
         ProjectileFactory factory = new ProjectileFactory.Builder()
-                .setCooldown(1)
-                .setOriginOffset(new Point(.4f, -.25f))
-                .setThickness(.1f)
-                .setLength(.5f)
-                .setSpeed(20)
+                .setCooldown(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 1;
+                    }
+                })
+                .setOriginOffset(new PointStrategy() {
+                    @Override
+                    public Point getPoint() {
+                        return new Point(.4f, -.25f);
+                    }
+                })
+                .setThickness(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .1f;
+                    }
+                })
+                .setLength(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .5f;
+                    }
+                })
+                .setSpeed(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 20;
+                    }
+                })
                 .setColor(Color.RED)
-                .setLongevity(1)
+                .setLongevity(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 1;
+                    }
+                })
                 .build();
         inventory.addItem(new Gun(.1f, .1f, factory));
 

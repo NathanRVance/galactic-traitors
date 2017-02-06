@@ -24,12 +24,12 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public Point getPoint() {
-        return point;
+        return point.duplicate();
     }
 
     @Override
     public void setPoint(Point point) {
-        this.point = point;
+        this.point = point.duplicate();
     }
 
     @Override
@@ -39,7 +39,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public void setWorldPoint(Point point) {
-        this.point = getPlatform().convertToPlatformCoordinates(point);
+        this.point = getPlatform().convertToPlatformCoordinates(point).duplicate();
     }
 
     @Override
@@ -87,7 +87,7 @@ public abstract class AbstractThing implements Thing {
         setPoint(getWorldPoint());
         setRotation(getWorldRotation());
         if (platform != null) {
-            setPoint(platform.convertToPlatformCoordinates(getPoint()));
+            setPoint(platform.convertToPlatformCoordinates(getPoint()).duplicate());
             setRotation(platform.convertToPlatformRotation(rotation));
         }
         this.platform = platform;
@@ -104,7 +104,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public boolean contains(Point point) {
-        point = point.subtract(getWorldPoint()).rotate(-1 * getWorldRotation());
+        point.subtract(getWorldPoint()).rotate(-1 * getWorldRotation());
         return Math.abs(point.x) <= getWidth() / 2 && Math.abs(point.y) <= getHeight() / 2;
     }
 }
