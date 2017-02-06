@@ -63,7 +63,7 @@ public class GameScreen implements Screen {
         stuff.addActor(camera); //must happen before player
         stuff.addActor(player);
 
-        uiControls = new TouchControls(player, camera);
+        uiControls = new TouchControls(player);
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(camera)));
     }
 
@@ -102,7 +102,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
         stuff.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
-        uiControls = new TouchControls(stuff.getPlayer(), stuff.getCamera());
+        uiControls = new TouchControls(stuff.getPlayer());
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(stuff.getCamera())));
 
         textView = new TextView();

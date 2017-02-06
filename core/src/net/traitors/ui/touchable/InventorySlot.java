@@ -9,10 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
 import net.traitors.thing.item.Item;
+import net.traitors.thing.player.Player;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
-class InventorySlot extends Widget implements Touchable {
+class InventorySlot extends Widget implements Selectable {
 
     private Item item;
     private boolean selected = false;
@@ -22,7 +23,7 @@ class InventorySlot extends Widget implements Touchable {
     private Texture cooldown;
     private Point drawImageAt = new Point();
 
-    InventorySlot(final Inventory inventory) {
+    InventorySlot(final SelectableSwitch<InventorySlot> selectableSwitch, final Player player) {
         PixmapRotateRec pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);
         pixmap.setColor(0, 0, 0, .7f);
         pixmap.fill();
@@ -46,7 +47,7 @@ class InventorySlot extends Widget implements Touchable {
                 if (touched) return false;
                 drawImageAt = new Point(getX(), getY());
                 touched = true;
-                inventory.slotTapped(InventorySlot.this, !selected);
+                selectableSwitch.selectableTapped(InventorySlot.this, !selected);
                 return true;
             }
 
@@ -64,7 +65,7 @@ class InventorySlot extends Widget implements Touchable {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 touched = false;
                 if(! drawImageAt.equals(new Point(getX(), getY()))) {
-                    inventory.getPlayer().dropItem(item);
+                    player.dropItem(item);
                     item = null;
                 }
                 drawImageAt = new Point(getX(), getY());
@@ -97,15 +98,18 @@ class InventorySlot extends Widget implements Touchable {
         }
     }
 
-    void select() {
+    @Override
+    public void select() {
         selected = true;
     }
 
-    void unselect() {
+    @Override
+    public void unselect() {
         selected = false;
     }
 
-    boolean isSelected() {
+    @Override
+    public boolean isSelected() {
         return selected;
     }
 

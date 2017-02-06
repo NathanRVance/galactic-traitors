@@ -10,19 +10,24 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
+import net.traitors.thing.Thing;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.PixmapRotateRec;
 
-public class SyncCameraButton extends Widget implements Touchable {
+class Compass extends Widget implements Selectable {
 
     private BetterCamera camera;
+    private boolean selected = false;
     private boolean touched = false;
-    private TextureRegion compass;
+    private TextureRegion compassSelected;
+    private TextureRegion compassUnselected;
     private Texture needle;
+    private Thing trackThing;
 
-    public SyncCameraButton(final BetterCamera camera) {
+    Compass(final SelectableSwitch<Compass> selectableSwitch, final BetterCamera camera) {
         this.camera = camera;
-        compass = getCompass();
+        compassSelected = getCompass(Color.BLUE);
+        compassUnselected = getCompass(Color.GRAY);
         needle = getNeedle();
 
         addListener(new InputListener() {
@@ -31,8 +36,13 @@ public class SyncCameraButton extends Widget implements Touchable {
                 if (touched) return false;
                 touched = true;
                 camera.syncRotations();
-                camera.zoom = 1;
+                selectableSwitch.selectableTapped(Compass.this, true);
                 return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                camera.setOffset((float) (x / getWidth() * Math.PI * 2 + Math.PI));
             }
 
             @Override
@@ -47,7 +57,13 @@ public class SyncCameraButton extends Widget implements Touchable {
     public void draw(Batch batch, float parentAlpha) {
         Color c = getColor();
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
+
+        Thing cameraTracking = camera.getRotatingWith();
+        camera.rotateWith(trackThing);
+        TextureRegion compass = (isSelected())? compassSelected : compassUnselected;
         batch.draw(compass, getX(), getY(), getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, -camera.getOffset() * MathUtils.radiansToDegrees);
+        camera.rotateWith(cameraTracking);
+
         float needleWidth = getWidth() / 25;
         batch.draw(needle, getX() + getWidth() / 2 - needleWidth / 2, getY() + getHeight() / 2, needleWidth, getHeight() / 3);
     }
@@ -57,11 +73,20 @@ public class SyncCameraButton extends Widget implements Touchable {
         return touched;
     }
 
-    private TextureRegion getCompass() {
+    void setTrackThing(Thing trackThing) {
+        this.trackThing = trackThing;
+        if(camera.getRotatingWith() == trackThing) {
+            select();
+        } else if (isSelected()) {
+            camera.rotateWith(trackThing);
+        }
+    }
+
+    private TextureRegion getCompass(Color ringColor) {
         int dim = 400;
         int radius = dim / 2;
         PixmapRotateRec pixmap = new PixmapRotateRec(dim, dim, Pixmap.Format.RGBA4444);
-        pixmap.setColor(Color.BLUE);
+        pixmap.setColor(ringColor);
         pixmap.fillCircle(radius, radius, radius);
         pixmap.setColor(Color.WHITE);
         pixmap.fillCircle(radius, radius, radius * 4 / 5);
@@ -138,5 +163,21 @@ public class SyncCameraButton extends Widget implements Touchable {
         pixmap.setColor(Color.RED);
         pixmap.fill();
         return new Texture(pixmap);
+    }
+
+    @Override
+    public void select() {
+        camera.rotateWith(trackThing);
+        selected = true;
+    }
+
+    @Override
+    public void unselect() {
+        selected = false;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return selected;
     }
 }

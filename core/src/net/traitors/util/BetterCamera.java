@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
 
-public class BetterCamera extends OrthographicCamera implements Actor{
+public class BetterCamera extends OrthographicCamera implements Actor {
 
     private Thing rotateWith = null;
     private float offset = 0;
@@ -30,19 +30,28 @@ public class BetterCamera extends OrthographicCamera implements Actor{
     }
 
     public void rotateWith(Thing thing) {
-        if(thing != rotateWith) {
+        if (thing != rotateWith) {
             //We're rotating with a new thing
             rotateWith = thing;
             offset = getCameraAngle() - thing.getWorldRotation();
         }
     }
 
+    public Thing getRotatingWith() {
+        return rotateWith;
+    }
+
     /**
      * Gets the offset from the "north" of the thing this platform is rotating with
+     *
      * @return offset in radians
      */
     public float getOffset() {
         return offset;
+    }
+
+    public void setOffset(float offset) {
+        this.offset = offset;
     }
 
     /**
@@ -50,6 +59,7 @@ public class BetterCamera extends OrthographicCamera implements Actor{
      */
     public void syncRotations() {
         offset = 0;
+        zoom = 1;
     }
 
     /**

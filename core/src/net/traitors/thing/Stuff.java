@@ -101,7 +101,8 @@ public class Stuff {
 
         Point playerWorldPoint = player.getWorldPoint();
         camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
-        camera.rotateWith(player.getPlatform());
+        if(camera.getRotatingWith() == null)
+            camera.rotateWith(player.getPlatform());
         camera.update();
 
         List<Point> touchesInWorld = Controls.getWorldTouches(camera);

@@ -12,7 +12,7 @@ import net.traitors.util.BetterCamera;
 
 public class OverviewScreen extends AbstractThing implements Tile {
 
-    private boolean imDrawingMyself = false;
+    private static boolean drawingMyself;
 
     public OverviewScreen(float width, float height) {
         super(width, height);
@@ -20,9 +20,9 @@ public class OverviewScreen extends AbstractThing implements Tile {
 
     @Override
     public void draw(Batch batch) {
-        //Draw myself only if I'm not't currently doing so
-        if (!imDrawingMyself) {
-            imDrawingMyself = true;
+        //Detect that an overview screen isn't currently doing the drawing
+        if (!drawingMyself) {
+            drawingMyself = true;
             //End the old batch
             batch.end();
             //Make a frame buffer to draw to
@@ -54,7 +54,7 @@ public class OverviewScreen extends AbstractThing implements Tile {
             Sprite sprite = new Sprite(frameBuffer.getColorBufferTexture());
             sprite.flip(false, true);
             batch.draw(sprite, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, getWorldRotation() * MathUtils.radiansToDegrees);
-            imDrawingMyself = false;
+            drawingMyself = false;
         }
     }
 }

@@ -10,11 +10,10 @@ import net.traitors.controls.Controls;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.player.Player;
 import net.traitors.thing.usable.ProjectileFactory;
+import net.traitors.ui.touchable.CompassBar;
 import net.traitors.ui.touchable.Inventory;
-import net.traitors.ui.touchable.SyncCameraButton;
 import net.traitors.ui.touchable.Touchable;
 import net.traitors.ui.touchable.TouchableTouchpad;
-import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
 
@@ -33,8 +32,9 @@ public class TouchControls extends Stage implements Touchable {
     private Set<Touchable> touchables = new HashSet<Touchable>();
 
     private TouchableTouchpad touchpad;
+    private CompassBar compassBar;
 
-    public TouchControls(Player player, BetterCamera camera) {
+    public TouchControls(Player player) {
         super(new ExtendViewport(arbitraryNumber, arbitraryNumber));
         float height = getHeight();
         float width = getWidth();
@@ -61,9 +61,8 @@ public class TouchControls extends Stage implements Touchable {
         inventory.addItem(new Gun(.1f, .1f, factory));
 
         float buttonDim = height / 6;
-        SyncCameraButton button = new SyncCameraButton(camera);
-        button.setBounds(0, height - buttonDim, buttonDim, buttonDim);
-        addTouchable(button);
+        compassBar = new CompassBar(this, 0, height - buttonDim, buttonDim, player);
+        addTouchable(compassBar);
 
         Controls.registerTouchControls(this);
     }
@@ -71,6 +70,11 @@ public class TouchControls extends Stage implements Touchable {
     public <A extends Actor & Touchable> void addTouchable(A touchable) {
         addActor(touchable);
         touchables.add(touchable);
+    }
+
+    public <A extends Actor & Touchable> void removeTouchable(A touchable) {
+        getActors().removeValue(touchable, false);
+        touchables.remove(touchable);
     }
 
     public float getTouchpadPercentX() {
@@ -98,6 +102,7 @@ public class TouchControls extends Stage implements Touchable {
                 }
             }
         }
+        compassBar.updateCompasses();
     }
 
     private boolean wasTouchedLastCycle(Touchable touchable) {
