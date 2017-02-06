@@ -21,6 +21,7 @@ public class GunTile extends AbstractThing implements Tile, Usable {
     private TextureRegion barrel;
     private float rotation = 0;
     private ProjectileFactory projectileFactory;
+    private RotationStrategy rotationStrategy;
 
     public GunTile(float width, float height, float rotation, Tile base) {
         super(width, height);
@@ -30,13 +31,13 @@ public class GunTile extends AbstractThing implements Tile, Usable {
 
         int domeExtent = 200;
         int domeWidth = 400;
-        Pixmap pixmap = new Pixmap(domeExtent, domeWidth, Pixmap.Format.RGBA4444);
+        Pixmap pixmap = new Pixmap(domeExtent, domeWidth, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.GRAY);
         pixmap.fillCircle(0, domeWidth / 2, domeExtent);
         dome = new TextureRegion(new Texture(pixmap));
 
         int barrelLen = 10;
-        pixmap = new Pixmap(barrelLen, barrelLen, Pixmap.Format.RGBA4444);
+        pixmap = new Pixmap(barrelLen, barrelLen, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.DARK_GRAY);
         pixmap.fill();
         barrel = new TextureRegion(new Texture(pixmap));
@@ -53,6 +54,8 @@ public class GunTile extends AbstractThing implements Tile, Usable {
                 .setColor(Color.RED)
                 .setLongevity(5)
                 .build();
+
+        rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 3);
     }
 
     @Override
@@ -89,20 +92,7 @@ public class GunTile extends AbstractThing implements Tile, Usable {
 
     @Override
     public void use(Thing user) {
-        //Since all operations are done % 2PI, this is guaranteed to fall between 0 and 2PI
-        float rot = user.getWorldRotation();
-        //rotation must be within our world rotation +- PI/3
-        float mid = getWorldRotation();
-        float variation = (float) Math.PI / 3;
-        float lower = (float) ((mid - variation + Math.PI * 2) % (Math.PI * 2));
-        float upper = (float) ((mid + variation + Math.PI * 2) % (Math.PI * 2));
-        if ((lower < upper && rot > lower && rot < upper) || (lower > upper && (rot > lower || rot < upper))) {
-            rotation = rot;
-        } else if (Math.abs(rot - lower) % (Math.PI * 2) < Math.PI - variation) {
-            rotation = lower;
-        } else {
-            rotation = upper;
-        }
+        rotation = rotationStrategy.getRotation(user.getWorldRotation(), getWorldRotation());
         projectileFactory.use(this, rotation);
     }
 

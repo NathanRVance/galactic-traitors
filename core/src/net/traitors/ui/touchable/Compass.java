@@ -24,6 +24,10 @@ class Compass extends Widget implements Selectable {
     private Texture needle;
     private Thing trackThing;
 
+    //Variables for dragging
+    private float startX = 0;
+    private boolean doingDrag = false;
+
     Compass(final SelectableSwitch<Compass> selectableSwitch, final BetterCamera camera) {
         this.camera = camera;
         compassSelected = getCompass(Color.BLUE);
@@ -37,17 +41,21 @@ class Compass extends Widget implements Selectable {
                 touched = true;
                 camera.syncRotations();
                 selectableSwitch.selectableTapped(Compass.this, true);
+                startX = x;
                 return true;
             }
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                camera.setOffset((float) (x / getWidth() * Math.PI * 2 + Math.PI));
+                if(Math.abs(startX - x) > getWidth() / 10) doingDrag = true;
+                if(doingDrag)
+                    camera.setOffset((float) (x / getWidth() * Math.PI * 2 + Math.PI));
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 touched = false;
+                doingDrag = false;
             }
 
         });

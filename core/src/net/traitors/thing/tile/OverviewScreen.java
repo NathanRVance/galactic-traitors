@@ -36,7 +36,7 @@ public class OverviewScreen extends AbstractThing implements Tile {
             camera.translate(getWorldPoint().x - camera.position.x, getWorldPoint().y - camera.position.y);
             camera.rotateWith(this);
             camera.syncRotations();
-            camera.zoom = 10;
+            camera.zoom = 25;
             camera.update();
             //Set the batch to use the camera
             batch.setProjectionMatrix(camera.combined);
