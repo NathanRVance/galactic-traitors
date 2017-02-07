@@ -147,12 +147,12 @@ public class Player extends AbstractThing {
             batch.draw(animation[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
         } else {
             batch.draw(animationHolding[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
-            Texture inHand = holding.getHandImage();
+            TextureRegion inHand = holding.getHandImage();
             Point itemp = new Point(getWidth() / 22, -getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio
-            float height = width * inHand.getHeight() / inHand.getWidth();
-            batch.draw(new TextureRegion(inHand),
+            float height = width * inHand.getTexture().getHeight() / inHand.getTexture().getWidth();
+            batch.draw(inHand,
                     worldPointLowLeft.x + itemp.x,
                     worldPointLowLeft.y + itemp.y,
                     getWidth() / 2 - itemp.x,

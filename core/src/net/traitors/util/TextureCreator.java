@@ -7,9 +7,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TextureCreator {
 
     private static TextureRegion tileTexture;
+
+    private static Map<Color, TextureRegion> colorRecs = new HashMap<>();
 
     public static TextureRegion getTileTexture() {
         if (tileTexture == null) {
@@ -49,6 +54,17 @@ public class TextureCreator {
         touchpadStyle.knob.setMinWidth(knobWidth);
         touchpadStyle.knob.setMinHeight(knobWidth);
         return touchpadStyle;
+    }
+
+    public static TextureRegion getColorRec(Color color) {
+        if(! colorRecs.containsKey(color)) {
+            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA4444);
+            pixmap.setColor(color);
+            pixmap.fill();
+            colorRecs.put(color, new TextureRegion(new Texture(pixmap)));
+        }
+
+        return colorRecs.get(color);
     }
 
 }

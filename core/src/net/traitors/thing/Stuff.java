@@ -7,18 +7,12 @@ import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.Platform;
 import net.traitors.thing.player.Player;
 import net.traitors.util.BetterCamera;
-import net.traitors.util.Overlapper;
 import net.traitors.util.Point;
-import net.traitors.util.TreeNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Stuff {
 
@@ -28,7 +22,6 @@ public class Stuff {
     private List<Actor> addBuffer = new ArrayList<>();
     private BetterCamera camera;
     private Player player;
-    private Map<Platform, Set<TreeNode<Thing>>> stuffOnPlatforms = new HashMap<>();
 
     public Stuff(BetterCamera camera, Player player) {
         this.camera = camera;
@@ -64,8 +57,8 @@ public class Stuff {
                 public int compare(Thing thing1, Thing thing2) {
                     float surfaceArea1 = thing1.getHeight() * thing1.getWidth();
                     float surfaceArea2 = thing2.getHeight() * thing2.getWidth();
-                    if (surfaceArea1 > surfaceArea2) return -1;
-                    if (surfaceArea1 < surfaceArea2) return 1;
+                    if (surfaceArea1 > surfaceArea2) return 1;
+                    if (surfaceArea1 < surfaceArea2) return -1;
                     return 0;
                 }
             });
@@ -84,16 +77,13 @@ public class Stuff {
     }
 
     public void drawStuff(Batch batch) {
-        for (Thing thing : stuff) {
-            thing.draw(batch);
+        for (int i = stuff.size() - 1; i >= 0; i--) {
+            stuff.get(i).draw(batch);
         }
     }
 
     public void doStuff(float delta) {
-        stuffOnPlatforms.clear();
-        for (TreeNode<Thing> tree : Overlapper.getOverlaps(stuff)) {
-            placeThings(null, tree);
-        }
+        placeStuff(stuff);
 
         for (Actor actor : actors) {
             actor.act(delta);
@@ -114,26 +104,32 @@ public class Stuff {
     }
 
     public Item getItemAt(Point point) {
-        for (Set<TreeNode<Thing>> platformContents : stuffOnPlatforms.values()) {
-            for (TreeNode<Thing> node : platformContents) {
-                if (node.getPayload() instanceof Item && node.getPayload().contains(point)) {
-                    return (Item) node.getPayload();
-                }
+        for (Thing thing : stuff) {
+            if (thing instanceof Item && thing.contains(point)) {
+                return (Item) thing;
             }
         }
         return null;
     }
 
-    private void placeThings(Platform parent, TreeNode<Thing> child) {
-        child.getPayload().setPlatform(parent);
-        if (parent != null) {
-            stuffOnPlatforms.get(parent).add(child);
-        }
-        if (!child.getChildren().isEmpty()) {
-            stuffOnPlatforms.put((Platform) child.getPayload(), new HashSet<TreeNode<Thing>>());
-        }
-        for (TreeNode<Thing> treeNode : child.getChildren()) {
-            placeThings((Platform) child.getPayload(), treeNode);
+    /**
+     * Puts stuff on stuff
+     *
+     * @param stuff all the things we're dealing with, sorted by stacking
+     *              precedence (earlier in the list ends up on top of stacks)
+     */
+    private void placeStuff(List<Thing> stuff) {
+        //Stuff toward the start of the list end up on top
+        for (int i = 0; i < stuff.size(); i++) {
+            Thing thing = stuff.get(i);
+            thing.setPlatform(null);
+            for (int j = i + 1; j < stuff.size(); j++) {
+                if (stuff.get(j) instanceof Platform
+                        && stuff.get(j).contains(thing.getWorldPoint())) {
+                    thing.setPlatform((Platform) stuff.get(j));
+                    break;
+                }
+            }
         }
     }
 

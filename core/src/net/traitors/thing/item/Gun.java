@@ -15,7 +15,7 @@ import net.traitors.util.PixmapRotateRec;
 public class Gun extends AbstractThing implements Item {
 
     private Texture inventoryImage;
-    private Texture handImage;
+    private TextureRegion handImage;
     private ProjectileFactory projectileFactory;
 
     public Gun(float width, float height, ProjectileFactory projectileFactory) {
@@ -43,13 +43,13 @@ public class Gun extends AbstractThing implements Item {
     }
 
     @Override
-    public Texture getHandImage() {
+    public TextureRegion getHandImage() {
         if (handImage == null) {
             int width = 10;
             Pixmap pixmap = new Pixmap(width, width * 4, Pixmap.Format.RGBA4444);
             pixmap.setColor(Color.DARK_GRAY);
             pixmap.fill();
-            handImage = new Texture(pixmap);
+            handImage = new TextureRegion(new Texture(pixmap));
         }
         return handImage;
     }

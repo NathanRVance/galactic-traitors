@@ -1,8 +1,6 @@
 package net.traitors.thing.projectile;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -10,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.GameScreen;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
+import net.traitors.util.TextureCreator;
 
 public class Projectile extends AbstractThing {
 
@@ -25,16 +24,12 @@ public class Projectile extends AbstractThing {
         this.velocity = velocity.duplicate();
         this.longevity = longevity;
 
-        int dim = 10;
-        Pixmap pixmap = new Pixmap(dim, dim, Pixmap.Format.RGBA4444);
-        pixmap.setColor(color);
-        pixmap.fill();
-        texture = new TextureRegion(new Texture(pixmap));
+        texture = TextureCreator.getColorRec(color);
     }
 
     @Override
     public void draw(Batch batch) {
-        Point drawLocation = (location == null)? getWorldPoint() : location;
+        Point drawLocation = (location == null) ? getWorldPoint() : location;
         batch.draw(texture, drawLocation.x, drawLocation.y,
                 0, 0, getWidth(), getHeight(), 1, 1,
                 velocity.angle() * MathUtils.radiansToDegrees);
@@ -43,11 +38,10 @@ public class Projectile extends AbstractThing {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if(location == null) location = getWorldPoint();
+        if (location == null) location = getWorldPoint();
         location.add(velocity.duplicate().scale(delta));
         longevity -= delta;
-        if(longevity < 0) {
-            texture.getTexture().dispose();
+        if (longevity < 0) {
             GameScreen.getStuff().removeActor(this);
         }
 
