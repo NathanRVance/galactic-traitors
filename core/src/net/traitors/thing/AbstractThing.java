@@ -11,6 +11,7 @@ public abstract class AbstractThing implements Thing {
 
     private final float width;
     private final float height;
+    private final float mass;
     private Point point = new Point();
     private Point lastWorldPoint = new Point();
     private Point velocity = new Point();
@@ -18,9 +19,16 @@ public abstract class AbstractThing implements Thing {
     private Platform platform;
     private Platform nullPlatform = new NullPlatform();
 
+    public AbstractThing(float width, float height, float mass) {
+        this.width = width;
+        this.height = height;
+        this.mass = mass;
+    }
+
     public AbstractThing(float width, float height) {
         this.width = width;
         this.height = height;
+        this.mass = width * height;
     }
 
     @Override
@@ -71,6 +79,11 @@ public abstract class AbstractThing implements Thing {
     @Override
     public float getWidth() {
         return width;
+    }
+
+    @Override
+    public float getMass() {
+        return mass;
     }
 
     @Override

@@ -76,6 +76,12 @@ public interface Thing extends Actor, Disposable {
 
     float getHeight();
 
+    /**
+     * Gets the mass of this thing
+     * @return mass in kg
+     */
+    float getMass();
+
     Platform getPlatform();
 
     /**

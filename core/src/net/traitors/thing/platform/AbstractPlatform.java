@@ -9,11 +9,16 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
     private float rotationalVelocity = 0f;
 
     AbstractPlatform() {
-        super(0, 0);
+        super(0, 0, Float.MAX_VALUE);
     }
 
-    AbstractPlatform(int width, int height) {
-        super(width, height);
+    AbstractPlatform(float width, float height) {
+        //By default, assume 1 meter thick and a mass of 1000 kg / m^3
+        super(width, height, width * height * 1000);
+    }
+
+    AbstractPlatform(float width, float height, float mass) {
+        super(width, height, mass);
     }
 
     @Override
@@ -39,7 +44,7 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
     @Override
     public void act(float delta) {
         super.act(delta);
-        setPoint(getPoint().add(translationalVelocity.scale(delta)));
+        setPoint(getPoint().add(getTranslationalVelocity().scale(delta)));
         setRotation((getRotation() + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
 
@@ -83,5 +88,28 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
     public float convertToPlatformRotation(float rotation) {
         rotation = getPlatform().convertToPlatformRotation(rotation);
         return (float) ((rotation - getRotation() + Math.PI * 2) % (float) (Math.PI * 2));
+    }
+
+    @Override
+    public void applyForce(Point force, Point radius, float delta) {
+        // radius vector X force vector = torque
+        //   [x1,        y1,        z1]
+        // X [x2,        y2,        z2]
+        // = [y1z2-z1y2, z1x2-x1z2, x1y2-y1x2]
+        // We only care about the z component of the cross product for torque
+        float torque = radius.x * force.y - radius.y * force.x;
+
+        // torque = moment of inertia * angular acceleration
+        // moment of inertia for thin rectangular plate = m / 12 * (h^4 + w^2)
+        float I = getMass() / 12 * (getHeight() * getHeight() + getWidth() * getWidth());
+        float angAccel = torque / I;
+        setRotationalVelocity(getRotationalVelocity() + angAccel * delta);
+
+        //The rest of the force goes to translational velocity. I (think) this is right ?
+        force.scale((force.distanceFromZero() - torque) / force.distanceFromZero());
+        // force = mass * acceleration
+        Point transAccel = force.scale(1 / getMass());
+        transAccel.rotate(getWorldRotation());
+        setTranslationalVelocity(getTranslationalVelocity().add(transAccel.scale(delta)));
     }
 }

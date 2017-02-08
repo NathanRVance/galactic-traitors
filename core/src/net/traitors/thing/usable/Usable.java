@@ -7,7 +7,7 @@ public interface Usable {
     /**
      * Cause this usable to do whatever it does
      *
-     * @param user the thing that is using this usable
+     * @param user  the thing that is using this usable
      */
     void use(Thing user);
 

@@ -23,6 +23,7 @@ public class Stuff {
     private List<Actor> addBuffer = new ArrayList<>();
     private BetterCamera camera;
     private Player player;
+    private float delta;
 
     public Stuff(BetterCamera camera, Player player) {
         this.camera = camera;
@@ -80,6 +81,10 @@ public class Stuff {
         return player;
     }
 
+    public float getDelta() {
+        return delta;
+    }
+
     public void drawStuff(Batch batch, BetterCamera camera) {
         for (int i = stuff.size() - 1; i >= 0; i--) {
             stuff.get(i).draw(batch, camera);
@@ -87,6 +92,7 @@ public class Stuff {
     }
 
     public void doStuff(float delta) {
+        this.delta = delta;
         placeStuff(stuff);
 
         for (Actor actor : actors) {

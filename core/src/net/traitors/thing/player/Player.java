@@ -31,7 +31,7 @@ public class Player extends AbstractThing {
     private Inventory inventory;
 
     public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
-        super(.5f, .5f);
+        super(.5f, .5f, 70);
         animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
         animationHolding = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, true);
     }

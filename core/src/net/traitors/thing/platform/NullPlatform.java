@@ -47,6 +47,11 @@ public class NullPlatform implements Platform {
     }
 
     @Override
+    public void applyForce(Point force, Point position, float delta) {
+
+    }
+
+    @Override
     public Point getPoint() {
         throw new UnsupportedOperationException();
     }
@@ -99,6 +104,11 @@ public class NullPlatform implements Platform {
     @Override
     public float getHeight() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public float getMass() {
+        return 0;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GameScreen;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.usable.FloatStrategy;
@@ -27,6 +28,7 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
     private RotationStrategy rotationStrategy;
     private Set<ThrusterTile> thrusters = new HashSet<>();
     private ProjectileFactory projectileFactory;
+    private float forceMagnitude = 5000;
 
     public ThrusterTile(float width, float height, float rotation, Tile base) {
         super(width, height);
@@ -87,6 +89,7 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
                 .build();
 
         rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 7);
+        thrusters.add(this);
     }
 
     public void lockUseWith(ThrusterTile thruster) {
@@ -108,7 +111,7 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
                 worldPoint.y + conep.y - coneWidth / 2,
                 0,
                 coneWidth / 2,
-                coneLen, coneWidth, 1, 1, rotation * MathUtils.radiansToDegrees);
+                coneLen, coneWidth, 1, 1, getPlatform().convertToWorldRotation(rotation) * MathUtils.radiansToDegrees);
         //draw base
         base.setPlatform(getPlatform());
         base.setRotation(getRotation());
@@ -118,12 +121,18 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
 
     @Override
     public void use(Thing user) {
-        rotation = rotationStrategy.getRotation(user.getWorldRotation(), getWorldRotation());
-        projectileFactory.use(this, rotation);
+        rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
+        projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
         for (ThrusterTile thruster : thrusters) {
-            thruster.rotation = rotation;
-            thruster.projectileFactory.use(thruster, rotation);
+            thruster.applyThrust(rotation);
         }
+    }
+
+    private void applyThrust(float rotation) {
+        this.rotation = rotation;
+        projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
+        Point force = new Point(forceMagnitude * -1, 0).rotate(rotation);
+        getPlatform().applyForce(force, getPoint(), GameScreen.getStuff().getDelta());
     }
 
     @Override

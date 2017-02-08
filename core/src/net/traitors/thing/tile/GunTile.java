@@ -114,7 +114,8 @@ public class GunTile extends AbstractThing implements Tile, Usable {
                 worldPoint.y + barrelp.y - barrelWidth / 2,
                 0,
                 barrelWidth / 2,
-                drawLen, barrelWidth, 1, 1, rotation * MathUtils.radiansToDegrees);
+                drawLen, barrelWidth, 1, 1,
+                getPlatform().convertToWorldRotation(rotation) * MathUtils.radiansToDegrees);
         //draw dome
         float domeWidth = getHeight();
         float domeExtent = domeWidth / 2;
@@ -129,8 +130,8 @@ public class GunTile extends AbstractThing implements Tile, Usable {
 
     @Override
     public void use(Thing user) {
-        rotation = rotationStrategy.getRotation(user.getWorldRotation(), getWorldRotation());
-        projectileFactory.use(this, rotation);
+        rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
+        projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
     }
 
     @Override

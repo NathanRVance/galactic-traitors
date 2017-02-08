@@ -16,16 +16,17 @@ public class RotationStrategy {
      * @return the closest valid rotation
      */
     public float getRotation(float userRotation, float thisRotation) {
-        float lower = (float) ((thisRotation - rotationAngle / 2 + Math.PI * 2) % (Math.PI * 2));
-        float upper = (float) ((thisRotation + rotationAngle / 2 + Math.PI * 2) % (Math.PI * 2));
+        float pi2 = (float) Math.PI * 2;
+        userRotation = (userRotation + pi2) % pi2;
+        float lower = (thisRotation - rotationAngle / 2 + pi2) % pi2;
+        float upper = (thisRotation + rotationAngle / 2 + pi2) % pi2;
         if ((lower < upper && userRotation > lower && userRotation < upper)
                 || (lower > upper && (userRotation > lower || userRotation < upper))) {
             return userRotation;
-        } else if (lower - userRotation > 0 && lower - userRotation < Math.PI - rotationAngle / 2) {
-            return lower;
-        } else {
-            return upper;
         }
+        float distToLower = Math.min(Math.abs(lower - userRotation), pi2 - Math.abs(lower - userRotation));
+        float distToUpper = Math.min(Math.abs(upper - userRotation), pi2 - Math.abs(upper - userRotation));
+        return (distToLower < distToUpper) ? lower : upper;
     }
 
 }
