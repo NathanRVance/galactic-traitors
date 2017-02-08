@@ -11,10 +11,8 @@ import net.traitors.thing.Stuff;
 import net.traitors.thing.platform.Platform;
 import net.traitors.thing.platform.Ship;
 import net.traitors.thing.platform.ShipFactory;
-import net.traitors.thing.platform.TileGrid;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.player.Player;
-import net.traitors.ui.TextView;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
@@ -23,7 +21,7 @@ public class GameScreen implements Screen {
     private static Stuff stuff;
     private GalacticTraitors game;
     private Stage uiControls;
-    private TextView textView;
+    //private TextView textView;
 
     GameScreen(GalacticTraitors game) {
         this.game = game;
@@ -39,27 +37,27 @@ public class GameScreen implements Screen {
         world.setPoint(new Point(0, 0));
         stuff.addActor(world);
 
-        TileGrid t = new TileGrid(50, 2);
-        t.setPoint(new Point(0, -20));
-        t.setRotationalVelocity(-.3f);
-        stuff.addActor(t);
+        ship = new ShipFactory().buildTileGrid(50, 2);
+        ship.setPoint(new Point(0, -20));
+        ship.setRotationalVelocity(-.3f);
+        stuff.addActor(ship);
 
-        TileGrid tiles = new TileGrid(4, 3);
-        tiles.setPoint(new Point(1, 2));
-        tiles.setRotationalVelocity(-1);
-        stuff.addActor(tiles);
+        ship = new ShipFactory().buildTileGrid(4, 3);
+        ship.setPoint(new Point(1, 2));
+        ship.setRotationalVelocity(-1);
+        stuff.addActor(ship);
 
-        TileGrid moreTiles = new TileGrid(3, 3);
-        moreTiles.setPoint(new Point(1, 1));
-        moreTiles.setRotationalVelocity(-1);
-        stuff.addActor(moreTiles);
+        ship = new ShipFactory().buildTileGrid(3, 3);
+        ship.setPoint(new Point(1, 1));
+        ship.setRotationalVelocity(-1);
+        stuff.addActor(ship);
 
-        tiles = new TileGrid(1, 1);
-        tiles.setPoint(new Point(1, 2));
-        tiles.setRotationalVelocity(1);
-        stuff.addActor(tiles);
+        ship = new ShipFactory().buildTileGrid(1, 1);
+        ship.setPoint(new Point(1, 2));
+        ship.setRotationalVelocity(1);
+        stuff.addActor(ship);
 
-        player.setPoint(new Point(-2, 2));
+        player.setPoint(new Point(-4, 10));
         stuff.addActor(camera); //must happen before player
         stuff.addActor(player);
 
@@ -81,10 +79,10 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(stuff.getCamera().combined);
         game.batch.begin();
         //textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
-        stuff.drawStuff(game.batch);
+        stuff.drawStuff(game.batch, stuff.getCamera());
         game.batch.end();
 
-        textView.draw();
+        //textView.draw();
         uiControls.draw();
     }
 
@@ -105,7 +103,7 @@ public class GameScreen implements Screen {
         uiControls = new TouchControls(stuff.getPlayer());
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(stuff.getCamera())));
 
-        textView = new TextView();
+        //textView = new TextView();
     }
 
     @Override

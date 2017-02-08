@@ -1,11 +1,13 @@
 package net.traitors.thing;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.thing.platform.Platform;
+import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 
-public interface Thing extends Actor {
+public interface Thing extends Actor, Disposable {
 
     /**
      * Get the center of mass of this thing relative to the platform it is on
@@ -87,8 +89,11 @@ public interface Thing extends Actor {
     /**
      * Draw this thing using its point, rotation, width, height, and platform
      *
-     * @param batch batch used to draw this thing
+     * @param batch  batch used to draw this thing
+     * @param camera camera that batch is using to draw
      */
+    void draw(Batch batch, BetterCamera camera);
+
     void draw(Batch batch);
 
     /**

@@ -143,4 +143,11 @@ public class GunTile extends AbstractThing implements Tile, Usable {
     public float getCooldownPercent() {
         return projectileFactory.getCooldownPercent();
     }
+
+    @Override
+    public void dispose() {
+        base.dispose();
+        dome.getTexture().dispose();
+        barrel.getTexture().dispose();
+    }
 }

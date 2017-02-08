@@ -2,6 +2,7 @@ package net.traitors.thing.platform;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 
 public class NullPlatform implements Platform {
@@ -111,6 +112,11 @@ public class NullPlatform implements Platform {
     }
 
     @Override
+    public void draw(Batch batch, BetterCamera camera) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void draw(Batch batch) {
         throw new UnsupportedOperationException();
     }
@@ -123,5 +129,10 @@ public class NullPlatform implements Platform {
     @Override
     public void act(float delta) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

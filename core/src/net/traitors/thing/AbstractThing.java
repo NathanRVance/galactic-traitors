@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
+import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 
 public abstract class AbstractThing implements Thing {
@@ -94,7 +95,11 @@ public abstract class AbstractThing implements Thing {
     }
 
     @Override
-    public abstract void draw(Batch batch);
+    public void draw(Batch batch, BetterCamera camera) {
+        if(camera.isWatching(this, getWidth())) {
+            draw(batch);
+        }
+    }
 
     @Override
     public void act(float delta) {

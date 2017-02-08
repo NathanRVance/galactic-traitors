@@ -75,4 +75,19 @@ public class BetterCamera extends OrthographicCamera implements Actor {
         }
     }
 
+
+    /**
+     * Determines if any portion of this thing falls withing the camera.
+     *
+     * @param thing   the thing this camera may be seeing
+     * @param padding amount of wiggle room around the thing's bounds we allow while still "seeing" it
+     * @return whether or not the thing is seen
+     */
+    public boolean isWatching(Thing thing, float padding) {
+        float offset = thing.getWorldPoint().subtract(new Point(position.x, position.y)).distanceFromZero();
+        float extent = new Point(thing.getWidth(), thing.getHeight()).distanceFromZero() + padding;
+        float viewWidth = new Point(viewportWidth * zoom, viewportHeight * zoom).distanceFromZero() / 2;
+        return offset - extent < viewWidth;
+    }
+
 }

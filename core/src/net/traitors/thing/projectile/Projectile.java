@@ -47,4 +47,9 @@ public class Projectile extends AbstractThing {
 
         //TODO: Check if touching something (other than player who shot me) and deal damage
     }
+
+    @Override
+    public void dispose() {
+        //Do nothing; this texture is obtained from the TextureCreator, which reuses them.
+    }
 }

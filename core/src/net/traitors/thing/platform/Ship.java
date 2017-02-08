@@ -53,6 +53,15 @@ public class Ship extends AbstractPlatform {
         }
     }
 
+    @Override
+    public void dispose() {
+        for (Tile[] column : grid) {
+            for (Tile tile : column) {
+                tile.dispose();
+            }
+        }
+    }
+
     static class ShipBuilder {
 
         private Ship ship;

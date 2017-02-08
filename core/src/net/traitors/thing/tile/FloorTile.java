@@ -24,4 +24,8 @@ public class FloorTile extends AbstractThing implements Tile {
         batch.draw(texture, worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation * MathUtils.radiansToDegrees);
     }
 
+    @Override
+    public void dispose() {
+        //Do nothing since this texture comes from the TextureCreator, which reuses it.
+    }
 }

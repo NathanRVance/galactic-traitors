@@ -136,4 +136,10 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
     public float getCooldownPercent() {
         return 100;
     }
+
+    @Override
+    public void dispose() {
+        base.dispose();
+        cone.getTexture().dispose();
+    }
 }

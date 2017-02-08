@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class UniverseTile extends AbstractPlatform {
 
-    public static final float TILE_DIM = 1000;
+    private static final float TILE_DIM = 1000;
 
     @Override
     public float getWidth() {
@@ -18,6 +18,11 @@ public class UniverseTile extends AbstractPlatform {
 
     @Override
     public void draw(Batch batch) {
+
+    }
+
+    @Override
+    public void dispose() {
 
     }
 }

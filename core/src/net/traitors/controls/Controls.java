@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class Controls {
 
-    private static Map<Key, Integer> keymap = new HashMap<Key, Integer>();
+    private static Map<Key, Integer> keymap = new HashMap<>();
     private static TouchControls touchControls;
 
     static {
@@ -48,7 +48,7 @@ public class Controls {
     }
 
     public static List<Point> getWorldTouches(Camera camera) {
-        List<Point> points = new ArrayList<Point>(TouchControls.maxFingers);
+        List<Point> points = new ArrayList<>(TouchControls.maxFingers);
         for (int i = 0; i < TouchControls.maxFingers; i++) {
             if (Gdx.input.isTouched(i) && (touchControls == null || !touchControls.isTouched(i))) {
                 points.add(new Point(Gdx.input.getX(i), Gdx.input.getY(i)).unproject(camera));

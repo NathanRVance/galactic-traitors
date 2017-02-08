@@ -262,6 +262,16 @@ public class Player extends AbstractThing {
         }
     }
 
+    @Override
+    public void dispose() {
+        for(TextureRegion textureRegion : animation) {
+            textureRegion.getTexture().dispose();
+        }
+        for(TextureRegion textureRegion : animationHolding) {
+            textureRegion.getTexture().dispose();
+        }
+    }
+
     private static class Appendage {
         Color[] colors;
         int[] widths;

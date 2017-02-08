@@ -24,4 +24,8 @@ public class ShipFactory {
         return shipBuilder.getShip();
     }
 
+    public Ship buildTileGrid(int width, int height) {
+        return new Ship.ShipBuilder(width, height).getShip();
+    }
+
 }

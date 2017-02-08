@@ -74,4 +74,10 @@ public class Gun extends AbstractThing implements Item {
     public float getCooldownPercent() {
         return projectileFactory.getCooldownPercent();
     }
+
+    @Override
+    public void dispose() {
+        inventoryImage.dispose();
+        handImage.getTexture().dispose();
+    }
 }

@@ -1,6 +1,7 @@
 package net.traitors.thing;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.controls.Controls;
 import net.traitors.thing.item.Item;
@@ -42,6 +43,9 @@ public class Stuff {
             if (actor instanceof Thing) {
                 stuff.remove(actor);
             }
+            if (actor instanceof Disposable) {
+                ((Disposable) actor).dispose();
+            }
         }
         boolean addedThing = false;
         for (Actor actor : addBuffer) {
@@ -76,9 +80,9 @@ public class Stuff {
         return player;
     }
 
-    public void drawStuff(Batch batch) {
+    public void drawStuff(Batch batch, BetterCamera camera) {
         for (int i = stuff.size() - 1; i >= 0; i--) {
-            stuff.get(i).draw(batch);
+            stuff.get(i).draw(batch, camera);
         }
     }
 
