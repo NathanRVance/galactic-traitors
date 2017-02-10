@@ -106,10 +106,11 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
         setRotationalVelocity(getRotationalVelocity() + angAccel * delta);
 
         //The rest of the force goes to translational velocity. I (think) this is right ?
-        force.scale((force.distanceFromZero() - torque) / force.distanceFromZero());
+        force.scale((force.distanceFromZero() - Math.abs(torque)) / force.distanceFromZero());
         // force = mass * acceleration
         Point transAccel = force.scale(1 / getMass());
         transAccel.rotate(getWorldRotation());
         setTranslationalVelocity(getTranslationalVelocity().add(transAccel.scale(delta)));
+        System.out.println(getTranslationalVelocity());
     }
 }

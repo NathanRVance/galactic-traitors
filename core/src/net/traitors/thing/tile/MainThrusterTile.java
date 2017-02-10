@@ -20,17 +20,17 @@ import net.traitors.util.Point;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ThrusterTile extends AbstractThing implements Tile, Usable {
+public class MainThrusterTile extends AbstractThing implements Tile, Usable {
 
     private float rotation = 0;
     private Tile base;
     private TextureRegion cone;
     private RotationStrategy rotationStrategy;
-    private Set<ThrusterTile> thrusters = new HashSet<>();
+    private Set<MainThrusterTile> thrusters = new HashSet<>();
     private ProjectileFactory projectileFactory;
-    private float forceMagnitude = 5000;
+    private float forceMagnitude = 50000;
 
-    public ThrusterTile(float width, float height, float rotation, Tile base) {
+    public MainThrusterTile(float width, float height, float rotation, Tile base) {
         super(width, height);
         setRotation(rotation);
         this.rotation = rotation;
@@ -52,7 +52,7 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
                 .setOriginOffset(new PointStrategy() {
                     @Override
                     public Point getPoint() {
-                        return new Point(getWidth() * .9f, MathUtils.random(-getWidth() * .4f, getWidth() * .4f) - .1f);
+                        return new Point(getWidth() * .95f, MathUtils.random(-getWidth() * .4f, getWidth() * .4f) - .1f);
                     }
                 })
                 .setRotationOffset(new PointStrategy() {
@@ -88,11 +88,11 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
                 })
                 .build();
 
-        rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 7);
+        rotationStrategy = new RotationStrategy((float) Math.PI / 7);
         thrusters.add(this);
     }
 
-    public void lockUseWith(ThrusterTile thruster) {
+    public void lockUseWith(MainThrusterTile thruster) {
         thrusters.add(thruster);
         thruster.thrusters.add(this);
     }
@@ -122,8 +122,7 @@ public class ThrusterTile extends AbstractThing implements Tile, Usable {
     @Override
     public void use(Thing user) {
         rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
-        projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
-        for (ThrusterTile thruster : thrusters) {
+        for (MainThrusterTile thruster : thrusters) {
             thruster.applyThrust(rotation);
         }
     }

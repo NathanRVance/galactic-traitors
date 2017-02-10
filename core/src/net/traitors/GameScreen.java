@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
 
         ship = new ShipFactory().buildTileGrid(50, 2);
         ship.setPoint(new Point(0, -20));
-        ship.setRotationalVelocity(-.3f);
+        //ship.setRotationalVelocity(-.3f);
         stuff.addActor(ship);
 
         ship = new ShipFactory().buildTileGrid(4, 3);
