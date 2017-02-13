@@ -1,4 +1,4 @@
-package net.traitors.thing.tile;
+package net.traitors.thing.tile.thrust;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -8,36 +8,31 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GameScreen;
-import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
+import net.traitors.thing.tile.RotationStrategy;
+import net.traitors.thing.tile.Tile;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
-import net.traitors.thing.usable.Usable;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
-public class RotationalThrusterTile extends AbstractThing implements Tile, Usable {
+public class RotationalThrusterStrategy implements ThrustStrategy {
 
-    private float rotation;
-    private Tile base;
+    private float rotation = 0;
+    private Thing base;
     private TextureRegion cone;
-    private ProjectileFactory projectileFactory;
     private final float coneWidth = .5f;
     private final float coneLen = coneWidth / 2;
-    private RotationStrategy rotationStrategy;
-    private float forceMagnitude = 1000;
+    private Tile tile;
+    private float forceMagnitude = 5000;
 
-    /**
-     * This tile has a thruster on the top and on the right. Rotate accordingly.
-     *
-     * @param rotation Rotation of this tile relative to the platform
-     * @param base     tile the player steps on
-     */
-    public RotationalThrusterTile(float rotation, Tile base) {
-        super(1, 1);
-        this.rotation = rotation;
-        this.base = base;
+    private RotationStrategy rotationStrategy;
+    private ProjectileFactory projectileFactory;
+
+    public RotationalThrusterStrategy(Tile tile, float forceMagnitude) {
+        this.tile = tile;
+        this.forceMagnitude = forceMagnitude;
 
         int coneDim = 100;
         PixmapRotateRec pixmap = new PixmapRotateRec(coneDim, coneDim, Pixmap.Format.RGBA8888);
@@ -45,6 +40,13 @@ public class RotationalThrusterTile extends AbstractThing implements Tile, Usabl
         pixmap.fillQuadrahedron(0, coneDim / 3, coneDim, 0, coneDim, coneDim, 0, coneDim * 2 / 3);
         cone = new TextureRegion(new Texture(pixmap));
 
+        rotationStrategy = new RotationStrategy(.1f);
+    }
+
+    @Override
+    public void setBase(final Thing base) {
+        this.base = base;
+        rotation = base.getRotation();
         projectileFactory = new ProjectileFactory.Builder()
                 .setCooldown(new FloatStrategy() {
                     @Override
@@ -55,7 +57,7 @@ public class RotationalThrusterTile extends AbstractThing implements Tile, Usabl
                 .setOriginOffset(new PointStrategy() {
                     @Override
                     public Point getPoint() {
-                        return new Point(getWidth() / 2 + coneLen, MathUtils.random(-coneWidth * .4f, coneWidth * .4f) - .05f);
+                        return new Point(base.getWidth() / 2 + coneLen, MathUtils.random(-coneWidth * .4f, coneWidth * .4f) - .05f);
                     }
                 })
                 .setRotationOffset(new PointStrategy() {
@@ -90,81 +92,58 @@ public class RotationalThrusterTile extends AbstractThing implements Tile, Usabl
                     }
                 })
                 .build();
+    }
 
-        rotationStrategy = new RotationStrategy(.1f);
-
+    @Override
+    public void applyThrust(Thing user) {
+        float thrustRotation = (rotationStrategy.getRotation(rotation - user.getRotation() + (float) Math.PI / 4, 0) > Math.PI / 4) ?
+                //Activate top thruster
+                rotation + (float) Math.PI / 2
+                : //Activate bottom thruster
+                rotation;
+        projectileFactory.use(base, base.getPlatform().convertToWorldRotation(thrustRotation));
+        Point force = new Point(forceMagnitude * -1, 0).rotate(thrustRotation);
+        base.getPlatform().applyForce(force, base.getPoint(), GameScreen.getStuff().getDelta());
     }
 
     @Override
     public void draw(Batch batch) {
-        Point worldPoint = getWorldPoint();
-        float rot = getPlatform().getWorldRotation() + getRotation();
+        Point worldPoint = base.getWorldPoint();
+        float rot = base.getPlatform().getWorldRotation() + base.getRotation();
         //draw cone
-        Point conep = new Point(getWidth() / 2, 0);
-        conep.rotate(rot + rotation);
+        Point conep = new Point(base.getWidth() / 2, 0);
+        conep.rotate(rot);
         batch.draw(cone,
                 worldPoint.x + conep.x,
                 worldPoint.y + conep.y - coneWidth / 2,
                 0,
                 coneWidth / 2,
-                coneLen, coneWidth, 1, 1, getPlatform().convertToWorldRotation(rotation) * MathUtils.radiansToDegrees);
+                coneLen, coneWidth, 1, 1, base.getPlatform().convertToWorldRotation(rotation) * MathUtils.radiansToDegrees);
 
         //draw cone again
-        conep = new Point(0, getHeight() / 2);
-        conep.rotate(rot + rotation);
+        conep = new Point(0, base.getHeight() / 2);
+        conep.rotate(rot);
         batch.draw(cone,
                 worldPoint.x + conep.x,
                 worldPoint.y + conep.y - coneWidth / 2,
                 0,
                 coneWidth / 2,
-                coneLen, coneWidth, 1, 1, getPlatform().convertToWorldRotation(rotation + (float) Math.PI / 2) * MathUtils.radiansToDegrees);
-        //draw base
-        base.setPlatform(getPlatform());
-        base.setRotation(getRotation());
-        base.setPoint(getPoint());
-        base.draw(batch);
+                coneLen, coneWidth, 1, 1, base.getPlatform().convertToWorldRotation(rotation + (float) Math.PI / 2) * MathUtils.radiansToDegrees);
+        //draw tile
+        tile.setPlatform(base.getPlatform());
+        tile.setRotation(base.getRotation());
+        tile.setPoint(base.getPoint());
+        tile.draw(batch);
     }
 
     @Override
-    public void dispose() {
-        base.dispose();
-        cone.getTexture().dispose();
-    }
-
-    @Override
-    public void use(Thing user) {
-        if(rotationStrategy.getRotation(rotation - user.getRotation() + (float) Math.PI / 4, 0) > Math.PI / 4) {
-            //Activate top thruster
-            applyThrust(rotation + (float) Math.PI / 2);
-            if(rtt != null) {
-                rtt.applyThrust(rotation + (float) Math.PI / 2);
-            }
-        } else {
-            //Activate bottom thruster
-            applyThrust(rotation);
-        }
-    }
-
-    private void applyThrust(float rotation) {
-        projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
-        Point force = new Point(forceMagnitude * -1, 0).rotate(rotation);
-        getPlatform().applyForce(force, getPoint(), GameScreen.getStuff().getDelta());
-    }
-
-    private RotationalThrusterTile rtt;
-
-    public void secretSpecialTestStuff(RotationalThrusterTile rtt) {
-        this.rtt = rtt;
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
+    public void updateCooldown(float delta) {
         projectileFactory.updateCooldown(delta);
     }
 
     @Override
-    public float getCooldownPercent() {
-        return 0;
+    public void dispose() {
+        tile.dispose();
+        cone.getTexture().dispose();
     }
 }
