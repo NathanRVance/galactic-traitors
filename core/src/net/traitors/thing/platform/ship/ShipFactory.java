@@ -1,4 +1,4 @@
-package net.traitors.thing.platform;
+package net.traitors.thing.platform.ship;
 
 import net.traitors.thing.tile.FloorTile;
 import net.traitors.thing.tile.GunTile;
@@ -19,10 +19,14 @@ public class ShipFactory {
         shipBuilder.addTile(new GunTile(1, 1, 0, new FloorTile()), 3, 2);
         shipBuilder.addTile(new GunTile(1, 1, (float) Math.PI, new FloorTile()), 0, 2);
 
+        ShipComputer computer = new ShipComputer();
+        shipBuilder.setComputer(computer);
+
         ThrusterTile t1 = new ThrusterTile(1, 1, (float) Math.PI * 3 / 2,
                 new MainThrusterStrategy(new FloorTile(), 50000));
         ThrusterTile t2 = new ThrusterTile(1, 1, (float) Math.PI * 3 / 2,
                 new MainThrusterStrategy(new FloorTile(), 50000));
+        computer.syncUsages(t1, t2);
         shipBuilder.addTile(t1, 1, 0);
         shipBuilder.addTile(t2, 2, 0);
 

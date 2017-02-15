@@ -9,13 +9,14 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
+import net.traitors.thing.platform.ship.ShipComponent;
+import net.traitors.thing.platform.ship.ShipComputer;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
-import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 
-public class GunTile extends AbstractThing implements Tile, Usable {
+public class GunTile extends AbstractThing implements ShipComponent {
 
     private final float barrelLength;
     private Tile base;
@@ -24,6 +25,7 @@ public class GunTile extends AbstractThing implements Tile, Usable {
     private float rotation = 0;
     private ProjectileFactory projectileFactory;
     private RotationStrategy rotationStrategy;
+    private ShipComputer computer;
 
     public GunTile(float width, float height, float rotation, Tile base) {
         super(width, height);
@@ -150,5 +152,10 @@ public class GunTile extends AbstractThing implements Tile, Usable {
         base.dispose();
         dome.getTexture().dispose();
         barrel.getTexture().dispose();
+    }
+
+    @Override
+    public void setUseCallback(ShipComputer computer) {
+        this.computer = computer;
     }
 }

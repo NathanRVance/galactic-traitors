@@ -11,7 +11,7 @@ import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
-import net.traitors.thing.platform.Ship;
+import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.usable.Usable;
 import net.traitors.ui.touchable.Inventory;
 import net.traitors.util.Point;

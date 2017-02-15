@@ -1,7 +1,8 @@
-package net.traitors.thing.platform;
+package net.traitors.thing.platform.ship;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.thing.platform.AbstractPlatform;
 import net.traitors.thing.tile.FloorTile;
 import net.traitors.thing.tile.Tile;
 import net.traitors.thing.usable.Usable;
@@ -14,7 +15,8 @@ public class Ship extends AbstractPlatform {
 
 
     private Tile[][] grid;
-    private List<Tile> usables = new ArrayList<>(); //Guaranteed to also be usable
+    private List<ShipComponent> components = new ArrayList<>(); //Guaranteed to also be tiles
+    private ShipComputer computer;
 
     private Ship(int width, int height) {
         super(width, height);
@@ -37,7 +39,7 @@ public class Ship extends AbstractPlatform {
      * @return the usable usable, or null if there isn't one
      */
     public Usable getUsableAt(Point point) {
-        for(Tile tile : usables) {
+        for(Tile tile : components) {
             if(tile.contains(point.duplicate())) {
                 return (Usable) tile;
             }
@@ -48,7 +50,7 @@ public class Ship extends AbstractPlatform {
     @Override
     public void act(float delta) {
         super.act(delta);
-        for(Tile tile : usables) {
+        for(Tile tile : components) {
             tile.act(delta); //Updates cooldowns
         }
     }
@@ -88,9 +90,13 @@ public class Ship extends AbstractPlatform {
                     occupied[ox][oy] = true;
                 }
             }
-            if (tile instanceof Usable) {
-                ship.usables.add(tile);
+            if (tile instanceof ShipComponent) {
+                ship.components.add((ShipComponent) tile);
             }
+        }
+
+        void setComputer(ShipComputer computer) {
+            ship.computer = computer;
         }
 
         Ship getShip() {

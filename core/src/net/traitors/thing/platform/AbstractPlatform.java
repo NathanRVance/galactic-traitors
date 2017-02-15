@@ -3,7 +3,7 @@ package net.traitors.thing.platform;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
 
-abstract class AbstractPlatform extends AbstractThing implements Platform {
+public abstract class AbstractPlatform extends AbstractThing implements Platform {
 
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
@@ -12,12 +12,12 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
         super(0, 0, Float.MAX_VALUE);
     }
 
-    AbstractPlatform(float width, float height) {
+    public AbstractPlatform(float width, float height) {
         //By default, assume 1 meter thick and a mass of 1000 kg / m^3
         super(width, height, width * height * 1000);
     }
 
-    AbstractPlatform(float width, float height, float mass) {
+    public AbstractPlatform(float width, float height, float mass) {
         super(width, height, mass);
     }
 
@@ -99,8 +99,8 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
         // We only care about the z component of the cross product for torque
         float torque = radius.x * force.y - radius.y * force.x;
         // torque = moment of inertia * angular acceleration
-        // moment of inertia for thin rectangular plate = m / 12 * (h^4 + w^2)
-        float I = getMass() / 12 * (getHeight() * getHeight() + getWidth() * getWidth());
+        // moment of inertia for thin rectangular plate = m * (h^2 + w^2) / 12
+        float I = getMass() * (getHeight() * getHeight() + getWidth() * getWidth()) / 12;
         float angAccel = torque / I;
         setRotationalVelocity(getRotationalVelocity() + angAccel * delta);
 
@@ -108,6 +108,5 @@ abstract class AbstractPlatform extends AbstractThing implements Platform {
         Point a = force.scale(1 / getMass());
         a.rotate(getWorldRotation());
         setTranslationalVelocity(getTranslationalVelocity().add(a.scale(delta)));
-        System.out.println(getTranslationalVelocity());
     }
 }

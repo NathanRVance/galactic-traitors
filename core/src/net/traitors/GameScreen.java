@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.traitors.thing.Stuff;
 import net.traitors.thing.platform.Platform;
-import net.traitors.thing.platform.Ship;
-import net.traitors.thing.platform.ShipFactory;
+import net.traitors.thing.platform.ship.Ship;
+import net.traitors.thing.platform.ship.ShipFactory;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.player.Player;
 import net.traitors.ui.TouchControls;
