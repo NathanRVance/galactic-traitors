@@ -15,13 +15,14 @@ public class Projectile extends AbstractThing {
     private Point velocity;
     private TextureRegion texture;
     private float longevity;
+    //Keep track of our own location so that we don't rotate/move with our platform
     private Point location;
 
     public Projectile(float width, float height, Color color, Point start, Point velocity, float longevity) {
         super(width, height);
         setPoint(start);
         location = null;
-        this.velocity = velocity.duplicate();
+        this.velocity = velocity;
         this.longevity = longevity;
 
         texture = TextureCreator.getColorRec(color);
@@ -39,7 +40,7 @@ public class Projectile extends AbstractThing {
     public void act(float delta) {
         super.act(delta);
         if (location == null) location = getWorldPoint();
-        location.add(velocity.duplicate().scale(delta));
+        location = location.add(velocity.scale(delta));
         longevity -= delta;
         if (longevity < 0) {
             GameScreen.getStuff().removeActor(this);

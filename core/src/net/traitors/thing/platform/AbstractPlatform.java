@@ -23,12 +23,12 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
 
     @Override
     public Point getTranslationalVelocity() {
-        return translationalVelocity.duplicate();
+        return translationalVelocity;
     }
 
     @Override
     public void setTranslationalVelocity(Point velocity) {
-        translationalVelocity = velocity.duplicate();
+        translationalVelocity = velocity;
     }
 
     @Override
@@ -53,10 +53,10 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
         //First convert to the coordinates of the platform one level up (if there is one)
         //Resolve rotation induced differences
         if (!point.isZero()) {
-            point.rotate(getRotation());
+            point = point.rotate(getRotation());
         }
         //And translation
-        point.add(getPoint());
+        point = point.add(getPoint());
 
         //Then, convert from that platform's coordinates
         return getPlatform().convertToWorldCoordinates(point);
@@ -69,10 +69,10 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
 
         //Then, convert to our coordinates
         //Resolve translation
-        point.subtract(getPoint());
+        point = point.subtract(getPoint());
         //And rotation
         if (!point.isZero()) {
-            point.rotate(-1 * getRotation());
+            point = point.rotate(-1 * getRotation());
         }
 
         return point;
@@ -105,8 +105,7 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
         setRotationalVelocity(getRotationalVelocity() + angAccel * delta);
 
         // a = f / m
-        Point a = force.scale(1 / getMass());
-        a.rotate(getWorldRotation());
+        Point a = force.scale(1 / getMass()).rotate(getWorldRotation());
         setTranslationalVelocity(getTranslationalVelocity().add(a.scale(delta)));
     }
 }

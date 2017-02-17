@@ -110,7 +110,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
         float barrelWidth = barrelLength / 8;
         float drawLen = (projectileFactory.getCooldownPercent() * .1f + .9f) * barrelLength;
         Point barrelp = new Point(getWidth() / 2 * 1.2f, 0);
-        barrelp.rotate(rot);
+        barrelp = barrelp.rotate(rot);
         batch.draw(barrel,
                 worldPoint.x + barrelp.x,
                 worldPoint.y + barrelp.y - barrelWidth / 2,

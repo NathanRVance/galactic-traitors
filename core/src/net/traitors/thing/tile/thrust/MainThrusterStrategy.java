@@ -56,7 +56,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
         float coneWidth = base.getWidth();
         float coneLen = base.getWidth() / 2;
         Point conep = new Point(base.getWidth() / 2 * .8f, 0);
-        conep.rotate(rot);
+        conep = conep.rotate(rot);
         batch.draw(cone,
                 worldPoint.x + conep.x,
                 worldPoint.y + conep.y - coneWidth / 2,

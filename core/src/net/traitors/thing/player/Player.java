@@ -41,10 +41,11 @@ public class Player extends AbstractThing {
     }
 
     private void rotateToFace(Point point) {
-        setRotation(point.duplicate().subtract(getPoint()).angle());
+        setRotation(point.subtract(getPoint()).angle());
     }
 
-    public void worldTouched(Point point) {
+    private void worldTouched(Point point) {
+        point = getPlatform().convertToPlatformCoordinates(point);
         rotateToFace(point);
         if (getPoint().distance(point) < getWidth()) {
             Item item = GameScreen.getStuff().getItemAt(getPlatform().convertToWorldCoordinates(point));
@@ -87,10 +88,6 @@ public class Player extends AbstractThing {
         holding = item;
     }
 
-    public Point convertToPlatformCoordinates(Point point) {
-        return (getPlatform() == null) ? point : getPlatform().convertToPlatformCoordinates(point);
-    }
-
     public void dropItem(Item item) {
         if (holding == item) { //If we're holding the same instance of the item
             holding = null;
@@ -100,34 +97,32 @@ public class Player extends AbstractThing {
         GameScreen.getStuff().addActor(item);
     }
 
-    @Override
-    public void act(float delta) {
-        super.act(delta);
+    public void move(float delta, Controls.UserInput input) {
         float x = 0;
         float y = 0;
         float speedMult = 1;
-        if (Controls.isKeyPressed(Controls.Key.UP)) {
+        if (input.keysPressed.contains(Controls.Key.UP)) {
             y += BASE_MOVE_SPEED * delta;
         }
-        if (Controls.isKeyPressed(Controls.Key.DOWN)) {
+        if (input.keysPressed.contains(Controls.Key.DOWN)) {
             y -= BASE_MOVE_SPEED * delta;
         }
-        if (Controls.isKeyPressed(Controls.Key.RIGHT)) {
+        if (input.keysPressed.contains(Controls.Key.RIGHT)) {
             x += BASE_MOVE_SPEED * delta;
         }
-        if (Controls.isKeyPressed(Controls.Key.LEFT)) {
+        if (input.keysPressed.contains(Controls.Key.LEFT)) {
             x -= BASE_MOVE_SPEED * delta;
         }
-        if (Controls.isKeyPressed(Controls.Key.SPRINT)) {
+        if (input.keysPressed.contains(Controls.Key.SPRINT)) {
             speedMult = 3;
         }
         Point d = new Point(x, y);
-        d.rotate(GameScreen.getStuff().getCamera().getCameraAngle() - getPlatform().getWorldRotation());
+        d = d.rotate(GameScreen.getStuff().getCamera().getCameraAngle() - getPlatform().getWorldRotation());
 
         float totMove = d.distanceFromZero();
         if (totMove != 0) {
             setAnimationLength(BASE_ANIMATION_LENGTH / speedMult);
-            d.scale(BASE_MOVE_SPEED * delta * speedMult / totMove);
+            d = d.scale(BASE_MOVE_SPEED * delta * speedMult / totMove);
             Point destination = getPoint().add(d);
             rotateToFace(destination);
             setPoint(destination);
@@ -136,6 +131,14 @@ public class Player extends AbstractThing {
             resetAnimation();
         }
 
+        if(input.pointsTouched.size() == 1) {
+            worldTouched(input.pointsTouched.get(0));
+        }
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
         inventory.updateCooldowns(delta);
     }
 

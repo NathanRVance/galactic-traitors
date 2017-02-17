@@ -15,7 +15,7 @@ public class Ship extends AbstractPlatform {
 
 
     private Tile[][] grid;
-    private List<ShipComponent> components = new ArrayList<>(); //Guaranteed to also be tiles
+    private List<ShipComponent> components = new ArrayList<>();
     private ShipComputer computer;
 
     private Ship(int width, int height) {
@@ -39,9 +39,9 @@ public class Ship extends AbstractPlatform {
      * @return the usable usable, or null if there isn't one
      */
     public Usable getUsableAt(Point point) {
-        for(Tile tile : components) {
-            if(tile.contains(point.duplicate())) {
-                return (Usable) tile;
+        for(ShipComponent component : components) {
+            if(component.contains(point)) {
+                return component;
             }
         }
         return null;

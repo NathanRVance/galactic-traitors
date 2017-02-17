@@ -4,13 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 
+import net.traitors.GameScreen;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Controls {
 
@@ -25,7 +28,7 @@ public class Controls {
         keymap.put(Key.SPRINT, Input.Keys.SHIFT_LEFT);
     }
 
-    public static boolean isKeyPressed(Key key) {
+    private static boolean isKeyPressed(Key key) {
         return Gdx.input.isKeyPressed(keymap.get(key)) || isPressedByTouchpad(key);
     }
 
@@ -47,7 +50,7 @@ public class Controls {
         }
     }
 
-    public static List<Point> getWorldTouches(Camera camera) {
+    private static List<Point> getWorldTouches(Camera camera) {
         List<Point> points = new ArrayList<>(TouchControls.maxFingers);
         for (int i = 0; i < TouchControls.maxFingers; i++) {
             if (Gdx.input.isTouched(i) && (touchControls == null || !touchControls.isTouched(i))) {
@@ -61,12 +64,32 @@ public class Controls {
         Controls.touchControls = touchControls;
     }
 
+    public static UserInput getUserInput() {
+        UserInput ret = new UserInput();
+        ret.pointsTouched = getWorldTouches(GameScreen.getStuff().getCamera());
+        ret.keysPressed = new HashSet<>();
+        for (Key key : Key.values()) {
+            if (isKeyPressed(key)) {
+                ret.keysPressed.add(key);
+            }
+        }
+        return ret;
+    }
+
     public enum Key {
         UP,
         DOWN,
         LEFT,
         RIGHT,
         SPRINT,
+    }
+
+    public static class UserInput {
+
+        public List<Point> pointsTouched;
+
+        public Set<Key> keysPressed;
+
     }
 
 }

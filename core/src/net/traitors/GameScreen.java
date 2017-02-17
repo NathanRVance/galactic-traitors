@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.traitors.controls.InputProcessor;
 import net.traitors.thing.Stuff;
 import net.traitors.thing.platform.Platform;
 import net.traitors.thing.platform.ship.Ship;
@@ -62,7 +63,7 @@ public class GameScreen implements Screen {
         stuff.addActor(player);
 
         uiControls = new TouchControls(player);
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(camera)));
+        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(camera)));
     }
 
     public static Stuff getStuff() {
@@ -101,7 +102,7 @@ public class GameScreen implements Screen {
         float aspectRatio = (float) width / (float) height;
         stuff.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
         uiControls = new TouchControls(stuff.getPlayer());
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new net.traitors.controls.Input(stuff.getCamera())));
+        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(stuff.getCamera())));
 
         //textView = new TextView();
     }

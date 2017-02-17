@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Point {
 
-    public float x;
-    public float y;
+    public final float x;
+    public final float y;
 
     public Point() {
         x = 0;
@@ -21,10 +21,6 @@ public class Point {
     public Point(Vector3 vector) {
         this.x = vector.x;
         this.y = vector.y;
-    }
-
-    public Point duplicate() {
-        return new Point(x, y);
     }
 
     public float distance(Point other) {
@@ -56,28 +52,21 @@ public class Point {
         if (!isZero()) {
             float angle = angle() + rotation;
             float distance = distanceFromZero();
-            x = (float) Math.cos(angle) * distance;
-            y = (float) Math.sin(angle) * distance;
+            return new Point((float) Math.cos(angle) * distance, (float) Math.sin(angle) * distance);
         }
         return this;
     }
 
     public Point add(Point other) {
-        x += other.x;
-        y += other.y;
-        return this;
+        return new Point(x + other.x, y + other.y);
     }
 
     public Point subtract(Point other) {
-        x -= other.x;
-        y -= other.y;
-        return this;
+        return new Point(x - other.x, y - other.y);
     }
 
     public Point scale(float amnt) {
-        x *= amnt;
-        y *= amnt;
-        return this;
+        return new Point(x * amnt, y * amnt);
     }
 
     public boolean isZero() {
@@ -87,17 +76,13 @@ public class Point {
     public Point unproject(Camera camera) {
         Vector3 v = new Vector3(x, y, 0);
         camera.unproject(v);
-        x = v.x;
-        y = v.y;
-        return this;
+        return new Point(v.x, v.y);
     }
 
     public Point project(Camera camera) {
         Vector3 v = new Vector3(x, y, 0);
         camera.project(v);
-        x = v.x;
-        y = v.y;
-        return this;
+        return new Point(v.x, v.y);
     }
 
     @Override

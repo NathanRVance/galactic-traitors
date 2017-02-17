@@ -105,10 +105,7 @@ public class Stuff {
             camera.rotateWith(player.getPlatform());
         camera.update();
 
-        List<Point> touchesInWorld = Controls.getWorldTouches(camera);
-        if (touchesInWorld.size() == 1) {
-            player.worldTouched(player.convertToPlatformCoordinates(touchesInWorld.get(0)));
-        }
+        player.move(delta, Controls.getUserInput());
 
         resolveBuffers();
     }

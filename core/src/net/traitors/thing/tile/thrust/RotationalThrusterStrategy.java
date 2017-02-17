@@ -112,7 +112,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
         float rot = base.getPlatform().getWorldRotation() + base.getRotation();
         //draw cone
         Point conep = new Point(base.getWidth() / 2, 0);
-        conep.rotate(rot);
+        conep = conep.rotate(rot);
         batch.draw(cone,
                 worldPoint.x + conep.x,
                 worldPoint.y + conep.y - coneWidth / 2,
@@ -122,7 +122,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
 
         //draw cone again
         conep = new Point(0, base.getHeight() / 2);
-        conep.rotate(rot);
+        conep = conep.rotate(rot);
         batch.draw(cone,
                 worldPoint.x + conep.x,
                 worldPoint.y + conep.y - coneWidth / 2,
