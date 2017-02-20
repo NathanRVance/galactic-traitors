@@ -6,6 +6,8 @@ import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 
 public class NullPlatform implements Platform {
+    private static final long serialVersionUID = 3113137130998697554L;
+
     @Override
     public Point getTranslationalVelocity() {
         return new Point();

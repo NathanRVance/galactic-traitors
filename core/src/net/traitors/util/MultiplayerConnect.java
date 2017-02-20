@@ -8,9 +8,12 @@ import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.net.SocketHints;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.traitors.controls.Controls;
 import net.traitors.thing.Actor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class MultiplayerConnect implements Disposable, Actor {
@@ -20,6 +23,7 @@ public class MultiplayerConnect implements Disposable, Actor {
     private Thread serverThread;
     private ServerSocket serverSocket;
     private Socket cliSock;
+    private List<Controls.UserInput> inputs = new ArrayList<>();
 
     public MultiplayerConnect() {
 

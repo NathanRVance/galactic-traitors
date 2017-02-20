@@ -5,6 +5,7 @@ import net.traitors.util.Point;
 
 public abstract class AbstractPlatform extends AbstractThing implements Platform {
 
+    private static final long serialVersionUID = 1867652038890912824L;
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
 

@@ -91,6 +91,14 @@ public class ProjectileFactory implements Usable {
             timeToNextFire -= delta;
     }
 
+    public float getTimeToNextFire() {
+        return timeToNextFire;
+    }
+
+    public void setTimeToNextFire(float timeToNextFire){
+        this.timeToNextFire = timeToNextFire;
+    }
+
     public static class Builder {
 
         ProjectileFactory factory = new ProjectileFactory();

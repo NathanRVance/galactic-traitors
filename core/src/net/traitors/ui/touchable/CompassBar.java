@@ -5,35 +5,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import net.traitors.GameScreen;
 import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
-import net.traitors.thing.player.Player;
 import net.traitors.ui.TouchControls;
-import net.traitors.util.BetterCamera;
 
 public class CompassBar extends Widget implements Touchable {
 
     private TouchControls stage;
     private SelectableSwitch<Compass> selectableSwitch = new SelectableSwitch<>();
-    private Player player;
-    private BetterCamera camera;
     private float x;
     private float y;
     private float compassDim;
 
-    public CompassBar(TouchControls stage, float x, float y, float compassDim, Player player) {
+    public CompassBar(TouchControls stage, float x, float y, float compassDim) {
         this.stage = stage;
-        this.player = player;
-        this.camera = GameScreen.getStuff().getCamera();
         this.x = x;
         this.y = y;
         this.compassDim = compassDim;
     }
 
     public void updateCompasses() {
-        Platform p = player.getPlatform();
+        Platform p = GameScreen.getStuff().getPlayer().getPlatform();
         int compassIndex = 0;
         while (!(p instanceof NullPlatform)) {
             if (selectableSwitch.getSelectables().size() <= compassIndex) {
-                Compass compass = new Compass(selectableSwitch, camera);
+                Compass compass = new Compass(selectableSwitch, GameScreen.getStuff().getCamera());
                 compass.setBounds(x + compassDim * compassIndex, y, compassDim, compassDim);
                 selectableSwitch.addSelectable(compass);
                 stage.addTouchable(compass);

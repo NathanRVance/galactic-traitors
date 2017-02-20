@@ -9,6 +9,7 @@ import net.traitors.util.Point;
 
 public abstract class AbstractThing implements Thing {
 
+    private static final long serialVersionUID = 1572340344909082858L;
     private final float width;
     private final float height;
     private final float mass;

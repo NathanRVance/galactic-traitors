@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SelectableSwitch <T extends Selectable> implements Touchable {
 
-    private List<T> selectables = new ArrayList<T>();
+    private List<T> selectables = new ArrayList<>();
 
     public SelectableSwitch() {
 

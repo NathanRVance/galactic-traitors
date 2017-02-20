@@ -1,6 +1,8 @@
 package net.traitors.thing;
 
-public interface Actor {
+import java.io.Serializable;
+
+public interface Actor extends Serializable {
 
     /**
      * Do whatever this thing does

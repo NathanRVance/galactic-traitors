@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 public class UniverseTile extends AbstractPlatform {
 
     private static final float TILE_DIM = 1000;
+    private static final long serialVersionUID = 8244386766578908621L;
 
     @Override
     public float getWidth() {

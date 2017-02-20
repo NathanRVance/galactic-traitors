@@ -8,18 +8,33 @@ import net.traitors.thing.tile.Tile;
 import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Ship extends AbstractPlatform {
 
 
+    private static final long serialVersionUID = 7866075723148790776L;
     private Tile[][] grid;
-    private List<ShipComponent> components = new ArrayList<>();
-    private ShipComputer computer;
+    private Set<ShipComponent> components = new HashSet<>();
+    private transient ShipComputer computer;
 
     private Ship(int width, int height) {
         super(width, height);
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(computer.saveComponents());
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        computer = new ShipComputer((Serializable) in.readObject(), components);
     }
 
     @Override
@@ -35,12 +50,13 @@ public class Ship extends AbstractPlatform {
 
     /**
      * Get a usable that can be used from point
+     *
      * @param point point to get usable at, in world coordinates
      * @return the usable usable, or null if there isn't one
      */
     public Usable getUsableAt(Point point) {
-        for(ShipComponent component : components) {
-            if(component.contains(point)) {
+        for (ShipComponent component : components) {
+            if (component.contains(point)) {
                 return component;
             }
         }
@@ -50,7 +66,7 @@ public class Ship extends AbstractPlatform {
     @Override
     public void act(float delta) {
         super.act(delta);
-        for(Tile tile : components) {
+        for (Tile tile : components) {
             tile.act(delta); //Updates cooldowns
         }
     }

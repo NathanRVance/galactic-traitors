@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
+import net.traitors.GameScreen;
 import net.traitors.thing.item.Item;
-import net.traitors.thing.player.Player;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
@@ -23,7 +23,7 @@ class InventorySlot extends Widget implements Selectable {
     private Texture cooldown;
     private Point drawImageAt = new Point();
 
-    InventorySlot(final SelectableSwitch<InventorySlot> selectableSwitch, final Player player) {
+    InventorySlot(final SelectableSwitch<InventorySlot> selectableSwitch) {
         PixmapRotateRec pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);
         pixmap.setColor(0, 0, 0, .7f);
         pixmap.fill();
@@ -64,8 +64,9 @@ class InventorySlot extends Widget implements Selectable {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 touched = false;
-                if(! drawImageAt.equals(new Point(getX(), getY()))) {
-                    player.dropItem(item);
+                if (!drawImageAt.equals(new Point(getX(), getY()))) {
+                    selectableSwitch.selectableTapped(InventorySlot.this, false); //unselect
+                    GameScreen.getStuff().getPlayer().dropItem(item);
                     item = null;
                 }
                 drawImageAt = new Point(getX(), getY());
@@ -89,7 +90,7 @@ class InventorySlot extends Widget implements Selectable {
             float scale = .9f;
             batch.draw(item.getInventoryImage(), drawImageAt.x + getWidth() * (1 - scale) / 2,
                     drawImageAt.y + getHeight() * (1 - scale) / 2, getWidth() * scale, getHeight() * scale);
-            if(item.getCooldownPercent() < 1) {
+            if (item.getCooldownPercent() < 1) {
                 batch.draw(cooldown, getX(), getY(), getWidth() * item.getCooldownPercent(), getHeight());
             }
         }
@@ -101,11 +102,13 @@ class InventorySlot extends Widget implements Selectable {
     @Override
     public void select() {
         selected = true;
+        GameScreen.getStuff().getPlayer().setHolding(getItem());
     }
 
     @Override
     public void unselect() {
         selected = false;
+        GameScreen.getStuff().getPlayer().setHolding(null);
     }
 
     @Override

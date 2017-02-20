@@ -5,14 +5,13 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.traitors.controls.InputProcessor;
 import net.traitors.thing.Stuff;
 import net.traitors.thing.platform.Platform;
+import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.platform.ship.ShipFactory;
-import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.player.Player;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.BetterCamera;
@@ -20,13 +19,14 @@ import net.traitors.util.Point;
 
 public class GameScreen implements Screen {
     private static Stuff stuff;
+    private static TouchControls uiControls;
     private GalacticTraitors game;
-    private Stage uiControls;
     //private TextView textView;
 
     GameScreen(GalacticTraitors game) {
         this.game = game;
         BetterCamera camera = new BetterCamera();
+        uiControls = new TouchControls();
         Player player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
         stuff = new Stuff(camera, player);
 
@@ -62,12 +62,15 @@ public class GameScreen implements Screen {
         stuff.addActor(camera); //must happen before player
         stuff.addActor(player);
 
-        uiControls = new TouchControls(player);
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(camera)));
     }
 
     public static Stuff getStuff() {
         return stuff;
+    }
+
+    public static TouchControls getTouchControls() {
+        return uiControls;
     }
 
     @Override
@@ -101,9 +104,9 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
         stuff.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
-        uiControls = new TouchControls(stuff.getPlayer());
+        uiControls = new TouchControls();
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(stuff.getCamera())));
-
+        stuff.getPlayer().getInventory().update();
         //textView = new TextView();
     }
 

@@ -10,13 +10,18 @@ import net.traitors.thing.player.Player;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class Stuff {
+public class Stuff implements Serializable {
 
+    private static final long serialVersionUID = -4534574279158725444L;
     private List<Actor> actors = new ArrayList<>();
     private List<Thing> stuff = new ArrayList<>();
     private List<Actor> removeBuffer = new ArrayList<>();
@@ -28,6 +33,14 @@ public class Stuff {
     public Stuff(BetterCamera camera, Player player) {
         this.camera = camera;
         this.player = player;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
     }
 
     public void addActor(Actor actor) {

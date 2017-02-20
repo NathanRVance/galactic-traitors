@@ -13,7 +13,6 @@ import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.usable.Usable;
-import net.traitors.ui.touchable.Inventory;
 import net.traitors.util.Point;
 
 public class Player extends AbstractThing {
@@ -21,6 +20,7 @@ public class Player extends AbstractThing {
     //Animation stuff
     private static final float BASE_ANIMATION_LENGTH = 1; //seconds
     private static final float BASE_MOVE_SPEED = 1.4f; //meters per second
+    private static final long serialVersionUID = -9175410120719630779L;
     private final int cycleLength = 200;
     private TextureRegion[] animation;
     private TextureRegion[] animationHolding;
@@ -32,12 +32,9 @@ public class Player extends AbstractThing {
 
     public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
         super(.5f, .5f, 70);
+        inventory = new Inventory();
         animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
         animationHolding = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, true);
-    }
-
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
     }
 
     private void rotateToFace(Point point) {
@@ -89,6 +86,7 @@ public class Player extends AbstractThing {
     }
 
     public void dropItem(Item item) {
+        inventory.removeItem(item);
         if (holding == item) { //If we're holding the same instance of the item
             holding = null;
         }
@@ -131,7 +129,7 @@ public class Player extends AbstractThing {
             resetAnimation();
         }
 
-        if(input.pointsTouched.size() == 1) {
+        if (input.pointsTouched.size() == 1) {
             worldTouched(input.pointsTouched.get(0));
         }
     }
@@ -140,6 +138,10 @@ public class Player extends AbstractThing {
     public void act(float delta) {
         super.act(delta);
         inventory.updateCooldowns(delta);
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 
     @Override
@@ -267,10 +269,10 @@ public class Player extends AbstractThing {
 
     @Override
     public void dispose() {
-        for(TextureRegion textureRegion : animation) {
+        for (TextureRegion textureRegion : animation) {
             textureRegion.getTexture().dispose();
         }
-        for(TextureRegion textureRegion : animationHolding) {
+        for (TextureRegion textureRegion : animationHolding) {
             textureRegion.getTexture().dispose();
         }
     }

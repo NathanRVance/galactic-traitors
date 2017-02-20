@@ -1,22 +1,15 @@
 package net.traitors.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import net.traitors.controls.Controls;
-import net.traitors.thing.item.Gun;
-import net.traitors.thing.player.Player;
-import net.traitors.thing.usable.FloatStrategy;
-import net.traitors.thing.usable.PointStrategy;
-import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.ui.touchable.CompassBar;
-import net.traitors.ui.touchable.Inventory;
+import net.traitors.ui.touchable.InventoryBar;
 import net.traitors.ui.touchable.Touchable;
 import net.traitors.ui.touchable.TouchableTouchpad;
-import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
 
 import java.util.HashSet;
@@ -35,8 +28,9 @@ public class TouchControls extends Stage implements Touchable {
 
     private TouchableTouchpad touchpad;
     private CompassBar compassBar;
+    private InventoryBar inventoryBar;
 
-    public TouchControls(Player player) {
+    public TouchControls() {
         super(new ExtendViewport(arbitraryNumber, arbitraryNumber));
         float height = getHeight();
         float width = getWidth();
@@ -49,51 +43,11 @@ public class TouchControls extends Stage implements Touchable {
         addTouchable(touchpad);
 
         float slotWidth = height / 5;
-        Inventory inventory = new Inventory(this, 5, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4, player);
-        addTouchable(inventory);
-        ProjectileFactory factory = new ProjectileFactory.Builder()
-                .setCooldown(new FloatStrategy() {
-                    @Override
-                    public float getFloat() {
-                        return 1;
-                    }
-                })
-                .setOriginOffset(new PointStrategy() {
-                    @Override
-                    public Point getPoint() {
-                        return new Point(.4f, -.25f);
-                    }
-                })
-                .setThickness(new FloatStrategy() {
-                    @Override
-                    public float getFloat() {
-                        return .1f;
-                    }
-                })
-                .setLength(new FloatStrategy() {
-                    @Override
-                    public float getFloat() {
-                        return .5f;
-                    }
-                })
-                .setSpeed(new FloatStrategy() {
-                    @Override
-                    public float getFloat() {
-                        return 20;
-                    }
-                })
-                .setColor(Color.RED)
-                .setLongevity(new FloatStrategy() {
-                    @Override
-                    public float getFloat() {
-                        return 1;
-                    }
-                })
-                .build();
-        inventory.addItem(new Gun(.1f, .1f, factory));
+        inventoryBar = new InventoryBar(this, 5, width - slotWidth, height - slotWidth * 4, slotWidth, slotWidth * 4);
+        addTouchable(inventoryBar);
 
         float buttonDim = height / 6;
-        compassBar = new CompassBar(this, 0, height - buttonDim, buttonDim, player);
+        compassBar = new CompassBar(this, 0, height - buttonDim, buttonDim);
         addTouchable(compassBar);
 
         Controls.registerTouchControls(this);
@@ -135,6 +89,10 @@ public class TouchControls extends Stage implements Touchable {
             }
         }
         compassBar.updateCompasses();
+    }
+
+    public InventoryBar getInventoryBar() {
+        return inventoryBar;
     }
 
     private boolean wasTouchedLastCycle(Touchable touchable) {

@@ -9,18 +9,79 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
+import net.traitors.thing.usable.FloatStrategy;
+import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
+import net.traitors.util.Point;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class Gun extends AbstractThing implements Item {
 
-    private Texture inventoryImage;
-    private TextureRegion handImage;
-    private ProjectileFactory projectileFactory;
+    private static final long serialVersionUID = 9165310561115300489L;
+    private transient Texture inventoryImage;
+    private transient TextureRegion handImage;
+    private transient ProjectileFactory projectileFactory;
 
-    public Gun(float width, float height, ProjectileFactory projectileFactory) {
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeFloat(projectileFactory.getTimeToNextFire());
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        projectileFactory = getProjectileFactory();
+        projectileFactory.setTimeToNextFire(in.readFloat());
+    }
+
+    public Gun(float width, float height) {
         super(width, height);
-        this.projectileFactory = projectileFactory;
+        projectileFactory = getProjectileFactory();
+    }
+
+    private ProjectileFactory getProjectileFactory() {
+        return new ProjectileFactory.Builder()
+                .setCooldown(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 1;
+                    }
+                })
+                .setOriginOffset(new PointStrategy() {
+                    @Override
+                    public Point getPoint() {
+                        return new Point(.4f, -.25f);
+                    }
+                })
+                .setThickness(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .1f;
+                    }
+                })
+                .setLength(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return .5f;
+                    }
+                })
+                .setSpeed(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 20;
+                    }
+                })
+                .setColor(Color.RED)
+                .setLongevity(new FloatStrategy() {
+                    @Override
+                    public float getFloat() {
+                        return 1;
+                    }
+                })
+                .build();
     }
 
     @Override
@@ -61,7 +122,7 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public void draw(Batch batch) {
-        batch.draw(new TextureRegion(inventoryImage), getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, getWorldRotation() * MathUtils.radiansToDegrees);
+        batch.draw(new TextureRegion(getInventoryImage()), getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, getWorldRotation() * MathUtils.radiansToDegrees);
     }
 
     @Override
@@ -77,7 +138,9 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public void dispose() {
-        inventoryImage.dispose();
-        handImage.getTexture().dispose();
+        getInventoryImage().dispose();
+        inventoryImage = null; //Set to null so that if getInventoryImage is called, it returns the right thing.
+        getHandImage().getTexture().dispose();
+        handImage = null;
     }
 }
