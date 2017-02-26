@@ -16,6 +16,7 @@ import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public class MainThrusterStrategy implements ThrustStrategy {
 
@@ -31,6 +32,26 @@ public class MainThrusterStrategy implements ThrustStrategy {
         this.tile = tile;
         this.forceMagnitude = forceMagnitude;
         setup();
+    }
+
+    public MainThrusterStrategy() {
+        setup();
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = new SaveData();
+        sd.writeSavable(tile);
+        sd.writeFloat(forceMagnitude);
+        sd.writeFloat(projectileFactory.getTimeToNextFire());
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        tile = (Tile) saveData.readSavable(tile);
+        forceMagnitude = saveData.readFloat();
+        projectileFactory.setTimeToNextFire(saveData.readFloat());
     }
 
     private void setup() {

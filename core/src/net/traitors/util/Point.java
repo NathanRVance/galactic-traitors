@@ -3,11 +3,8 @@ package net.traitors.util;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
-import java.io.Serializable;
+public class Point {
 
-public class Point implements Serializable {
-
-    private static final long serialVersionUID = 187380356439359410L;
     public final float x;
     public final float y;
 
@@ -99,5 +96,4 @@ public class Point implements Serializable {
     public String toString() {
         return "X: " + x + ", Y: " + y;
     }
-
 }

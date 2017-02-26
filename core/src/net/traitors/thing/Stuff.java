@@ -18,7 +18,9 @@ import net.traitors.util.save.SaveData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Stuff implements Savable {
 
@@ -27,9 +29,12 @@ public class Stuff implements Savable {
     private List<Actor> removeBuffer = new ArrayList<>();
     private List<Actor> addBuffer = new ArrayList<>();
     private List<Player> players = new ArrayList<>();
+    private final Map<Player, Controls.UserInput> inputs = new HashMap<>();
     private int playersToAdd = 0;
     private BetterCamera camera;
     private float delta;
+
+    private SaveData cachedSaveData = null;
 
     public Stuff(BetterCamera camera) {
         this.camera = camera;
@@ -39,10 +44,15 @@ public class Stuff implements Savable {
 
     @Override
     public SaveData getSaveData() {
+        return cachedSaveData;
+    }
+
+    private void updateSaveData() {
         SaveData sd = new SaveData();
         sd.writeList(actors, null);
         sd.writeSaveData(camera.getSaveData());
-        return sd;
+        sd.writeFloat(delta);
+        cachedSaveData = sd;
     }
 
     @Override
@@ -51,6 +61,17 @@ public class Stuff implements Savable {
             addActor(actor);
         }
         camera.loadSaveData(saveData.readSaveData());
+        delta = saveData.readFloat();
+    }
+
+    public void updateInputs(List<Controls.UserInput> in) {
+        synchronized (inputs) {
+            for (int i = 0; i < players.size(); i++) {
+                if (in.size() > i) {
+                    inputs.put(players.get(i), in.get(i));
+                }
+            }
+        }
     }
 
     public void addActor(Actor actor) {
@@ -119,10 +140,11 @@ public class Stuff implements Savable {
         System.out.println("Adding player");
         Player p = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, players.size());
         addActor(p);
+        inputs.put(p, new Controls.UserInput());
     }
 
     public boolean clean() {
-        return playersToAdd == 0;
+        return playersToAdd == 0 && cachedSaveData != null;
     }
 
     public void addPlayerAsync() {
@@ -139,7 +161,7 @@ public class Stuff implements Savable {
         }
     }
 
-    public synchronized void doStuff(float delta) {
+    public void doStuff(float delta) {
         resolveBuffers();
         this.delta = delta;
         placeStuff(stuff);
@@ -158,8 +180,14 @@ public class Stuff implements Savable {
             camera.setRotateDepth(1);
         camera.update();
 
-        getPlayer().move(delta, Controls.getUserInput());
+        synchronized (inputs) {
+            inputs.put(getPlayer(), Controls.getUserInput());
+            for (Player player : players) {
+                player.move(delta, inputs.get(player));
+            }
+        }
         resolveBuffers();
+        updateSaveData();
     }
 
     public Item getItemAt(Point point) {

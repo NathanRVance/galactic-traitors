@@ -56,12 +56,17 @@ public class SaveData {
     }
 
     public void writeSavable(Savable savable) {
-        writeString(savable.getClass().toString());
-        writeSaveData(savable.getSaveData());
+        if(savable == null) {
+            writeString("null");
+        } else {
+            writeString(savable.getClass().toString());
+            writeSaveData(savable.getSaveData());
+        }
     }
 
     public Savable readSavable(Savable cachedSavable) {
         String classname = readString();
+        if(classname.equals("null")) return null;
         try {
             Class<? extends Savable> c = Class.forName(classname).asSubclass(Savable.class);
             Savable s = (c.isInstance(cachedSavable)) ? cachedSavable : c.newInstance();

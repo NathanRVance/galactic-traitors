@@ -7,8 +7,9 @@ import com.badlogic.gdx.graphics.Camera;
 import net.traitors.GameScreen;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.Point;
+import net.traitors.util.save.Savable;
+import net.traitors.util.save.SaveData;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,22 +86,49 @@ public class Controls {
         SPRINT,
     }
 
-    public static class UserInput implements Serializable {
+    public static class UserInput implements Savable {
 
-        private static final long serialVersionUID = 4990555252952478767L;
         public List<Point> pointsTouched = new ArrayList<>();
         public Set<Key> keysPressed = new HashSet<>();
 
         @Override
+        public SaveData getSaveData() {
+            SaveData sd = new SaveData();
+            sd.writeInt(pointsTouched.size());
+            for(Point p : pointsTouched) {
+                sd.writeFloat(p.x);
+                sd.writeFloat(p.y);
+            }
+            sd.writeInt(keysPressed.size());
+            for(Key key : keysPressed) {
+                sd.writeString(key.name());
+            }
+            return sd;
+        }
+
+        @Override
+        public void loadSaveData(SaveData saveData) {
+            int numPoints = saveData.readInt();
+            pointsTouched = new ArrayList<>(numPoints);
+            for(int i = 0; i < numPoints; i++) {
+                pointsTouched.add(new Point(saveData.readFloat(), saveData.readFloat()));
+            }
+            int numKeys = saveData.readInt();
+            keysPressed = new HashSet<>(numKeys);
+            for(int i = 0; i < numKeys; i++) {
+                keysPressed.add(Key.valueOf(saveData.readString()));
+            }
+        }
+
+        @Override
         public boolean equals(Object other) {
-            if(this == other) return true;
-            if(other instanceof UserInput) {
+            if (this == other) return true;
+            if (other instanceof UserInput) {
                 UserInput o = (UserInput) other;
                 return pointsTouched.equals(o.pointsTouched) && keysPressed.equals(o.keysPressed);
             }
             return false;
         }
-
     }
 
 }

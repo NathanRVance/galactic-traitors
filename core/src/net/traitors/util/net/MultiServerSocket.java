@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
+import net.traitors.util.save.SaveData;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -67,7 +68,7 @@ class MultiServerSocket implements Disposable {
         serverThread.start();
     }
 
-    void pushData(final Serializable data) {
+    void pushData(final String data) {
         for (final ObjectOutputStream oos : outputs) {
             new Thread(new Runnable() {
                 @Override

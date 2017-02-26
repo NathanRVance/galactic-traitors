@@ -15,10 +15,11 @@ import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public class GunTile extends AbstractThing implements ShipComponent {
 
-    private final float barrelLength;
+    private float barrelLength;
     private Tile base;
     private transient TextureRegion dome;
     private transient TextureRegion barrel;
@@ -32,12 +33,31 @@ public class GunTile extends AbstractThing implements ShipComponent {
         setRotation(rotation);
         this.rotation = rotation;
         this.base = base;
-        this.barrelLength = getHeight() * 3 / 4;
 
         setup();
     }
 
+    public GunTile() {
+        setup();
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        sd.writeSavable(base);
+        sd.writeFloat(projectileFactory.getTimeToNextFire());
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        base = (Tile) saveData.readSavable(base);
+        projectileFactory.setTimeToNextFire(saveData.readFloat());
+    }
+
     private void setup() {
+        this.barrelLength = getHeight() * 3 / 4;
         int domeExtent = 200;
         int domeWidth = 400;
         Pixmap pixmap = new Pixmap(domeExtent, domeWidth, Pixmap.Format.RGBA8888);
@@ -137,6 +157,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
     public void use(Thing user) {
         rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
         projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
+        if (computer != null) computer.componentUsed(this, user);
     }
 
     @Override

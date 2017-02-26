@@ -6,6 +6,7 @@ import com.badlogic.gdx.net.Socket;
 
 import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
+import net.traitors.util.save.SaveData;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -39,7 +40,9 @@ public class MultiplayerConnect {
                         int playerID = input.readInt();
                         //Then do inputs
                         while (!Thread.interrupted()) {
-                            GameScreen.deserializeStuff((byte[]) input.readObject());
+                            SaveData saveData = new SaveData();
+                            saveData.loadData((String) input.readObject());
+                            GameScreen.getStuff().loadSaveData(saveData);
                             MultiplayerConnect.playerID = playerID;
                         }
                     } catch (IOException | ClassNotFoundException e) {
@@ -90,10 +93,10 @@ public class MultiplayerConnect {
 
     private static void serverTick() {
         if(GameScreen.getStuff().clean()) {
-            serverSocket.pushData(GameScreen.serializeStuff());
+            serverSocket.pushData(GameScreen.getStuff().getSaveData().toString());
         }
         List<Controls.UserInput> inputs = serverSocket.getInputs();
-
+        GameScreen.getStuff().updateInputs(inputs);
     }
 
     private static void clientTick() {
@@ -104,7 +107,7 @@ public class MultiplayerConnect {
                 @Override
                 public void run() {
                     try {
-                        outputStream.writeObject(input);
+                        outputStream.writeObject(input.getSaveData().toString());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

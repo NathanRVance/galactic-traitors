@@ -16,24 +16,45 @@ import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public class RotationalThrusterStrategy implements ThrustStrategy {
 
     private final float coneWidth = .5f;
     private final float coneLen = coneWidth / 2;
     private float rotation = 0;
-    private transient Thing base;
-    private transient TextureRegion cone;
+    private Thing base;
+    private TextureRegion cone;
     private Tile tile;
-    private float forceMagnitude = 5000;
+    private float forceMagnitude;
 
-    private transient RotationStrategy rotationStrategy;
-    private transient ProjectileFactory projectileFactory;
+    private RotationStrategy rotationStrategy;
+    private ProjectileFactory projectileFactory;
 
     public RotationalThrusterStrategy(Tile tile, float forceMagnitude) {
         this.tile = tile;
         this.forceMagnitude = forceMagnitude;
         setup();
+    }
+
+    public RotationalThrusterStrategy() {
+        setup();
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = new SaveData();
+        sd.writeSavable(tile);
+        sd.writeFloat(forceMagnitude);
+        sd.writeFloat(projectileFactory.getTimeToNextFire());
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        tile = (Tile) saveData.readSavable(tile);
+        forceMagnitude = saveData.readFloat();
+        projectileFactory.setTimeToNextFire(saveData.readFloat());
     }
 
     private void setup() {

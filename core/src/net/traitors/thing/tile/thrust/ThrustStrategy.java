@@ -4,8 +4,9 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.thing.Thing;
+import net.traitors.util.save.Savable;
 
-public interface ThrustStrategy extends Disposable {
+public interface ThrustStrategy extends Disposable, Savable {
 
     void setBase(Thing base);
 

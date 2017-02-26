@@ -16,15 +16,8 @@ import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.net.MultiplayerConnect;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 public class GameScreen implements Screen {
     private static Stuff stuff;
-    private static byte[] serializedStuff;
     private static TouchControls uiControls;
     private GalacticTraitors game;
     //private TextView textView;
@@ -68,8 +61,6 @@ public class GameScreen implements Screen {
 
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(camera)));
 
-        //MultiplayerConnect.makeServer();
-        //MultiplayerConnect.connectToServer("209.140.230.243");
         //MultiplayerConnect.start();
     }
 
@@ -77,30 +68,8 @@ public class GameScreen implements Screen {
         return stuff;
     }
 
-    public static synchronized byte[] serializeStuff() {
-        return serializedStuff;
-    }
-
-    public static synchronized void deserializeStuff(byte[] bytes) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
-        ObjectInputStream si = new ObjectInputStream(bi);
-        GameScreen.stuff = (Stuff) si.readObject();
-    }
-
     public static TouchControls getTouchControls() {
         return uiControls;
-    }
-
-    private void setSerializedStuff() {
-        try {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            ObjectOutputStream so = new ObjectOutputStream(bo);
-            so.writeObject(stuff);
-            so.flush();
-            serializedStuff = bo.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

@@ -9,7 +9,7 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
 
-    AbstractPlatform() {
+    protected AbstractPlatform() {
         super(0, 0, Float.MAX_VALUE);
     }
 

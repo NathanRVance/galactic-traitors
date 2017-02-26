@@ -14,20 +14,38 @@ import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public class Gun extends AbstractThing implements Item {
 
-    private transient Texture inventoryImage;
-    private transient TextureRegion handImage;
-    private transient ProjectileFactory projectileFactory;
+    private Texture inventoryImage;
+    private TextureRegion handImage;
+    private ProjectileFactory projectileFactory;
 
     public Gun(float width, float height) {
         super(width, height);
-        projectileFactory = getProjectileFactory();
+        setup();
     }
 
-    private ProjectileFactory getProjectileFactory() {
-        return new ProjectileFactory.Builder()
+    public Gun() {
+        setup();
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        sd.writeFloat(projectileFactory.getTimeToNextFire());
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        projectileFactory.setTimeToNextFire(saveData.readFloat());
+    }
+
+    private void setup() {
+        projectileFactory = new ProjectileFactory.Builder()
                 .setCooldown(new FloatStrategy() {
                     @Override
                     public float getFloat() {

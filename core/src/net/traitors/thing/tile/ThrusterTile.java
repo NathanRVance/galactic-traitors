@@ -7,6 +7,7 @@ import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.ShipComponent;
 import net.traitors.thing.platform.ship.ShipComputer;
 import net.traitors.thing.tile.thrust.ThrustStrategy;
+import net.traitors.util.save.SaveData;
 
 public class ThrusterTile extends AbstractThing implements ShipComponent {
 
@@ -17,6 +18,24 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
         super(width, height);
         setRotation(rotation);
         this.thrustStrategy = thrustStrategy;
+        thrustStrategy.setBase(this);
+    }
+
+    public ThrusterTile() {
+
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        sd.writeSavable(thrustStrategy);
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        thrustStrategy = (ThrustStrategy) saveData.readSavable(thrustStrategy);
         thrustStrategy.setBase(this);
     }
 

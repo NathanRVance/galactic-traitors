@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.GameScreen;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.BetterCamera;
+import net.traitors.util.save.SaveData;
 
 public class OverviewScreen extends AbstractThing implements Tile {
 
@@ -20,9 +21,16 @@ public class OverviewScreen extends AbstractThing implements Tile {
 
     public OverviewScreen(float width, float height) {
         super(width, height);
-        myCamera.setToOrtho(false, getWidth(), getHeight());
-        myCamera.syncRotations();
-        myCamera.zoom = 25;
+        setup();
+    }
+
+    public OverviewScreen() {
+
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
         setup();
     }
 
@@ -42,6 +50,9 @@ public class OverviewScreen extends AbstractThing implements Tile {
             //End the old batch
             batch.end();
             //Sync up my camera
+            myCamera.setToOrtho(false, getWidth(), getHeight());
+            myCamera.syncRotations();
+            myCamera.zoom = 25;
             myCamera.translate(getWorldPoint().x - myCamera.position.x, getWorldPoint().y - myCamera.position.y);
             myCamera.rotateTo(getWorldRotation());
             myCamera.update();

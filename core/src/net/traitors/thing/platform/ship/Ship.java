@@ -7,6 +7,7 @@ import net.traitors.thing.tile.FloorTile;
 import net.traitors.thing.tile.Tile;
 import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,10 +16,49 @@ public class Ship extends AbstractPlatform {
 
     private Tile[][] grid;
     private Set<ShipComponent> components = new HashSet<>();
-    private transient ShipComputer computer = new ShipComputer();
+    private ShipComputer computer = new ShipComputer();
 
     private Ship(int width, int height) {
         super(width, height);
+    }
+
+    public Ship() {
+
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        sd.writeInt(grid.length);
+        for (Tile[] column : grid) {
+            sd.writeInt(column.length);
+            for (Tile tile : column) {
+                sd.writeSavable(tile);
+            }
+        }
+        sd.writeSaveData(computer.getSaveData());
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        components = new HashSet<>();
+        Tile[][] grid = new Tile[saveData.readInt()][];
+        for (int col = 0; col < grid.length; col++) {
+            grid[col] = new Tile[saveData.readInt()];
+            for (int tile = 0; tile < grid[col].length; tile++) {
+                grid[col][tile] = (Tile) saveData.readSavable(
+                        (this.grid != null && this.grid.length >= col && this.grid[col].length >= tile) ?
+                                this.grid[col][tile] : null
+                );
+                if (grid[col][tile] instanceof ShipComponent) {
+                    components.add((ShipComponent) grid[col][tile]);
+                }
+            }
+        }
+        computer = new ShipComputer(components);
+        computer.loadSaveData(saveData.readSaveData());
     }
 
     @Override
@@ -50,8 +90,8 @@ public class Ship extends AbstractPlatform {
     @Override
     public void act(float delta) {
         super.act(delta);
-        for (Tile tile : components) {
-            tile.act(delta); //Updates cooldowns
+        for (ShipComponent component : components) {
+            component.act(delta); //Updates cooldowns
         }
     }
 

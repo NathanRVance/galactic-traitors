@@ -32,6 +32,10 @@ public abstract class AbstractThing implements Thing {
         this.mass = width * height;
     }
 
+    protected AbstractThing() {
+        //This must be followed by a call to loadSaveData
+    }
+
     @Override
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
