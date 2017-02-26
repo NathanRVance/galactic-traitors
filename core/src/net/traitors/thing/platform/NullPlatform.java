@@ -4,9 +4,19 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public class NullPlatform implements Platform {
-    private static final long serialVersionUID = 3113137130998697554L;
+
+    @Override
+    public SaveData getSaveData() {
+        return new SaveData();
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        //Do nothing
+    }
 
     @Override
     public Point getTranslationalVelocity() {
@@ -115,7 +125,7 @@ public class NullPlatform implements Platform {
 
     @Override
     public Platform getPlatform() {
-        throw new UnsupportedOperationException();
+        return this;
     }
 
     @Override

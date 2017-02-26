@@ -4,33 +4,60 @@ import net.traitors.GameScreen;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.item.Item;
 import net.traitors.ui.touchable.InventoryBar;
+import net.traitors.util.net.MultiplayerConnect;
+import net.traitors.util.save.Savable;
+import net.traitors.util.save.SaveData;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Inventory implements Serializable {
+public class Inventory implements Savable {
 
-    private static final long serialVersionUID = -3541440266159851697L;
-    private List<Item> inventory;
+    private List<Item> inventory = new ArrayList<>();
+    private Item held;
+    private int playerID;
 
-    public Inventory() {
-        inventory = new ArrayList<>();
+    public Inventory(int playerID) {
+        this.playerID = playerID;
         //Populate with default inventory
         inventory.add(new Gun(.1f, .1f));
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
+    public Inventory() {
+
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        update();
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = new SaveData();
+        sd.writeInt(playerID);
+        sd.writeList(inventory, held);
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        playerID = saveData.readInt();
+        for(Item item : saveData.readList(inventory, Item.class)) {
+            inventory.add(item);
+        }
+        held = (Item) saveData.getFlaggedSavable();
+    }
+
+    public int getPlayerID() {
+        return playerID;
+    }
+
+    public Item getHeld() {
+        return held;
+    }
+
+    public void setHeld(Item item) {
+        if (item != null && !inventory.contains(item)) {
+            addItem(item);
+        }
+        held = item;
     }
 
     public void addItem(Item item) {
@@ -55,6 +82,7 @@ public class Inventory implements Serializable {
     }
 
     public void update() {
+        if (playerID != MultiplayerConnect.getPlayerID()) return;
         InventoryBar inventoryBar = GameScreen.getTouchControls().getInventoryBar();
         for (int i = 0; i < inventory.size() && i < inventoryBar.getCapacity(); i++) {
             inventoryBar.setItemAt(inventory.get(i), i);
@@ -62,7 +90,9 @@ public class Inventory implements Serializable {
         for (int i = inventory.size(); i < inventoryBar.getCapacity(); i++) {
             inventoryBar.setItemAt(null, i);
         }
+        if (held != null) {
+            inventoryBar.setTapped(held);
+        }
     }
-
 
 }

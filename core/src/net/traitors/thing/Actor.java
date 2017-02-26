@@ -1,8 +1,8 @@
 package net.traitors.thing;
 
-import java.io.Serializable;
+import net.traitors.util.save.Savable;
 
-public interface Actor extends Serializable {
+public interface Actor extends Savable {
 
     /**
      * Do whatever this thing does

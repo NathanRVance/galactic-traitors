@@ -21,6 +21,15 @@ public class InventoryBar extends Widget implements Touchable {
         }
     }
 
+    public void setTapped(Item item) {
+        for(InventorySlot slot : selectableSwitch.getSelectables()) {
+            if(slot.getItem() == item) {
+                selectableSwitch.selectableTapped(slot, true);
+                break;
+            }
+        }
+    }
+
     /**
      * Sets an item at the specified index
      *

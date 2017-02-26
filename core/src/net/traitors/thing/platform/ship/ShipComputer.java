@@ -17,7 +17,9 @@ public class ShipComputer {
 
     public ShipComputer(Serializable savedComponents, Set<ShipComponent> components) {
         Set<Set<Point>> save = (Set<Set<Point>>) savedComponents;
-        this.components.addAll(components);
+        for(ShipComponent component : components) {
+            addComponent(component);
+        }
         for (Set<Point> points : save) {
             Set<ShipComponent> c = new HashSet<>();
             for (Point point : points) {

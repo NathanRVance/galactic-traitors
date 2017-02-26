@@ -13,7 +13,7 @@ import net.traitors.util.TextureCreator;
 public class Projectile extends AbstractThing {
 
     private Point velocity;
-    private TextureRegion texture;
+    private transient TextureRegion texture;
     private float longevity;
     //Keep track of our own location so that we don't rotate/move with our platform
     private Point location;
@@ -24,7 +24,6 @@ public class Projectile extends AbstractThing {
         location = null;
         this.velocity = velocity;
         this.longevity = longevity;
-
         texture = TextureCreator.getColorRec(color);
     }
 

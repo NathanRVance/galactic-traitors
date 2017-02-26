@@ -8,6 +8,7 @@ import net.traitors.GameScreen;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,11 +85,21 @@ public class Controls {
         SPRINT,
     }
 
-    public static class UserInput {
+    public static class UserInput implements Serializable {
 
-        public List<Point> pointsTouched;
+        private static final long serialVersionUID = 4990555252952478767L;
+        public List<Point> pointsTouched = new ArrayList<>();
+        public Set<Key> keysPressed = new HashSet<>();
 
-        public Set<Key> keysPressed;
+        @Override
+        public boolean equals(Object other) {
+            if(this == other) return true;
+            if(other instanceof UserInput) {
+                UserInput o = (UserInput) other;
+                return pointsTouched.equals(o.pointsTouched) && keysPressed.equals(o.keysPressed);
+            }
+            return false;
+        }
 
     }
 

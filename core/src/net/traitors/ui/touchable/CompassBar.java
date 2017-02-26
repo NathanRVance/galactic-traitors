@@ -32,7 +32,7 @@ public class CompassBar extends Widget implements Touchable {
                 selectableSwitch.addSelectable(compass);
                 stage.addTouchable(compass);
             }
-            selectableSwitch.getSelectables().get(compassIndex).setTrackThing(p);
+            selectableSwitch.getSelectables().get(compassIndex).setTrackDepth(compassIndex + 1);
             p = p.getPlatform();
             compassIndex++;
         }

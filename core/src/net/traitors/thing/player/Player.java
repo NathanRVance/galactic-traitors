@@ -14,27 +14,69 @@ import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public class Player extends AbstractThing {
 
     //Animation stuff
     private static final float BASE_ANIMATION_LENGTH = 1; //seconds
     private static final float BASE_MOVE_SPEED = 1.4f; //meters per second
-    private static final long serialVersionUID = -9175410120719630779L;
     private final int cycleLength = 200;
-    private TextureRegion[] animation;
-    private TextureRegion[] animationHolding;
+    private transient TextureRegion[] animation;
+    private transient TextureRegion[] animationHolding;
     private float animationLength = 1; //Time, in seconds, it takes to run through the animation
     private float animationPoint = 0;
 
-    private Item holding;
     private Inventory inventory;
+    private Color[] colors = new Color[5];
 
-    public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor) {
+    public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, int playerID) {
+        this();
+        colors[0] = bodyColor;
+        colors[1] = skinColor;
+        colors[2] = hairColor;
+        colors[3] = pantsColor;
+        colors[4] = shoesColor;
+        inventory = new Inventory(playerID);
+        generateAnimations();
+    }
+
+    public Player() {
         super(.5f, .5f, 70);
-        inventory = new Inventory();
-        animation = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, false);
-        animationHolding = getAnimation(bodyColor, skinColor, hairColor, pantsColor, shoesColor, true);
+    }
+
+    private void generateAnimations() {
+        animation = getAnimation(colors[0], colors[1], colors[2], colors[3], colors[4], false);
+        animationHolding = getAnimation(colors[0], colors[1], colors[2], colors[3], colors[4], true);
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        //Save inventory
+        sd.writeSavable(inventory);
+        //Save colors
+        sd.writeInt(colors.length);
+        for (Color color : colors) {
+            sd.writeInt(color.toIntBits());
+        }
+
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        //Read inventory
+        inventory = (Inventory) saveData.readSavable(inventory);
+        //Read colors
+        colors = new Color[saveData.readInt()];
+        for(int i = 0; i < colors.length; i++) {
+            colors[i] = new Color(saveData.readInt());
+        }
+        if(animation == null) {
+            generateAnimations();
+        }
     }
 
     private void rotateToFace(Point point) {
@@ -51,8 +93,8 @@ public class Player extends AbstractThing {
                 inventory.addItem(item);
             }
         }
-        if (holding != null) {
-            holding.use(this);
+        if (inventory.getHeld() != null) {
+            inventory.getHeld().use(this);
         } else if (getPlatform() instanceof Ship) {
             Usable usable = ((Ship) getPlatform()).getUsableAt(getWorldPoint());
             if (usable != null) {
@@ -82,13 +124,13 @@ public class Player extends AbstractThing {
     }
 
     public void setHolding(Item item) {
-        holding = item;
+        inventory.setHeld(item);
     }
 
     public void dropItem(Item item) {
         inventory.removeItem(item);
-        if (holding == item) { //If we're holding the same instance of the item
-            holding = null;
+        if (inventory.getHeld() == item) { //If we're holding the same instance of the item
+            inventory.setHeld(null);
         }
         item.setPlatform(getPlatform());
         item.setPoint(getPoint());
@@ -148,11 +190,11 @@ public class Player extends AbstractThing {
     public void draw(Batch batch) {
         Point worldPointLowLeft = getWorldPoint().subtract(new Point(getWidth() / 2, getHeight() / 2));
         float rotation = getPlatform().getWorldRotation() + getRotation() + (float) Math.PI / 2;
-        if (holding == null) {
+        if (inventory.getHeld() == null) {
             batch.draw(animation[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
         } else {
             batch.draw(animationHolding[getAnimationIndex()], worldPointLowLeft.x, worldPointLowLeft.y, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
-            TextureRegion inHand = holding.getHandImage();
+            TextureRegion inHand = inventory.getHeld().getHandImage();
             Point itemp = new Point(getWidth() / 22, -getHeight() / 3);
             float width = getWidth() / 10;
             //keep ratio

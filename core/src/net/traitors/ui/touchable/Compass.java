@@ -10,19 +10,18 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
-import net.traitors.thing.Thing;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.PixmapRotateRec;
 
 class Compass extends Widget implements Selectable {
 
+    private static TextureRegion compassSelected;
+    private static TextureRegion compassUnselected;
     private BetterCamera camera;
     private boolean selected = false;
     private boolean touched = false;
-    private static TextureRegion compassSelected;
-    private static TextureRegion compassUnselected;
     private Texture needle;
-    private Thing trackThing;
+    private int trackDepth;
 
     //Variables for dragging
     private float startX = 0;
@@ -30,10 +29,10 @@ class Compass extends Widget implements Selectable {
 
     Compass(final SelectableSwitch<Compass> selectableSwitch, final BetterCamera camera) {
         this.camera = camera;
-        if(compassSelected == null) {
+        if (compassSelected == null) {
             compassSelected = getCompass(Color.BLUE);
         }
-        if(compassUnselected == null) {
+        if (compassUnselected == null) {
             compassUnselected = getCompass(Color.GRAY);
         }
         needle = getNeedle();
@@ -51,8 +50,8 @@ class Compass extends Widget implements Selectable {
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                if(Math.abs(startX - x) > getWidth() / 10) doingDrag = true;
-                if(doingDrag)
+                if (Math.abs(startX - x) > getWidth() / 10) doingDrag = true;
+                if (doingDrag)
                     camera.setOffset((float) (x / getWidth() * Math.PI * 2 + Math.PI));
             }
 
@@ -70,11 +69,9 @@ class Compass extends Widget implements Selectable {
         Color c = getColor();
         batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
 
-        Thing cameraTracking = camera.getRotatingWith();
-        camera.rotateWith(trackThing);
-        TextureRegion compass = (isSelected())? compassSelected : compassUnselected;
-        batch.draw(compass, getX(), getY(), getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, -camera.getOffset() * MathUtils.radiansToDegrees);
-        camera.rotateWith(cameraTracking);
+        TextureRegion compass = (isSelected()) ? compassSelected : compassUnselected;
+        batch.draw(compass, getX(), getY(), getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (-camera.getCameraAngle() + camera.getThingAtDepth(trackDepth).getWorldRotation()) * MathUtils.radiansToDegrees);
+
 
         float needleWidth = getWidth() / 25;
         batch.draw(needle, getX() + getWidth() / 2 - needleWidth / 2, getY() + getHeight() / 2, needleWidth, getHeight() / 3);
@@ -85,13 +82,10 @@ class Compass extends Widget implements Selectable {
         return touched;
     }
 
-    void setTrackThing(Thing trackThing) {
-        this.trackThing = trackThing;
-        if(camera.getRotatingWith() == trackThing) {
+    void setTrackDepth(int trackDepth) {
+        this.trackDepth = trackDepth;
+        if(camera.getRotateDepth() == trackDepth || isSelected())
             select();
-        } else if (isSelected()) {
-            camera.rotateWith(trackThing);
-        }
     }
 
     private TextureRegion getCompass(Color ringColor) {
@@ -179,7 +173,7 @@ class Compass extends Widget implements Selectable {
 
     @Override
     public void select() {
-        camera.rotateWith(trackThing);
+        camera.setRotateDepth(trackDepth);
         selected = true;
     }
 

@@ -2,10 +2,10 @@ package net.traitors.thing.platform;
 
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public abstract class AbstractPlatform extends AbstractThing implements Platform {
 
-    private static final long serialVersionUID = 1867652038890912824L;
     private Point translationalVelocity = new Point();
     private float rotationalVelocity = 0f;
 
@@ -20,6 +20,26 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
 
     public AbstractPlatform(float width, float height, float mass) {
         super(width, height, mass);
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        //Save translational velocity
+        sd.writeFloat(translationalVelocity.x);
+        sd.writeFloat(translationalVelocity.y);
+        //Save rotational velocity
+        sd.writeFloat(rotationalVelocity);
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        //Load translational velocity
+        translationalVelocity = new Point(saveData.readFloat(), saveData.readFloat());
+        //Load rotational velocity
+        rotationalVelocity = saveData.readFloat();
     }
 
     @Override

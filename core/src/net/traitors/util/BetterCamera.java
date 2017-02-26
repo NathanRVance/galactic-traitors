@@ -3,20 +3,40 @@ package net.traitors.util;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GameScreen;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
+import net.traitors.thing.platform.NullPlatform;
+import net.traitors.thing.platform.Platform;
+import net.traitors.util.save.SaveData;
 
 public class BetterCamera extends OrthographicCamera implements Actor {
 
-    private Thing rotateWith = null;
+    private int rotateDepth;
     private float offset = 0;
+    private Thing cachedThing = null;
+    private Platform nullPlatform = new NullPlatform();
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = new SaveData();
+        sd.writeInt(rotateDepth);
+        sd.writeFloat(offset);
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        rotateDepth = saveData.readInt();
+        offset = saveData.readFloat();
+    }
 
     /**
      * Rotate the camera to face a given direction
      *
      * @param direction angle in radians
      */
-    private void rotateTo(float direction) {
+    public void rotateTo(float direction) {
         rotate((getCameraAngle() - direction) * MathUtils.radiansToDegrees);
     }
 
@@ -29,16 +49,25 @@ public class BetterCamera extends OrthographicCamera implements Actor {
         return -1 * (float) (Math.atan2(up.x, up.y));
     }
 
-    public void rotateWith(Thing thing) {
-        if (thing != rotateWith) {
-            //We're rotating with a new thing
-            rotateWith = thing;
-            offset = getCameraAngle() - thing.getWorldRotation();
-        }
+    public void setRotateDepth(int depth) {
+        rotateDepth = depth;
+    }
+
+    public int getRotateDepth() {
+        return rotateDepth;
     }
 
     public Thing getRotatingWith() {
-        return rotateWith;
+        return getThingAtDepth(rotateDepth);
+    }
+
+    public Thing getThingAtDepth(int depth) {
+        Thing thing = GameScreen.getStuff().getPlayer();
+        for(int i = 0; i < depth; i++) {
+            thing = thing.getPlatform();
+            if(thing == null) return nullPlatform;
+        }
+        return thing;
     }
 
     /**
@@ -70,9 +99,12 @@ public class BetterCamera extends OrthographicCamera implements Actor {
      */
     @Override
     public void act(float delta) {
-        if (rotateWith != null) {
-            rotateTo(rotateWith.getWorldRotation() + offset);
+        if (cachedThing != getRotatingWith()) {
+            //We're rotating with a new thing
+            cachedThing = getRotatingWith();
+            offset = getCameraAngle() - getRotatingWith().getWorldRotation();
         }
+        rotateTo(getRotatingWith().getWorldRotation() + offset);
     }
 
 
@@ -89,5 +121,4 @@ public class BetterCamera extends OrthographicCamera implements Actor {
         float viewWidth = new Point(viewportWidth * zoom, viewportHeight * zoom).distanceFromZero() / 2;
         return offset - extent < viewWidth;
     }
-
 }

@@ -10,7 +10,7 @@ import net.traitors.util.TextureCreator;
 
 public class FloorTile extends AbstractThing implements Tile {
 
-    private TextureRegion texture;
+    private transient TextureRegion texture;
 
     public FloorTile() {
         super(1, 1);

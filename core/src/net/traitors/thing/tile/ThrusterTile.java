@@ -11,7 +11,7 @@ import net.traitors.thing.tile.thrust.ThrustStrategy;
 public class ThrusterTile extends AbstractThing implements ShipComponent {
 
     private ThrustStrategy thrustStrategy;
-    private ShipComputer computer;
+    private transient ShipComputer computer;
 
     public ThrusterTile(float width, float height, float rotation, ThrustStrategy thrustStrategy) {
         super(width, height);
@@ -28,7 +28,7 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     @Override
     public void use(Thing user) {
         thrustStrategy.applyThrust(user);
-        if(computer != null) computer.componentUsed(this, user);
+        if (computer != null) computer.componentUsed(this, user);
     }
 
     @Override

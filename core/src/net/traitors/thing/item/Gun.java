@@ -15,27 +15,11 @@ import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 public class Gun extends AbstractThing implements Item {
 
-    private static final long serialVersionUID = 9165310561115300489L;
     private transient Texture inventoryImage;
     private transient TextureRegion handImage;
     private transient ProjectileFactory projectileFactory;
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        out.writeFloat(projectileFactory.getTimeToNextFire());
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        projectileFactory = getProjectileFactory();
-        projectileFactory.setTimeToNextFire(in.readFloat());
-    }
 
     public Gun(float width, float height) {
         super(width, height);

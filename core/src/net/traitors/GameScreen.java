@@ -3,7 +3,6 @@ package net.traitors;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 
 import net.traitors.controls.InputProcessor;
@@ -12,13 +11,20 @@ import net.traitors.thing.platform.Platform;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.platform.ship.ShipFactory;
-import net.traitors.thing.player.Player;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
+import net.traitors.util.net.MultiplayerConnect;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class GameScreen implements Screen {
     private static Stuff stuff;
+    private static byte[] serializedStuff;
     private static TouchControls uiControls;
     private GalacticTraitors game;
     //private TextView textView;
@@ -27,8 +33,7 @@ public class GameScreen implements Screen {
         this.game = game;
         BetterCamera camera = new BetterCamera();
         uiControls = new TouchControls();
-        Player player = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK);
-        stuff = new Stuff(camera, player);
+        stuff = new Stuff(camera);
 
         Ship ship = new ShipFactory().buildStandardShip();
         ship.setPoint(new Point(-5, 10));
@@ -58,23 +63,48 @@ public class GameScreen implements Screen {
         ship.setRotationalVelocity(1);
         stuff.addActor(ship);
 
-        player.setPoint(new Point(-4, 10));
-        stuff.addActor(camera); //must happen before player
-        stuff.addActor(player);
+        stuff.getPlayer().setPoint(new Point(-4, 10));
+        stuff.addActor(camera);
 
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(camera)));
+
+        //MultiplayerConnect.makeServer();
+        //MultiplayerConnect.connectToServer("209.140.230.243");
+        //MultiplayerConnect.start();
     }
 
     public static Stuff getStuff() {
         return stuff;
     }
 
+    public static synchronized byte[] serializeStuff() {
+        return serializedStuff;
+    }
+
+    public static synchronized void deserializeStuff(byte[] bytes) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
+        ObjectInputStream si = new ObjectInputStream(bi);
+        GameScreen.stuff = (Stuff) si.readObject();
+    }
+
     public static TouchControls getTouchControls() {
         return uiControls;
     }
 
+    private void setSerializedStuff() {
+        try {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            ObjectOutputStream so = new ObjectOutputStream(bo);
+            so.writeObject(stuff);
+            so.flush();
+            serializedStuff = bo.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
-    public void render(float delta) {
+    public synchronized void render(float delta) {
         doMoves(delta);
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -88,6 +118,8 @@ public class GameScreen implements Screen {
 
         //textView.draw();
         uiControls.draw();
+        //setSerializedStuff();
+        MultiplayerConnect.tick(delta);
     }
 
     private void doMoves(float delta) {

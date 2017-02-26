@@ -16,15 +16,17 @@ public class OverviewScreen extends AbstractThing implements Tile {
 
     private static boolean drawingMyself = false;
     private BetterCamera myCamera = new BetterCamera();
-    private FrameBuffer frameBuffer;
+    private transient FrameBuffer frameBuffer;
 
     public OverviewScreen(float width, float height) {
         super(width, height);
         myCamera.setToOrtho(false, getWidth(), getHeight());
-        myCamera.rotateWith(this);
         myCamera.syncRotations();
         myCamera.zoom = 25;
+        setup();
+    }
 
+    private void setup() {
         int resolution = 100;
         int w = (int) (resolution * getWidth());
         int h = (int) (resolution * getHeight());
@@ -33,6 +35,7 @@ public class OverviewScreen extends AbstractThing implements Tile {
 
     @Override
     public void draw(Batch batch) {
+        if (frameBuffer == null) setup();
         //Detect that an overview screen isn't currently doing the drawing
         if (!drawingMyself) {
             drawingMyself = true;
@@ -40,7 +43,7 @@ public class OverviewScreen extends AbstractThing implements Tile {
             batch.end();
             //Sync up my camera
             myCamera.translate(getWorldPoint().x - myCamera.position.x, getWorldPoint().y - myCamera.position.y);
-            myCamera.act(0);
+            myCamera.rotateTo(getWorldRotation());
             myCamera.update();
             //Set the batch to use my camera
             batch.setProjectionMatrix(myCamera.combined);

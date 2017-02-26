@@ -6,13 +6,13 @@ import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
+import net.traitors.util.save.SaveData;
 
 public abstract class AbstractThing implements Thing {
 
-    private static final long serialVersionUID = 1572340344909082858L;
-    private final float width;
-    private final float height;
-    private final float mass;
+    private float width;
+    private float height;
+    private float mass;
     private Point point = new Point();
     private Point lastWorldPoint = new Point();
     private Point velocity = new Point();
@@ -30,6 +30,33 @@ public abstract class AbstractThing implements Thing {
         this.width = width;
         this.height = height;
         this.mass = width * height;
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = new SaveData();
+        sd.writeFloat(width);
+        sd.writeFloat(height);
+        sd.writeFloat(mass);
+        sd.writeFloat(point.x);
+        sd.writeFloat(point.y);
+        sd.writeFloat(lastWorldPoint.x);
+        sd.writeFloat(lastWorldPoint.y);
+        sd.writeFloat(velocity.x);
+        sd.writeFloat(velocity.y);
+        sd.writeFloat(rotation);
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        width = saveData.readFloat();
+        height = saveData.readFloat();
+        mass = saveData.readFloat();
+        point = new Point(saveData.readFloat(), saveData.readFloat());
+        lastWorldPoint = new Point(saveData.readFloat(), saveData.readFloat());
+        velocity = new Point(saveData.readFloat(), saveData.readFloat());
+        rotation = saveData.readFloat();
     }
 
     @Override

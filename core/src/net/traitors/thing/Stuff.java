@@ -1,46 +1,56 @@
 package net.traitors.thing;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.controls.Controls;
 import net.traitors.thing.item.Item;
+import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
 import net.traitors.thing.player.Player;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
+import net.traitors.util.net.MultiplayerConnect;
+import net.traitors.util.save.Savable;
+import net.traitors.util.save.SaveData;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class Stuff implements Serializable {
+public class Stuff implements Savable {
 
-    private static final long serialVersionUID = -4534574279158725444L;
     private List<Actor> actors = new ArrayList<>();
     private List<Thing> stuff = new ArrayList<>();
     private List<Actor> removeBuffer = new ArrayList<>();
     private List<Actor> addBuffer = new ArrayList<>();
+    private List<Player> players = new ArrayList<>();
+    private int playersToAdd = 0;
     private BetterCamera camera;
-    private Player player;
     private float delta;
 
-    public Stuff(BetterCamera camera, Player player) {
+    public Stuff(BetterCamera camera) {
         this.camera = camera;
-        this.player = player;
+        addPlayer();
+        resolveBuffers();
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = new SaveData();
+        sd.writeList(actors, null);
+        sd.writeSaveData(camera.getSaveData());
+        return sd;
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        for(Actor actor : saveData.readList(actors, Actor.class)) {
+            addActor(actor);
+        }
+        camera.loadSaveData(saveData.readSaveData());
     }
 
     public void addActor(Actor actor) {
@@ -57,6 +67,9 @@ public class Stuff implements Serializable {
             if (actor instanceof Thing) {
                 stuff.remove(actor);
             }
+            if (actor instanceof Player) {
+                players.remove(actor);
+            }
             if (actor instanceof Disposable) {
                 ((Disposable) actor).dispose();
             }
@@ -67,6 +80,9 @@ public class Stuff implements Serializable {
             if (actor instanceof Thing) {
                 stuff.add((Thing) actor);
                 addedThing = true;
+            }
+            if (actor instanceof Player) {
+                players.add((Player) actor);
             }
         }
         if (addedThing) {
@@ -82,6 +98,11 @@ public class Stuff implements Serializable {
             });
         }
 
+        while (playersToAdd > 0) {
+            addPlayer();
+            playersToAdd--;
+        }
+
         addBuffer.clear();
         removeBuffer.clear();
     }
@@ -91,7 +112,21 @@ public class Stuff implements Serializable {
     }
 
     public Player getPlayer() {
-        return player;
+        return players.get(MultiplayerConnect.getPlayerID());
+    }
+
+    private void addPlayer() {
+        System.out.println("Adding player");
+        Player p = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, players.size());
+        addActor(p);
+    }
+
+    public boolean clean() {
+        return playersToAdd == 0;
+    }
+
+    public void addPlayerAsync() {
+        playersToAdd++;
     }
 
     public float getDelta() {
@@ -104,7 +139,8 @@ public class Stuff implements Serializable {
         }
     }
 
-    public void doStuff(float delta) {
+    public synchronized void doStuff(float delta) {
+        resolveBuffers();
         this.delta = delta;
         placeStuff(stuff);
 
@@ -112,14 +148,17 @@ public class Stuff implements Serializable {
             actor.act(delta);
         }
 
-        Point playerWorldPoint = player.getWorldPoint();
+        for (Player player : players) {
+            player.act(delta);
+        }
+
+        Point playerWorldPoint = getPlayer().getWorldPoint();
         camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
-        if (camera.getRotatingWith() == null)
-            camera.rotateWith(player.getPlatform());
+        if (camera.getRotatingWith() instanceof NullPlatform)
+            camera.setRotateDepth(1);
         camera.update();
 
-        player.move(delta, Controls.getUserInput());
-
+        getPlayer().move(delta, Controls.getUserInput());
         resolveBuffers();
     }
 
@@ -152,5 +191,4 @@ public class Stuff implements Serializable {
             }
         }
     }
-
 }

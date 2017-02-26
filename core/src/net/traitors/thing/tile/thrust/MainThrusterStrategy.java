@@ -20,17 +20,20 @@ import net.traitors.util.Point;
 public class MainThrusterStrategy implements ThrustStrategy {
 
     private float rotation = 0;
-    private Thing base;
+    private transient Thing base;
     private Tile tile;
-    private TextureRegion cone;
-    private RotationStrategy rotationStrategy;
-    private ProjectileFactory projectileFactory;
+    private transient TextureRegion cone;
+    private transient RotationStrategy rotationStrategy;
+    private transient ProjectileFactory projectileFactory;
     private float forceMagnitude;
 
     public MainThrusterStrategy(Tile tile, float forceMagnitude) {
         this.tile = tile;
         this.forceMagnitude = forceMagnitude;
+        setup();
+    }
 
+    private void setup() {
         int coneDim = 100;
         PixmapRotateRec pixmap = new PixmapRotateRec(coneDim, coneDim, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.GRAY);

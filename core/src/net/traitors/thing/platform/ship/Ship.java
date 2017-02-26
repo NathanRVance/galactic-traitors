@@ -8,33 +8,17 @@ import net.traitors.thing.tile.Tile;
 import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Ship extends AbstractPlatform {
 
-
-    private static final long serialVersionUID = 7866075723148790776L;
     private Tile[][] grid;
     private Set<ShipComponent> components = new HashSet<>();
-    private transient ShipComputer computer;
+    private transient ShipComputer computer = new ShipComputer();
 
     private Ship(int width, int height) {
         super(width, height);
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        out.writeObject(computer.saveComponents());
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        computer = new ShipComputer((Serializable) in.readObject(), components);
     }
 
     @Override

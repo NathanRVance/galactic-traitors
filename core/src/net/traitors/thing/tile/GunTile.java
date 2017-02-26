@@ -20,19 +20,24 @@ public class GunTile extends AbstractThing implements ShipComponent {
 
     private final float barrelLength;
     private Tile base;
-    private TextureRegion dome;
-    private TextureRegion barrel;
+    private transient TextureRegion dome;
+    private transient TextureRegion barrel;
     private float rotation = 0;
-    private ProjectileFactory projectileFactory;
-    private RotationStrategy rotationStrategy;
-    private ShipComputer computer;
+    private transient ProjectileFactory projectileFactory;
+    private transient RotationStrategy rotationStrategy;
+    private transient ShipComputer computer;
 
     public GunTile(float width, float height, float rotation, Tile base) {
         super(width, height);
         setRotation(rotation);
         this.rotation = rotation;
         this.base = base;
+        this.barrelLength = getHeight() * 3 / 4;
 
+        setup();
+    }
+
+    private void setup() {
         int domeExtent = 200;
         int domeWidth = 400;
         Pixmap pixmap = new Pixmap(domeExtent, domeWidth, Pixmap.Format.RGBA8888);
@@ -45,8 +50,6 @@ public class GunTile extends AbstractThing implements ShipComponent {
         pixmap.setColor(Color.DARK_GRAY);
         pixmap.fill();
         barrel = new TextureRegion(new Texture(pixmap));
-
-        this.barrelLength = getHeight() * 3 / 4;
 
         projectileFactory = new ProjectileFactory.Builder()
                 .setCooldown(new FloatStrategy() {
