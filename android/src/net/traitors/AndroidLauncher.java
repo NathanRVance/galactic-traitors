@@ -15,6 +15,6 @@ public class AndroidLauncher extends AndroidApplication {
         config.useAccelerometer = false;
         config.useCompass = false;
         initialize(new GalacticTraitors(), config);
-        MultiplayerConnect.connectToServer("209.140.232.113");
+        MultiplayerConnect.connectToServer("209.140.250.2");
     }
 }

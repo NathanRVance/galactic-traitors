@@ -28,6 +28,8 @@ public class MainThrusterStrategy implements ThrustStrategy {
     private transient ProjectileFactory projectileFactory;
     private float forceMagnitude;
 
+    private float initTimeToNextFire = 0;
+
     public MainThrusterStrategy(Tile tile, float forceMagnitude) {
         this.tile = tile;
         this.forceMagnitude = forceMagnitude;
@@ -35,7 +37,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
     }
 
     public MainThrusterStrategy() {
-        setup();
+
     }
 
     @Override
@@ -49,9 +51,10 @@ public class MainThrusterStrategy implements ThrustStrategy {
 
     @Override
     public void loadSaveData(SaveData saveData) {
+        setup();
         tile = (Tile) saveData.readSavable(tile);
         forceMagnitude = saveData.readFloat();
-        projectileFactory.setTimeToNextFire(saveData.readFloat());
+        initTimeToNextFire = saveData.readFloat();
     }
 
     private void setup() {
@@ -149,6 +152,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
                     }
                 })
                 .build();
+        projectileFactory.setTimeToNextFire(initTimeToNextFire);
     }
 
     @Override

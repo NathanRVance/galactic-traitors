@@ -56,7 +56,7 @@ public class Stuff implements Savable {
     }
 
     @Override
-    public void loadSaveData(SaveData saveData) {
+    public synchronized void loadSaveData(SaveData saveData) {
         for(Actor actor : saveData.readList(actors, Actor.class)) {
             addActor(actor);
         }
@@ -96,6 +96,11 @@ public class Stuff implements Savable {
             }
         }
         boolean addedThing = false;
+        while (playersToAdd > 0) {
+            addPlayer();
+            playersToAdd--;
+            addedThing = true;
+        }
         for (Actor actor : addBuffer) {
             actors.add(actor);
             if (actor instanceof Thing) {
@@ -117,11 +122,6 @@ public class Stuff implements Savable {
                     return 0;
                 }
             });
-        }
-
-        while (playersToAdd > 0) {
-            addPlayer();
-            playersToAdd--;
         }
 
         addBuffer.clear();
@@ -161,7 +161,7 @@ public class Stuff implements Savable {
         }
     }
 
-    public void doStuff(float delta) {
+    public synchronized void doStuff(float delta) {
         resolveBuffers();
         this.delta = delta;
         placeStuff(stuff);

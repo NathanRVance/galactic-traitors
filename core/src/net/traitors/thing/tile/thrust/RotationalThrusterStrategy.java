@@ -30,6 +30,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
 
     private RotationStrategy rotationStrategy;
     private ProjectileFactory projectileFactory;
+    private float initTimeToNextFire = 0;
 
     public RotationalThrusterStrategy(Tile tile, float forceMagnitude) {
         this.tile = tile;
@@ -38,7 +39,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
     }
 
     public RotationalThrusterStrategy() {
-        setup();
+
     }
 
     @Override
@@ -52,9 +53,10 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
 
     @Override
     public void loadSaveData(SaveData saveData) {
+        setup();
         tile = (Tile) saveData.readSavable(tile);
         forceMagnitude = saveData.readFloat();
-        projectileFactory.setTimeToNextFire(saveData.readFloat());
+        initTimeToNextFire = saveData.readFloat();
     }
 
     private void setup() {
@@ -116,6 +118,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
                     }
                 })
                 .build();
+        projectileFactory.setTimeToNextFire(initTimeToNextFire);
     }
 
     @Override

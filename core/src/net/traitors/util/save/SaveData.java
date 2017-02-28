@@ -6,17 +6,14 @@ import java.util.List;
 public class SaveData {
 
     private StringBuilder stringBuilder = new StringBuilder();
+    private Savable flagged = null;
 
     public SaveData() {
 
     }
 
     public SaveData(String saveData) {
-        loadData(saveData);
-    }
-
-    public void loadData(String savedData) {
-        stringBuilder = new StringBuilder(savedData);
+        stringBuilder = new StringBuilder(saveData);
     }
 
     public void writeBoolean(boolean b) {
@@ -64,19 +61,19 @@ public class SaveData {
     }
 
     public void writeSavable(Savable savable) {
-        if(savable == null) {
+        if (savable == null) {
             writeString("null");
         } else {
-            writeString(savable.getClass().toString());
+            writeString(SavableTypeMap.getStringType(savable));
             writeSaveData(savable.getSaveData());
         }
     }
 
     public Savable readSavable(Savable cachedSavable) {
         String classname = readString();
-        if(classname.equals("null")) return null;
+        if (classname.equals("null")) return null;
         try {
-            Class<? extends Savable> c = Class.forName(classname).asSubclass(Savable.class);
+            Class<? extends Savable> c = SavableTypeMap.getClass(classname);
             Savable s = (c.isInstance(cachedSavable)) ? cachedSavable : c.newInstance();
             s.loadSaveData(readSaveData());
             return s;
@@ -87,8 +84,6 @@ public class SaveData {
         return null;
     }
 
-    private Savable flagged = null;
-
     public Savable getFlaggedSavable() {
         return flagged;
     }
@@ -96,7 +91,6 @@ public class SaveData {
     public <T extends Savable> void writeList(List<T> savables, T flag) {
         writeInt(savables.size());
         for (Savable savable : savables) {
-            writeString(savable.getClass().toString());
             writeSavable(savable);
             writeBoolean(savable == flag); //Same instance
         }
@@ -116,7 +110,7 @@ public class SaveData {
         int cacheIndex = 0;
         for (int i = 0; i < len; i++) {
             try {
-                Class<? extends T> c = Class.forName(readString()).asSubclass(type);
+                Class<? extends T> c = SavableTypeMap.getClass(readString()).asSubclass(type);
                 while (cacheIndex < cachedSavables.size() && !c.isInstance(cachedSavables.get(cacheIndex))) {
                     cachedSavables.remove(cacheIndex);
                 }
@@ -124,13 +118,14 @@ public class SaveData {
                 if (cacheIndex < cachedSavables.size()) {
                     //Got a hit!
                     s = cachedSavables.get(cacheIndex);
+                    cachedSavables.remove(cacheIndex);
                 } else {
                     //Out of cached savables :(
                     s = c.newInstance();
                     ret.add(s);
                 }
                 s.loadSaveData(readSaveData());
-                if(readBoolean()) flagged = s;
+                if (readBoolean()) flagged = s;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -143,18 +138,17 @@ public class SaveData {
     }
 
     public SaveData readSaveData() {
-        SaveData ret = new SaveData();
-        int unmatched = 1;
-        for (int i = 1; i < stringBuilder.length(); i++) {
+        int unmatched = 0;
+        for (int i = 0; i < stringBuilder.length(); i++) {
             if (stringBuilder.charAt(i) == '(') unmatched++;
             if (stringBuilder.charAt(i) == ')') unmatched--;
             if (unmatched == 0) {
-                ret.loadData(stringBuilder.substring(1, i));
+                SaveData ret = new SaveData(stringBuilder.substring(1, i));
                 stringBuilder.delete(0, i + 1);
-                break;
+                return ret;
             }
         }
-        return ret;
+        return new SaveData();
     }
 
     @Override

@@ -31,7 +31,6 @@ public class OverviewScreen extends AbstractThing implements Tile {
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
-        setup();
     }
 
     private void setup() {
