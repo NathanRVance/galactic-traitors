@@ -61,7 +61,7 @@ public class GameScreen implements Screen {
 
         Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(camera)));
 
-        //MultiplayerConnect.start();
+        MultiplayerConnect.start();
     }
 
     public static Stuff getStuff() {

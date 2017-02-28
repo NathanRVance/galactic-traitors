@@ -7,6 +7,14 @@ public class SaveData {
 
     private StringBuilder stringBuilder = new StringBuilder();
 
+    public SaveData() {
+
+    }
+
+    public SaveData(String saveData) {
+        loadData(saveData);
+    }
+
     public void loadData(String savedData) {
         stringBuilder = new StringBuilder(savedData);
     }

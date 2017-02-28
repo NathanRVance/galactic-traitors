@@ -8,9 +8,10 @@ import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
 import net.traitors.util.save.SaveData;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.List;
 
 public class MultiplayerConnect {
@@ -20,7 +21,7 @@ public class MultiplayerConnect {
     private static float timeSinceLastTick = 0;
     private static MultiServerSocket serverSocket;
     private static Socket cliSock;
-    private static ObjectOutputStream outputStream;
+    private static PrintStream outputStream;
     private static int playerID = 0;
     private static Controls.UserInput lastUserInput = new Controls.UserInput();
     private static String connectIP;
@@ -34,18 +35,18 @@ public class MultiplayerConnect {
                 public void run() {
                     cliSock = Gdx.net.newClientSocket(Net.Protocol.TCP, connectIP, port, null);
                     try {
-                        outputStream = new ObjectOutputStream(cliSock.getOutputStream());
-                        final ObjectInputStream input = new ObjectInputStream(cliSock.getInputStream());
+                        outputStream = new PrintStream(cliSock.getOutputStream());
+                        final BufferedReader inputStream = new BufferedReader(new InputStreamReader(cliSock.getInputStream()));
                         //First get our playerID
-                        int playerID = input.readInt();
+                        int playerID = Integer.parseInt(inputStream.readLine());
                         //Then do inputs
                         while (!Thread.interrupted()) {
-                            SaveData saveData = new SaveData();
-                            saveData.loadData((String) input.readObject());
-                            GameScreen.getStuff().loadSaveData(saveData);
+                            System.out.println("Listening for game state");
+                            GameScreen.getStuff().loadSaveData(new SaveData(inputStream.readLine()));
                             MultiplayerConnect.playerID = playerID;
+                            System.out.println("Received game state");
                         }
-                    } catch (IOException | ClassNotFoundException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -92,7 +93,7 @@ public class MultiplayerConnect {
     }
 
     private static void serverTick() {
-        if(GameScreen.getStuff().clean()) {
+        if (GameScreen.getStuff().clean()) {
             serverSocket.pushData(GameScreen.getStuff().getSaveData().toString());
         }
         List<Controls.UserInput> inputs = serverSocket.getInputs();
@@ -106,11 +107,8 @@ public class MultiplayerConnect {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        outputStream.writeObject(input.getSaveData().toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    outputStream.println(input.getSaveData().toString());
+                    System.out.println("Sent user input");
                 }
             }).start();
         }

@@ -10,10 +10,10 @@ import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
 import net.traitors.util.save.SaveData;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.Map;
 class MultiServerSocket implements Disposable {
 
     private final List<Socket> sockets = Collections.synchronizedList(new ArrayList<Socket>());
-    private List<ObjectOutputStream> outputs = Collections.synchronizedList(new ArrayList<ObjectOutputStream>());
+    private List<PrintStream> outputs = Collections.synchronizedList(new ArrayList<PrintStream>());
     private Map<Socket, Controls.UserInput> incomingData = Collections.synchronizedMap(new HashMap<Socket, Controls.UserInput>());
 
     private ServerSocket serverSocket;
@@ -38,29 +38,28 @@ class MultiServerSocket implements Disposable {
                     final Socket s = serverSocket.accept(null);
                     synchronized (sockets) {
                         sockets.add(s);
-                        try {
-                            outputs.add(new ObjectOutputStream(s.getOutputStream()));
-                            GameScreen.getStuff().addPlayerAsync();
-                            //Tell the client what ID its player is
-                            outputs.get(outputs.size() - 1).writeInt(outputs.size());
-                            System.out.println("Told it");
-                            final ObjectInputStream inputStream = new ObjectInputStream(s.getInputStream());
-                            incomingData.put(s, null);
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        while (!Thread.interrupted()) {
-                                            incomingData.put(s, (Controls.UserInput) inputStream.readObject());
-                                        }
-                                    } catch (IOException | ClassNotFoundException e) {
-                                        e.printStackTrace();
+                        outputs.add(new PrintStream(s.getOutputStream()));
+                        GameScreen.getStuff().addPlayerAsync();
+                        //Tell the client what ID its player is
+                        outputs.get(outputs.size() - 1).println(outputs.size());
+                        System.out.println("Told it");
+                        final BufferedReader inputStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        incomingData.put(s, null);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    while (!Thread.interrupted()) {
+                                        Controls.UserInput input = new Controls.UserInput();
+                                        input.loadSaveData(new SaveData(inputStream.readLine()));
+                                        incomingData.put(s, input);
+                                        System.out.println("Received user input");
                                     }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
                                 }
-                            }).start();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                            }
+                        }).start();
                     }
                 }
             }
@@ -69,15 +68,12 @@ class MultiServerSocket implements Disposable {
     }
 
     void pushData(final String data) {
-        for (final ObjectOutputStream oos : outputs) {
+        for (final PrintStream out : outputs) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        oos.writeObject(data);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    out.println(data);
+                    System.out.println("Sent game state");
                 }
             }).start();
         }
