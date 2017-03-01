@@ -16,7 +16,7 @@ import java.util.List;
 
 public class MultiplayerConnect {
 
-    private static final float tickRate = 64;
+    private static final float tickRate = 16;
     private static int port = 31415;
     private static float timeSinceLastTick = 0;
     private static MultiServerSocket serverSocket;

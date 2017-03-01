@@ -24,17 +24,19 @@ import java.util.Map;
 
 public class Stuff implements Savable {
 
+    private final Map<Player, Controls.UserInput> inputs = new HashMap<>();
     private List<Actor> actors = new ArrayList<>();
     private List<Thing> stuff = new ArrayList<>();
     private List<Actor> removeBuffer = new ArrayList<>();
     private List<Actor> addBuffer = new ArrayList<>();
     private List<Player> players = new ArrayList<>();
-    private final Map<Player, Controls.UserInput> inputs = new HashMap<>();
     private int playersToAdd = 0;
     private BetterCamera camera;
     private float delta;
 
     private SaveData cachedSaveData = null;
+    private SaveData dataToLoad = null;
+    private long ID = 0;
 
     public Stuff(BetterCamera camera) {
         this.camera = camera;
@@ -49,28 +51,52 @@ public class Stuff implements Savable {
 
     private void updateSaveData() {
         SaveData sd = new SaveData();
+        sd.writeLong(ID++);
         sd.writeList(actors, null);
         sd.writeSaveData(camera.getSaveData());
         sd.writeFloat(delta);
+        sd.writeInt(players.size());
+        for (Player player : players) {
+            sd.writeSavable(inputs.get(player));
+        }
         cachedSaveData = sd;
     }
 
     @Override
-    public synchronized void loadSaveData(SaveData saveData) {
-        for(Actor actor : saveData.readList(actors, Actor.class)) {
-            addActor(actor);
+    public void loadSaveData(SaveData saveData) {
+        dataToLoad = saveData;
+    }
+
+    private void resolveSavedData() {
+        if(dataToLoad != null) {
+            //Make a new temp variable so that dataToLoad can be replaced by another thread.
+            SaveData saveData = dataToLoad;
+            //And set dataToLoad to be null. This is not atomic and may result in missing an update
+            //cycle, but at the worst case we only miss every other one.
+            dataToLoad = null;
+            long id = saveData.readLong();
+            if(id <= ID) return; //Sometimes updates come out of order.
+            ID = id;
+            for (Actor actor : saveData.readList(actors, Actor.class)) {
+                addActor(actor);
+            }
+            camera.loadSaveData(saveData.readSaveData());
+            delta = saveData.readFloat();
+            resolveBuffers();
+            int numInputs = saveData.readInt();
+            for (int i = 0; i < numInputs; i++) {
+                inputs.put(players.get(i), (Controls.UserInput) saveData.readSavable(inputs.get(players.get(i))));
+            }
         }
-        camera.loadSaveData(saveData.readSaveData());
-        delta = saveData.readFloat();
     }
 
     public void updateInputs(List<Controls.UserInput> in) {
-        synchronized (inputs) {
-            for (int i = 0; i < players.size(); i++) {
-                if (in.size() > i) {
-                    inputs.put(players.get(i), in.get(i));
-                }
+        System.out.println("Updating inputs");
+        for (int i = 0; i < players.size(); i++) {
+            if (in.size() > i) {
+                inputs.put(players.get(i), in.get(i));
             }
+
         }
     }
 
@@ -161,7 +187,8 @@ public class Stuff implements Savable {
         }
     }
 
-    public synchronized void doStuff(float delta) {
+    public void doStuff(float delta) {
+        System.out.println("Doing stuff");
         resolveBuffers();
         this.delta = delta;
         placeStuff(stuff);
@@ -180,14 +207,16 @@ public class Stuff implements Savable {
             camera.setRotateDepth(1);
         camera.update();
 
-        synchronized (inputs) {
-            inputs.put(getPlayer(), Controls.getUserInput());
-            for (Player player : players) {
-                player.move(delta, inputs.get(player));
-            }
+        inputs.put(getPlayer(), Controls.getUserInput());
+        for (Player player : players) {
+            player.move(delta, inputs.get(player));
         }
+
+
         resolveBuffers();
-        updateSaveData();
+        updateSaveData(); //TODO: Add method to check if this is a server, and only do this if so.
+        resolveSavedData(); //TODO: Same, but for client.
+        System.out.println("Done doing stuff");
     }
 
     public Item getItemAt(Point point) {

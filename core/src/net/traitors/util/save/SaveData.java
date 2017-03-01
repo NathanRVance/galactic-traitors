@@ -8,6 +8,8 @@ public class SaveData {
     private StringBuilder stringBuilder = new StringBuilder();
     private Savable flagged = null;
 
+    private static final String delimiter = ":";
+
     public SaveData() {
 
     }
@@ -16,48 +18,51 @@ public class SaveData {
         stringBuilder = new StringBuilder(saveData);
     }
 
+    private String getToDelimiter() {
+        int del = stringBuilder.indexOf(delimiter);
+        String ret = stringBuilder.substring(0, del);
+        stringBuilder.delete(0, del + 1);
+        return ret;
+    }
+
     public void writeBoolean(boolean b) {
-        stringBuilder.append(b).append(":");
+        stringBuilder.append(b).append(delimiter);
     }
 
     public boolean readBoolean() {
-        int firstColon = stringBuilder.indexOf(":");
-        boolean ret = Boolean.parseBoolean(stringBuilder.substring(0, firstColon));
-        stringBuilder.delete(0, firstColon + 1);
-        return ret;
+        return Boolean.parseBoolean(getToDelimiter());
     }
 
     public void writeInt(int i) {
-        stringBuilder.append(i).append(":");
+        stringBuilder.append(i).append(delimiter);
     }
 
     public int readInt() {
-        int firstColon = stringBuilder.indexOf(":");
-        int ret = Integer.parseInt(stringBuilder.substring(0, firstColon));
-        stringBuilder.delete(0, firstColon + 1);
-        return ret;
+        return Integer.parseInt(getToDelimiter());
+    }
+
+    public void writeLong(long l) {
+        stringBuilder.append(l).append(delimiter);
+    }
+
+    public long readLong() {
+        return Long.parseLong(getToDelimiter());
     }
 
     public void writeFloat(float f) {
-        stringBuilder.append(f).append(":");
+        stringBuilder.append(f).append(delimiter);
     }
 
     public float readFloat() {
-        int firstColon = stringBuilder.indexOf(":");
-        float ret = Float.parseFloat(stringBuilder.substring(0, firstColon));
-        stringBuilder.delete(0, firstColon + 1);
-        return ret;
+        return Float.parseFloat(getToDelimiter());
     }
 
     public void writeString(String s) {
-        stringBuilder.append(s).append(":");
+        stringBuilder.append(s).append(delimiter);
     }
 
     public String readString() {
-        int firstColon = stringBuilder.indexOf(":");
-        String ret = stringBuilder.substring(0, firstColon);
-        stringBuilder.delete(0, firstColon + 1);
-        return ret;
+        return getToDelimiter();
     }
 
     public void writeSavable(Savable savable) {
