@@ -71,10 +71,10 @@ public class Player extends AbstractThing {
         inventory = (Inventory) saveData.readSavable(inventory);
         //Read colors
         colors = new Color[saveData.readInt()];
-        for(int i = 0; i < colors.length; i++) {
+        for (int i = 0; i < colors.length; i++) {
             colors[i] = new Color(saveData.readInt());
         }
-        if(animation == null) {
+        if (animation == null) {
             generateAnimations();
         }
     }
@@ -141,6 +141,7 @@ public class Player extends AbstractThing {
         float x = 0;
         float y = 0;
         float speedMult = 1;
+        if (input == null) input = new Controls.UserInput();
         if (input.keysPressed.contains(Controls.Key.UP)) {
             y += BASE_MOVE_SPEED * delta;
         }

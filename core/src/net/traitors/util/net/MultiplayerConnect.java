@@ -79,15 +79,23 @@ public class MultiplayerConnect {
         }
     }
 
+    public static boolean isServer() {
+        return serverSocket != null;
+    }
+
+    public static boolean isClient() {
+        return outputStream != null;
+    }
+
     public static void tick(float delta) {
-        if (serverSocket != null) {
+        if (isServer()) {
             timeSinceLastTick += delta;
             if (timeSinceLastTick > 1 / tickRate) {
                 timeSinceLastTick = 0;
                 serverTick();
             }
         }
-        if (outputStream != null) {
+        if (isClient()) {
             clientTick();
         }
     }

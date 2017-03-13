@@ -68,14 +68,14 @@ public class Stuff implements Savable {
     }
 
     private void resolveSavedData() {
-        if(dataToLoad != null) {
+        if (dataToLoad != null) {
             //Make a new temp variable so that dataToLoad can be replaced by another thread.
             SaveData saveData = dataToLoad;
             //And set dataToLoad to be null. This is not atomic and may result in missing an update
             //cycle, but at the worst case we only miss every other one.
             dataToLoad = null;
             long id = saveData.readLong();
-            if(id <= ID) return; //Sometimes updates come out of order.
+            if (id <= ID) return; //Sometimes updates arrive out of order.
             ID = id;
             for (Actor actor : saveData.readList(actors, Actor.class)) {
                 addActor(actor);
@@ -91,7 +91,6 @@ public class Stuff implements Savable {
     }
 
     public void updateInputs(List<Controls.UserInput> in) {
-        System.out.println("Updating inputs");
         for (int i = 0; i < players.size(); i++) {
             if (in.size() > i) {
                 inputs.put(players.get(i), in.get(i));
@@ -159,7 +158,8 @@ public class Stuff implements Savable {
     }
 
     public Player getPlayer() {
-        return players.get(MultiplayerConnect.getPlayerID());
+        int index = MultiplayerConnect.getPlayerID();
+        return (index < players.size())? players.get(index) : players.get(players.size() - 1);
     }
 
     private void addPlayer() {
@@ -188,7 +188,6 @@ public class Stuff implements Savable {
     }
 
     public void doStuff(float delta) {
-        System.out.println("Doing stuff");
         resolveBuffers();
         this.delta = delta;
         placeStuff(stuff);
@@ -214,9 +213,10 @@ public class Stuff implements Savable {
 
 
         resolveBuffers();
-        updateSaveData(); //TODO: Add method to check if this is a server, and only do this if so.
-        resolveSavedData(); //TODO: Same, but for client.
-        System.out.println("Done doing stuff");
+        if (MultiplayerConnect.isServer())
+            updateSaveData();
+        if (MultiplayerConnect.isClient())
+            resolveSavedData();
     }
 
     public Item getItemAt(Point point) {

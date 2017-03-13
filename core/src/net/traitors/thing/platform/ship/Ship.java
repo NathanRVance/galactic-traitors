@@ -44,7 +44,7 @@ public class Ship extends AbstractPlatform {
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
         components = new HashSet<>();
-        Tile[][] grid = new Tile[saveData.readInt()][];
+        grid = new Tile[saveData.readInt()][];
         for (int col = 0; col < grid.length; col++) {
             grid[col] = new Tile[saveData.readInt()];
             for (int tile = 0; tile < grid[col].length; tile++) {
