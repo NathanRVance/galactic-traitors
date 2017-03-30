@@ -18,13 +18,11 @@ import net.traitors.util.save.SaveData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Stuff implements Savable {
 
-    private final Map<Player, Controls.UserInput> inputs = new HashMap<>();
+    private final List<Controls.UserInput> inputs = new ArrayList<>();
     private List<Actor> actors = new ArrayList<>();
     private List<Thing> stuff = new ArrayList<>();
     private List<Actor> removeBuffer = new ArrayList<>();
@@ -55,9 +53,9 @@ public class Stuff implements Savable {
         sd.writeList(actors, null);
         sd.writeSaveData(camera.getSaveData());
         sd.writeFloat(delta);
-        sd.writeInt(players.size());
-        for (Player player : players) {
-            sd.writeSavable(inputs.get(player));
+        sd.writeInt(inputs.size());
+        for (Controls.UserInput input : inputs) {
+            sd.writeSavable(input);
         }
         cachedSaveData = sd;
     }
@@ -77,25 +75,32 @@ public class Stuff implements Savable {
             long id = saveData.readLong();
             if (id <= ID) return; //Sometimes updates arrive out of order.
             ID = id;
+            //Wipe out everything
+            actors.clear();
+            stuff.clear();
+            removeBuffer.clear();
+            addBuffer.clear();
+            players.clear();
+            playersToAdd = 0;
+
             for (Actor actor : saveData.readList(actors, Actor.class)) {
-                addActor(actor);
+                if (!actors.contains(actor)) { //This instance could be recycled from in there
+                    addActor(actor);
+                }
             }
+            resolveBuffers();
             camera.loadSaveData(saveData.readSaveData());
             delta = saveData.readFloat();
-            resolveBuffers();
             int numInputs = saveData.readInt();
             for (int i = 0; i < numInputs; i++) {
-                inputs.put(players.get(i), (Controls.UserInput) saveData.readSavable(inputs.get(players.get(i))));
+                inputs.set(i, (Controls.UserInput) saveData.readSavable(inputs.get(i)));
             }
         }
     }
 
     public void updateInputs(List<Controls.UserInput> in) {
-        for (int i = 0; i < players.size(); i++) {
-            if (in.size() > i) {
-                inputs.put(players.get(i), in.get(i));
-            }
-
+        for (int i = 0; i < in.size(); i++) {
+            inputs.set(i, in.get(i));
         }
     }
 
@@ -122,9 +127,8 @@ public class Stuff implements Savable {
         }
         boolean addedThing = false;
         while (playersToAdd > 0) {
-            addPlayer();
+            addPlayer(); //Puts the player in the addBuffer, which is processed next
             playersToAdd--;
-            addedThing = true;
         }
         for (Actor actor : addBuffer) {
             actors.add(actor);
@@ -159,17 +163,17 @@ public class Stuff implements Savable {
 
     public Player getPlayer() {
         int index = MultiplayerConnect.getPlayerID();
-        return (index < players.size())? players.get(index) : players.get(players.size() - 1);
+        return (index < players.size()) ? players.get(index) : players.get(players.size() - 1);
     }
 
     private void addPlayer() {
         System.out.println("Adding player");
         Player p = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, players.size());
         addActor(p);
-        inputs.put(p, new Controls.UserInput());
+        inputs.add(new Controls.UserInput());
     }
 
-    public boolean clean() {
+    public boolean isClean() {
         return playersToAdd == 0 && cachedSaveData != null;
     }
 
@@ -206,9 +210,9 @@ public class Stuff implements Savable {
             camera.setRotateDepth(1);
         camera.update();
 
-        inputs.put(getPlayer(), Controls.getUserInput());
-        for (Player player : players) {
-            player.move(delta, inputs.get(player));
+        inputs.set(MultiplayerConnect.getPlayerID(), Controls.getUserInput());
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).move(delta, inputs.get(i));
         }
 
 

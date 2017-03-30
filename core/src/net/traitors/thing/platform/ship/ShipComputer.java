@@ -89,7 +89,7 @@ public class ShipComputer implements Savable {
      * @param component the component that was just used
      * @param user      the user that used this component
      */
-    public void componentUsed(ShipComponent component, Thing user) {
+    public void componentUsed(ShipComponent component, Thing user, Point touchPoint) {
         //So that we don't get an infinite loop of components syncing with each other, we keep track
         //of the ones that have already entered the call stack.
         if (components.contains(component)) {
@@ -98,7 +98,7 @@ public class ShipComputer implements Savable {
                     for (ShipComponent c : comps) {
                         if (c != component) {
                             components.remove(c);
-                            c.use(user);
+                            c.use(user, touchPoint);
                             components.add(c);
                         }
                     }

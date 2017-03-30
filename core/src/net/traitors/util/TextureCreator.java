@@ -67,4 +67,21 @@ public class TextureCreator {
         return colorRecs.get(color);
     }
 
+    public static Pixmap getCursor() {
+        int dim = 16;
+        Pixmap pixmap = new Pixmap(dim, dim, Pixmap.Format.RGBA8888);
+
+        pixmap.setColor(Color.DARK_GRAY);
+        int width = dim / 2;
+        pixmap.fillRectangle(0, dim / 2 - width / 2, dim, width);
+        pixmap.fillRectangle(dim / 2 - width / 2, 0, width, dim);
+
+        pixmap.setColor(Color.LIGHT_GRAY);
+        width /= 2;
+        pixmap.fillRectangle(width / 2, dim / 2 - width / 2, dim - width, width);
+        pixmap.fillRectangle(dim / 2 - width / 2, width / 2, width, dim - width);
+
+        return pixmap;
+    }
+
 }

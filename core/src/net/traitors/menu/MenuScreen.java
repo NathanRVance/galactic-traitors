@@ -1,25 +1,26 @@
-package net.traitors;
+package net.traitors.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+import net.traitors.GalacticTraitors;
+import net.traitors.GameScreen;
 import net.traitors.ui.TextView;
 import net.traitors.util.Point;
 
-
-class MainMenuScreen implements Screen {
+public class MenuScreen implements Screen {
 
     private final GalacticTraitors game;
     private OrthographicCamera camera;
-    private TextView textView;
 
-    MainMenuScreen(GalacticTraitors game) {
+    public MenuScreen(GalacticTraitors game) {
         this.game = game;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false);
+        game.getTextView().setCamera(camera);
     }
 
     @Override
@@ -33,13 +34,13 @@ class MainMenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
+        game.getBatch().setProjectionMatrix(camera.combined);
 
-        game.batch.begin();
-        game.batch.end();
+        game.getBatch().begin();
+        game.getBatch().end();
 
-        textView.drawStringOnScreen(game.font, "Welcome to Galactic Traitors!", new Point(.5f, .5f), TextView.Align.center, .5f);
-        textView.draw();
+        game.getTextView().drawStringOnScreen("Welcome to Galactic Traitors!", new Point(.5f, .5f), TextView.Align.center, .5f);
+        game.getTextView().draw();
 
         if (Gdx.input.isTouched()) {
             game.setScreen(new GameScreen(game));
@@ -51,7 +52,8 @@ class MainMenuScreen implements Screen {
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
         camera.setToOrtho(false, 5 * aspectRatio, 5);
-        textView = new TextView();
+        game.resize();
+        game.getTextView().setCamera(camera);
     }
 
     @Override

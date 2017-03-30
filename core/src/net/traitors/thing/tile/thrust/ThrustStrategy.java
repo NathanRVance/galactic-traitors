@@ -10,7 +10,13 @@ public interface ThrustStrategy extends Disposable, Savable {
 
     void setBase(Thing base);
 
-    void applyThrust(Thing user);
+    /**
+     * Applies a thrust to the base
+     *
+     * @param user   the thing that is using this thruster
+     * @param extent percent of max thrust to apply
+     */
+    void applyThrust(Thing user, float extent);
 
     void draw(Batch batch);
 

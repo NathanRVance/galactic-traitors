@@ -22,7 +22,7 @@ public class GameScreen implements Screen {
     private GalacticTraitors game;
     //private TextView textView;
 
-    GameScreen(GalacticTraitors game) {
+    public GameScreen(GalacticTraitors game) {
         this.game = game;
         BetterCamera camera = new BetterCamera();
         uiControls = new TouchControls();
@@ -79,11 +79,11 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.batch.setProjectionMatrix(stuff.getCamera().combined);
-        game.batch.begin();
+        game.getBatch().setProjectionMatrix(stuff.getCamera().combined);
+        game.getBatch().begin();
         //textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
-        stuff.drawStuff(game.batch, stuff.getCamera());
-        game.batch.end();
+        stuff.drawStuff(game.getBatch(), stuff.getCamera());
+        game.getBatch().end();
 
         //textView.draw();
         uiControls.draw();

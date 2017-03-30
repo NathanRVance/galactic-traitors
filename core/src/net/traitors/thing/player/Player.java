@@ -94,11 +94,11 @@ public class Player extends AbstractThing {
             }
         }
         if (inventory.getHeld() != null) {
-            inventory.getHeld().use(this);
+            inventory.getHeld().use(this, point);
         } else if (getPlatform() instanceof Ship) {
             Usable usable = ((Ship) getPlatform()).getUsableAt(getWorldPoint());
             if (usable != null) {
-                usable.use(this);
+                usable.use(this, point);
             }
         }
     }

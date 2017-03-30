@@ -1,6 +1,7 @@
 package net.traitors.thing.usable;
 
 import net.traitors.thing.Thing;
+import net.traitors.util.Point;
 
 public interface Usable {
 
@@ -9,7 +10,7 @@ public interface Usable {
      *
      * @param user  the thing that is using this usable
      */
-    void use(Thing user);
+    void use(Thing user, Point touchPoint);
 
     /**
      * Gets the progress this item has to cooling off, where 1 means it's ready to fire.

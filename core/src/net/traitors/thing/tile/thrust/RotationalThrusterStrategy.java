@@ -73,7 +73,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
     public void setBase(final Thing base) {
         this.base = base;
         rotation = base.getRotation();
-        projectileFactory = new ProjectileFactory.Builder()
+        projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
                     public float getFloat() {
@@ -116,20 +116,26 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
                     public float getFloat() {
                         return 1;
                     }
-                })
-                .build();
+                });
         projectileFactory.setTimeToNextFire(initTimeToNextFire);
     }
 
     @Override
-    public void applyThrust(Thing user) {
+    public void applyThrust(Thing user, final float extent) {
+        if(extent == 0) return;
         float thrustRotation = (rotationStrategy.getRotation(rotation - user.getRotation() + (float) Math.PI / 4, 0) > Math.PI / 4) ?
                 //Activate top thruster
                 rotation + (float) Math.PI / 2
                 : //Activate bottom thruster
                 rotation;
+        projectileFactory.setCooldown(new FloatStrategy() {
+            @Override
+            public float getFloat() {
+                return (1 / extent) * .01f;
+            }
+        });
         projectileFactory.use(base, base.getPlatform().convertToWorldRotation(thrustRotation));
-        Point force = new Point(forceMagnitude * -1, 0).rotate(thrustRotation);
+        Point force = new Point(forceMagnitude * -1 * extent, 0).rotate(thrustRotation);
         base.getPlatform().applyForce(force, base.getPoint(), GameScreen.getStuff().getDelta());
     }
 

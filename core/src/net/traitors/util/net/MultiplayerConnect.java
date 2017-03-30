@@ -16,7 +16,7 @@ import java.util.List;
 
 public class MultiplayerConnect {
 
-    private static final float tickRate = 16;
+    private static final float tickRate = 8;
     private static int port = 31415;
     private static float timeSinceLastTick = 0;
     private static MultiServerSocket serverSocket;
@@ -101,7 +101,7 @@ public class MultiplayerConnect {
     }
 
     private static void serverTick() {
-        if (GameScreen.getStuff().clean()) {
+        if (GameScreen.getStuff().isClean()) {
             serverSocket.pushData(GameScreen.getStuff().getSaveData().toString());
         }
         List<Controls.UserInput> inputs = serverSocket.getInputs();

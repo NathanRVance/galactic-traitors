@@ -71,7 +71,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
         pixmap.fill();
         barrel = new TextureRegion(new Texture(pixmap));
 
-        projectileFactory = new ProjectileFactory.Builder()
+        projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
                     public float getFloat() {
@@ -114,8 +114,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
                     public float getFloat() {
                         return 5;
                     }
-                })
-                .build();
+                });
 
         rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 3);
     }
@@ -154,10 +153,10 @@ public class GunTile extends AbstractThing implements ShipComponent {
     }
 
     @Override
-    public void use(Thing user) {
+    public void use(Thing user, Point touchPoint) {
         rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
         projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
-        if (computer != null) computer.componentUsed(this, user);
+        if (computer != null) computer.componentUsed(this, user, touchPoint);
     }
 
     @Override

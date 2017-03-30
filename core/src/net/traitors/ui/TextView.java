@@ -10,18 +10,28 @@ import net.traitors.util.Point;
 
 public class TextView extends Stage {
 
+    private BitmapFont font;
+    private Camera camera;
+
+    public TextView(BitmapFont font) {
+        this.font = font;
+    }
+
+    public void setCamera(Camera camera) {
+        this.camera = camera;
+    }
+
     /**
      * Draw a text where the location corresponds to the position on the screen, which is assumed
      * square and has dimensions 0-1.
      *
-     * @param font  font to draw in
-     * @param text
+     * @param text  the string to be drawn
      * @param pos   coordinates, both x and y between 0 and 1
      * @param align when center the text will be centered on x,y. When left, its left edge will be
      *              x,y. When right, its right edge will be on x,y.
      * @param width between 0 and 1 (same units as x and y), will wrap text that extends beyond
      */
-    public void drawStringOnScreen(BitmapFont font, CharSequence text, Point pos, Align align, float width) {
+    public void drawStringOnScreen(CharSequence text, Point pos, Align align, float width) {
         pos = new Point(pos.x * getWidth(), pos.y * getHeight());
         width *= getWidth();
         switch (align) {
@@ -42,18 +52,17 @@ public class TextView extends Stage {
     /**
      * Draws text in the world. Locations correspond to world locations
      *
-     * @param font  font to draw in
-     * @param text
+     * @param text  the string to be drawn
      * @param pos   coordinates in world units
      * @param align when center the text will be centered on x,y. When left, its right edge will be
      *              x,y. When right, its left edge will be on x,y.
      * @param width between 0 and 1 (same units as x and y), will wrap text that extends beyond
      */
-    public void drawStringInWorld(Camera camera, BitmapFont font, CharSequence text, Point pos, Align align, float width) {
+    public void drawStringInWorld(CharSequence text, Point pos, Align align, float width) {
         pos = pos.project(camera);
         pos = new Point(pos.x / getWidth(), pos.y / getHeight());
 
-        drawStringOnScreen(font, text, pos, align, width);
+        drawStringOnScreen(text, pos, align, width);
     }
 
     @Override
@@ -62,19 +71,19 @@ public class TextView extends Stage {
         getActors().clear();
     }
 
+    @Override
+    public void dispose() {
+        font.dispose();
+    }
+
     public enum Align {
         left(-1),
         center(1),
         right(0);
 
         int value;
-
         Align(int value) {
             this.value = value;
-        }
-
-        private int getValue() {
-            return value;
         }
     }
 
@@ -95,7 +104,7 @@ public class TextView extends Stage {
 
         @Override
         public void draw(Batch batch, float parentAlpha) {
-            font.draw(batch, text, point.x, point.y, width, align.getValue(), true);
+            font.draw(batch, text, point.x, point.y, width, align.value, true);
         }
 
     }

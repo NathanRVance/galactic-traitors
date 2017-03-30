@@ -7,6 +7,7 @@ import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.ShipComponent;
 import net.traitors.thing.platform.ship.ShipComputer;
 import net.traitors.thing.tile.thrust.ThrustStrategy;
+import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
 public class ThrusterTile extends AbstractThing implements ShipComponent {
@@ -45,9 +46,10 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     }
 
     @Override
-    public void use(Thing user) {
-        thrustStrategy.applyThrust(user);
-        if (computer != null) computer.componentUsed(this, user);
+    public void use(Thing user, Point touchPoint) {
+        float extent = user.getPoint().distance(touchPoint) / 2;
+        thrustStrategy.applyThrust(user, extent > 1 ? 1 : extent);
+        if (computer != null) computer.componentUsed(this, user, touchPoint);
     }
 
     @Override

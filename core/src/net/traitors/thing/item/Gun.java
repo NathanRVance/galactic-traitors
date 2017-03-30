@@ -45,7 +45,7 @@ public class Gun extends AbstractThing implements Item {
     }
 
     private void setup() {
-        projectileFactory = new ProjectileFactory.Builder()
+        projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
                     public float getFloat() {
@@ -82,8 +82,7 @@ public class Gun extends AbstractThing implements Item {
                     public float getFloat() {
                         return 1;
                     }
-                })
-                .build();
+                });
     }
 
     @Override
@@ -118,8 +117,8 @@ public class Gun extends AbstractThing implements Item {
     }
 
     @Override
-    public void use(Thing thing) {
-        projectileFactory.use(thing);
+    public void use(Thing thing, Point touchPoint) {
+        projectileFactory.use(thing, touchPoint);
     }
 
     @Override

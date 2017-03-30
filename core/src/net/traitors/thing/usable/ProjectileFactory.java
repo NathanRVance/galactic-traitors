@@ -56,11 +56,8 @@ public class ProjectileFactory implements Usable {
 
     private float timeToNextFire = 0;
 
-    private ProjectileFactory() {
-    }
-
     @Override
-    public void use(Thing user) {
+    public void use(Thing user, Point touchPoint) {
         use(user, user.getWorldRotation());
     }
 
@@ -99,53 +96,43 @@ public class ProjectileFactory implements Usable {
         this.timeToNextFire = timeToNextFire;
     }
 
-    public static class Builder {
+    public ProjectileFactory setCooldown(FloatStrategy cooldown) {
+        this.cooldown = cooldown;
+        return this;
+    }
 
-        ProjectileFactory factory = new ProjectileFactory();
+    public ProjectileFactory setOriginOffset(PointStrategy originOffset) {
+        this.originOffset = originOffset;
+        return this;
+    }
 
-        public Builder setCooldown(FloatStrategy cooldown) {
-            factory.cooldown = cooldown;
-            return this;
-        }
+    public ProjectileFactory setRotationOffset(PointStrategy rotationOffset) {
+        this.rotationOffset = rotationOffset;
+        return this;
+    }
 
-        public Builder setOriginOffset(PointStrategy originOffset) {
-            factory.originOffset = originOffset;
-            return this;
-        }
+    public ProjectileFactory setThickness(FloatStrategy thickness) {
+        this.thickness = thickness;
+        return this;
+    }
 
-        public Builder setRotationOffset(PointStrategy rotationOffset) {
-            factory.rotationOffset = rotationOffset;
-            return this;
-        }
+    public ProjectileFactory setLength(FloatStrategy length) {
+        this.length = length;
+        return this;
+    }
 
-        public Builder setThickness(FloatStrategy thickness) {
-            factory.thickness = thickness;
-            return this;
-        }
+    public ProjectileFactory setSpeed(FloatStrategy speed) {
+        this.speed = speed;
+        return this;
+    }
 
-        public Builder setLength(FloatStrategy length) {
-            factory.length = length;
-            return this;
-        }
+    public ProjectileFactory setColor(Color color) {
+        this.color = color;
+        return this;
+    }
 
-        public Builder setSpeed(FloatStrategy speed) {
-            factory.speed = speed;
-            return this;
-        }
-
-        public Builder setColor(Color color) {
-            factory.color = color;
-            return this;
-        }
-
-        public Builder setLongevity(FloatStrategy longevity) {
-            factory.longevity = longevity;
-            return this;
-        }
-
-        public ProjectileFactory build() {
-            return factory;
-        }
-
+    public ProjectileFactory setLongevity(FloatStrategy longevity) {
+        this.longevity = longevity;
+        return this;
     }
 }
