@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.ShipComponent;
-import net.traitors.thing.platform.ship.ShipComputer;
 import net.traitors.thing.tile.thrust.ThrustStrategy;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
@@ -13,7 +12,6 @@ import net.traitors.util.save.SaveData;
 public class ThrusterTile extends AbstractThing implements ShipComponent {
 
     private ThrustStrategy thrustStrategy;
-    private transient ShipComputer computer;
 
     public ThrusterTile(float width, float height, float rotation, ThrustStrategy thrustStrategy) {
         super(width, height);
@@ -49,7 +47,6 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     public void use(Thing user, Point touchPoint) {
         float extent = user.getPoint().distance(touchPoint) / 2;
         thrustStrategy.applyThrust(user, extent > 1 ? 1 : extent);
-        if (computer != null) computer.componentUsed(this, user, touchPoint);
     }
 
     @Override
@@ -66,10 +63,5 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     @Override
     public void dispose() {
         thrustStrategy.dispose();
-    }
-
-    @Override
-    public void setUseCallback(ShipComputer computer) {
-        this.computer = computer;
     }
 }

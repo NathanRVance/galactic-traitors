@@ -7,12 +7,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.ship.Ship;
-import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
@@ -96,10 +96,7 @@ public class Player extends AbstractThing {
         if (inventory.getHeld() != null) {
             inventory.getHeld().use(this, point);
         } else if (getPlatform() instanceof Ship) {
-            Usable usable = ((Ship) getPlatform()).getUsableAt(getWorldPoint());
-            if (usable != null) {
-                usable.use(this, point);
-            }
+            ((Ship) getPlatform()).useUsableAt(this, getWorldPoint(), point);
         }
     }
 
@@ -158,7 +155,7 @@ public class Player extends AbstractThing {
             speedMult = 3;
         }
         Point d = new Point(x, y);
-        d = d.rotate(GameScreen.getStuff().getCamera().getCameraAngle() - getPlatform().getWorldRotation());
+        d = d.rotate(GalacticTraitors.getCamera().getCameraAngle() - getPlatform().getWorldRotation());
 
         float totMove = d.distanceFromZero();
         if (totMove != 0) {

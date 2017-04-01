@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 
-import net.traitors.GameScreen;
+import net.traitors.GalacticTraitors;
 import net.traitors.ui.TouchControls;
 import net.traitors.util.Point;
 import net.traitors.util.save.Savable;
@@ -68,7 +68,7 @@ public class Controls {
 
     public static UserInput getUserInput() {
         UserInput ret = new UserInput();
-        ret.pointsTouched = getWorldTouches(GameScreen.getStuff().getCamera());
+        ret.pointsTouched = getWorldTouches(GalacticTraitors.getCamera());
         ret.keysPressed = new HashSet<>();
         for (Key key : Key.values()) {
             if (isKeyPressed(key)) {
@@ -95,12 +95,12 @@ public class Controls {
         public SaveData getSaveData() {
             SaveData sd = new SaveData();
             sd.writeInt(pointsTouched.size());
-            for(Point p : pointsTouched) {
+            for (Point p : pointsTouched) {
                 sd.writeFloat(p.x);
                 sd.writeFloat(p.y);
             }
             sd.writeInt(keysPressed.size());
-            for(Key key : keysPressed) {
+            for (Key key : keysPressed) {
                 sd.writeString(key.name());
             }
             return sd;
@@ -110,12 +110,12 @@ public class Controls {
         public void loadSaveData(SaveData saveData) {
             int numPoints = saveData.readInt();
             pointsTouched = new ArrayList<>(numPoints);
-            for(int i = 0; i < numPoints; i++) {
+            for (int i = 0; i < numPoints; i++) {
                 pointsTouched.add(new Point(saveData.readFloat(), saveData.readFloat()));
             }
             int numKeys = saveData.readInt();
             keysPressed = new HashSet<>(numKeys);
-            for(int i = 0; i < numKeys; i++) {
+            for (int i = 0; i < numKeys; i++) {
                 keysPressed.add(Key.valueOf(saveData.readString()));
             }
         }

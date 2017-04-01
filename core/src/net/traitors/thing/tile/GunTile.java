@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.ShipComponent;
-import net.traitors.thing.platform.ship.ShipComputer;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
@@ -26,7 +25,6 @@ public class GunTile extends AbstractThing implements ShipComponent {
     private float rotation = 0;
     private transient ProjectileFactory projectileFactory;
     private transient RotationStrategy rotationStrategy;
-    private transient ShipComputer computer;
 
     public GunTile(float width, float height, float rotation, Tile base) {
         super(width, height);
@@ -156,7 +154,6 @@ public class GunTile extends AbstractThing implements ShipComponent {
     public void use(Thing user, Point touchPoint) {
         rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
         projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
-        if (computer != null) computer.componentUsed(this, user, touchPoint);
     }
 
     @Override
@@ -175,10 +172,5 @@ public class GunTile extends AbstractThing implements ShipComponent {
         base.dispose();
         dome.getTexture().dispose();
         barrel.getTexture().dispose();
-    }
-
-    @Override
-    public void setUseCallback(ShipComputer computer) {
-        this.computer = computer;
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.traitors.GalacticTraitors;
 import net.traitors.controls.Controls;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.NullPlatform;
@@ -29,15 +30,13 @@ public class Stuff implements Savable {
     private List<Actor> addBuffer = new ArrayList<>();
     private List<Player> players = new ArrayList<>();
     private int playersToAdd = 0;
-    private BetterCamera camera;
     private float delta;
 
     private SaveData cachedSaveData = null;
     private SaveData dataToLoad = null;
     private long ID = 0;
 
-    public Stuff(BetterCamera camera) {
-        this.camera = camera;
+    public Stuff() {
         addPlayer();
         resolveBuffers();
     }
@@ -51,7 +50,7 @@ public class Stuff implements Savable {
         SaveData sd = new SaveData();
         sd.writeLong(ID++);
         sd.writeList(actors, null);
-        sd.writeSaveData(camera.getSaveData());
+        sd.writeSaveData(GalacticTraitors.getCamera().getSaveData());
         sd.writeFloat(delta);
         sd.writeInt(inputs.size());
         for (Controls.UserInput input : inputs) {
@@ -89,7 +88,7 @@ public class Stuff implements Savable {
                 }
             }
             resolveBuffers();
-            camera.loadSaveData(saveData.readSaveData());
+            GalacticTraitors.getCamera().loadSaveData(saveData.readSaveData());
             delta = saveData.readFloat();
             int numInputs = saveData.readInt();
             for (int i = 0; i < numInputs; i++) {
@@ -157,10 +156,6 @@ public class Stuff implements Savable {
         removeBuffer.clear();
     }
 
-    public BetterCamera getCamera() {
-        return camera;
-    }
-
     public Player getPlayer() {
         int index = MultiplayerConnect.getPlayerID();
         return (index < players.size()) ? players.get(index) : players.get(players.size() - 1);
@@ -205,10 +200,11 @@ public class Stuff implements Savable {
         }
 
         Point playerWorldPoint = getPlayer().getWorldPoint();
-        camera.translate(playerWorldPoint.x - camera.position.x, playerWorldPoint.y - camera.position.y);
-        if (camera.getRotatingWith() instanceof NullPlatform)
-            camera.setRotateDepth(1);
-        camera.update();
+        GalacticTraitors.getCamera().translate(playerWorldPoint.x - GalacticTraitors.getCamera().position.x,
+                playerWorldPoint.y - GalacticTraitors.getCamera().position.y);
+        if (GalacticTraitors.getCamera().getRotatingWith() instanceof NullPlatform)
+            GalacticTraitors.getCamera().setRotateDepth(1);
+        GalacticTraitors.getCamera().update();
 
         inputs.set(MultiplayerConnect.getPlayerID(), Controls.getUserInput());
         for (int i = 0; i < players.size(); i++) {

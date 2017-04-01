@@ -2,10 +2,10 @@ package net.traitors.thing.platform.ship;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.thing.Thing;
 import net.traitors.thing.platform.AbstractPlatform;
 import net.traitors.thing.tile.FloorTile;
 import net.traitors.thing.tile.Tile;
-import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
@@ -75,16 +75,17 @@ public class Ship extends AbstractPlatform {
     /**
      * Get a usable that can be used from point
      *
-     * @param point point to get usable at, in world coordinates
-     * @return the usable usable, or null if there isn't one
+     * @param user       The user that's using the usable
+     * @param point      point to get usable at, in world coordinates
+     * @param touchPoint point the user touched
      */
-    public Usable getUsableAt(Point point) {
+    public void useUsableAt(Thing user, Point point, Point touchPoint) {
         for (ShipComponent component : components) {
             if (component.contains(point)) {
-                return component;
+                component.use(user, touchPoint);
+                computer.componentUsed(component, user, touchPoint);
             }
         }
-        return null;
     }
 
     @Override

@@ -141,7 +141,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public void draw(Batch batch, BetterCamera camera) {
-        if(camera.isWatching(this, getWidth())) {
+        if (camera.isWatching(this, getWidth())) {
             draw(batch);
         }
     }

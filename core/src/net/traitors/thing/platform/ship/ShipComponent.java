@@ -5,6 +5,4 @@ import net.traitors.thing.usable.Usable;
 
 public interface ShipComponent extends Usable, Tile {
 
-    void setUseCallback(ShipComputer computer);
-
 }

@@ -8,16 +8,21 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
+import net.traitors.menu.Menu;
 import net.traitors.thing.AbstractThing;
+import net.traitors.thing.Thing;
+import net.traitors.thing.platform.ship.ShipComponent;
 import net.traitors.util.BetterCamera;
+import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
-public class OverviewScreen extends AbstractThing implements Tile {
+public class OverviewScreen extends AbstractThing implements ShipComponent {
 
     private static boolean drawingMyself = false;
     private BetterCamera myCamera = new BetterCamera();
-    private transient FrameBuffer frameBuffer;
+    private FrameBuffer frameBuffer;
 
     public OverviewScreen(float width, float height) {
         super(width, height);
@@ -69,7 +74,7 @@ public class OverviewScreen extends AbstractThing implements Tile {
             batch.end();
             frameBuffer.end();
             //Reset things so the rest of the render cycle isn't messed up
-            batch.setProjectionMatrix(GameScreen.getStuff().getCamera().combined);
+            batch.setProjectionMatrix(GalacticTraitors.getCamera().combined);
             batch.begin();
             //Draw the framebuffer
             batch.draw(new TextureRegion(frameBuffer.getColorBufferTexture()),
@@ -85,5 +90,23 @@ public class OverviewScreen extends AbstractThing implements Tile {
     @Override
     public void dispose() {
         frameBuffer.dispose();
+    }
+
+    @Override
+    public void use(Thing user, Point touchPoint) {
+        Menu menu = new Menu.MenuBuilder(2).addButton("Cool stuff", new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Fart");
+            }
+        }).build("Awesome Menu");
+        menu.setPlatform(getPlatform());
+        menu.setPoint(getPoint());
+        GameScreen.getStuff().addActor(menu);
+    }
+
+    @Override
+    public float getCooldownPercent() {
+        return 0;
     }
 }

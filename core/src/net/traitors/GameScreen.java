@@ -1,7 +1,6 @@
 package net.traitors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
@@ -12,21 +11,17 @@ import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.platform.ship.ShipFactory;
 import net.traitors.ui.TouchControls;
-import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.net.MultiplayerConnect;
 
 public class GameScreen implements Screen {
     private static Stuff stuff;
     private static TouchControls uiControls;
-    private GalacticTraitors game;
     //private TextView textView;
 
-    public GameScreen(GalacticTraitors game) {
-        this.game = game;
-        BetterCamera camera = new BetterCamera();
+    public GameScreen() {
         uiControls = new TouchControls();
-        stuff = new Stuff(camera);
+        stuff = new Stuff();
 
         Ship ship = new ShipFactory().buildStandardShip();
         ship.setPoint(new Point(-5, 10));
@@ -57,9 +52,16 @@ public class GameScreen implements Screen {
         stuff.addActor(ship);
 
         stuff.getPlayer().setPoint(new Point(-4, 10));
-        stuff.addActor(camera);
+        stuff.addActor(GalacticTraitors.getCamera());
 
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(camera)));
+        GalacticTraitors.getInputProcessor().addProcessor(new InputProcessor() {
+            @Override
+            public boolean scrolled(int amount) {
+                GalacticTraitors.getCamera().zoom *= 1 + amount * .1;
+                return false;
+            }
+        });
+        GalacticTraitors.getInputProcessor().addProcessor(uiControls);
 
         MultiplayerConnect.start();
     }
@@ -76,16 +78,18 @@ public class GameScreen implements Screen {
     public synchronized void render(float delta) {
         doMoves(delta);
 
+        GalacticTraitors.getInputProcessor().bump();
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.getBatch().setProjectionMatrix(stuff.getCamera().combined);
-        game.getBatch().begin();
+        GalacticTraitors.getBatch().setProjectionMatrix(GalacticTraitors.getCamera().combined);
+        GalacticTraitors.getBatch().begin();
         //textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
-        stuff.drawStuff(game.getBatch(), stuff.getCamera());
-        game.getBatch().end();
+        stuff.drawStuff(GalacticTraitors.getBatch(), GalacticTraitors.getCamera());
+        GalacticTraitors.getBatch().end();
 
-        //textView.draw();
+        GalacticTraitors.getTextView().draw();
         uiControls.draw();
         //setSerializedStuff();
         MultiplayerConnect.tick(delta);
@@ -104,9 +108,9 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
-        stuff.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
+        GalacticTraitors.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
         uiControls = new TouchControls();
-        Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(stuff.getCamera())));
+        //Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(stuff.getCamera())));
         stuff.getPlayer().getInventory().update();
         //textView = new TextView();
     }

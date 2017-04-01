@@ -73,12 +73,24 @@ public class Point {
         return x == 0 && y == 0;
     }
 
+    /**
+     * Converts from screen coordinates to world coordinates
+     *
+     * @param camera to perform the unprojection
+     * @return unprojected point
+     */
     public Point unproject(Camera camera) {
         Vector3 v = new Vector3(x, y, 0);
         camera.unproject(v);
         return new Point(v.x, v.y);
     }
 
+    /**
+     * Converts from world coordinates to screen coordinates
+     *
+     * @param camera to perform the projection
+     * @return projected point
+     */
     public Point project(Camera camera) {
         Vector3 v = new Vector3(x, y, 0);
         camera.project(v);

@@ -1,14 +1,6 @@
 package net.traitors.controls;
 
-import net.traitors.util.BetterCamera;
-
 public class InputProcessor implements com.badlogic.gdx.InputProcessor {
-
-    private BetterCamera camera;
-
-    public InputProcessor(BetterCamera camera) {
-        this.camera = camera;
-    }
 
     @Override
     public boolean keyDown(int keycode) {
@@ -47,7 +39,6 @@ public class InputProcessor implements com.badlogic.gdx.InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
-        camera.zoom *= 1 + amount * .1;
         return false;
     }
 }

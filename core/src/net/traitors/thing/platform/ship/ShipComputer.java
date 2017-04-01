@@ -5,7 +5,6 @@ import net.traitors.util.Point;
 import net.traitors.util.save.Savable;
 import net.traitors.util.save.SaveData;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,9 +16,9 @@ public class ShipComputer implements Savable {
     public ShipComputer() {
     }
 
-    public ShipComputer(Set<ShipComponent> components) {
-        for(ShipComponent component : components) {
-            addComponent(component);
+    ShipComputer(Set<ShipComponent> components) {
+        for (ShipComponent component : components) {
+            components.add(component);
         }
     }
 
@@ -27,9 +26,9 @@ public class ShipComputer implements Savable {
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
         sd.writeInt(syncedComponents.size());
-        for(Set<ShipComponent> components : syncedComponents) {
+        for (Set<ShipComponent> components : syncedComponents) {
             sd.writeInt(components.size());
-            for(ShipComponent component : components) {
+            for (ShipComponent component : components) {
                 Point p = component.getPoint();
                 sd.writeFloat(p.x);
                 sd.writeFloat(p.y);
@@ -42,13 +41,13 @@ public class ShipComputer implements Savable {
     public void loadSaveData(SaveData saveData) {
         syncedComponents = new HashSet<>();
         int len = saveData.readInt();
-        for(int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             int len2 = saveData.readInt();
             Set<ShipComponent> components = new HashSet<>();
-            for(int comp = 0; comp < len2; comp++) {
+            for (int comp = 0; comp < len2; comp++) {
                 Point p = new Point(saveData.readFloat(), saveData.readFloat());
-                for(ShipComponent sp : this.components) {
-                    if(p.equals(sp.getPoint())) {
+                for (ShipComponent sp : this.components) {
+                    if (p.equals(sp.getPoint())) {
                         components.add(sp);
                         break;
                     }
@@ -59,25 +58,15 @@ public class ShipComputer implements Savable {
     }
 
     /**
-     * Adds a component to be monitored by this computer.
-     *
-     * @param component the ShipComponent to be monitored.
-     */
-    public void addComponent(ShipComponent component) {
-        components.add(component);
-        component.setUseCallback(this);
-    }
-
-    /**
      * Causes both components to be used when one is used. If the components aren't already
      * monitored, they will be.
      *
      * @param components the components to be synced
      */
-    public void syncUsages(ShipComponent... components) {
+    void syncUsages(ShipComponent... components) {
         Set<ShipComponent> synced = new HashSet<>();
         for (ShipComponent component : components) {
-            addComponent(component);
+            this.components.add(component);
             synced.add(component);
         }
         syncedComponents.add(synced);

@@ -2,6 +2,7 @@ package net.traitors.ui.touchable;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
+import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
 import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
@@ -27,7 +28,7 @@ public class CompassBar extends Widget implements Touchable {
         int compassIndex = 0;
         while (!(p instanceof NullPlatform)) {
             if (selectableSwitch.getSelectables().size() <= compassIndex) {
-                Compass compass = new Compass(selectableSwitch, GameScreen.getStuff().getCamera());
+                Compass compass = new Compass(selectableSwitch, GalacticTraitors.getCamera());
                 compass.setBounds(x + compassDim * compassIndex, y, compassDim, compassDim);
                 selectableSwitch.addSelectable(compass);
                 stage.addTouchable(compass);

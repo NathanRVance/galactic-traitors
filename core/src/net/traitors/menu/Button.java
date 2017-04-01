@@ -4,59 +4,33 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.traitors.GalacticTraitors;
+import net.traitors.controls.MouseoverCallback;
+import net.traitors.thing.AbstractThing;
 import net.traitors.ui.TextView;
 import net.traitors.util.Point;
 
-public class Button extends Widget implements Disposable {
+class Button extends AbstractThing implements Disposable, MouseoverCallback {
 
-    TextView tv;
     private String text;
-    private Point lowerLeft, upperRight;
+    private Runnable onClick;
     private boolean selected = false;
     private Texture unselectedTexture;
     private Texture selectedTexture;
 
-    public Button(TextView tv, String text, Point lowerLeft, Point upperRight, final Runnable onClick) {
-        this.tv = tv;
+    Button(float width, float height, String text, Runnable onClick) {
+        super(width, height);
         this.text = text;
-        this.lowerLeft = lowerLeft;
-        this.upperRight = upperRight;
-
-        addListener(new InputListener() {
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                selected = true;
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                selected = false;
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true; //consume so I get notified on touchUp
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                onClick.run();
-            }
-        });
-
+        this.onClick = onClick;
         unselectedTexture = makeTexture(Color.DARK_GRAY, Color.LIGHT_GRAY);
         selectedTexture = makeTexture(Color.CYAN, Color.LIGHT_GRAY);
     }
 
     private Texture makeTexture(Color border, Color center) {
-        int width = (int) ((upperRight.x - lowerLeft.x) * 100);
-        int height = (int) ((upperRight.y - lowerLeft.y) * 100);
+        int width = (int) (getWidth() * 100);
+        int height = (int) (getHeight() * 100);
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA4444);
         pixmap.setColor(border);
         pixmap.fill();
@@ -69,17 +43,38 @@ public class Button extends Widget implements Disposable {
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
-        Texture button = (selected)? selectedTexture : unselectedTexture;
-        batch.draw(button, lowerLeft.x, lowerLeft.y, upperRight.x - lowerLeft.x, upperRight.y - lowerLeft.y);
-        tv.drawStringInWorld(text, new Point((lowerLeft.x + upperRight.x) / 2, (lowerLeft.y + upperRight.y) / 2), TextView.Align.center,
-                (upperRight.x - lowerLeft.x) * .8f);
+    public void draw(Batch batch) {
+        Point point = getWorldPoint();
+        Texture button = (selected) ? selectedTexture : unselectedTexture;
+        batch.draw(button, point.x - getWidth() / 2, point.y - getHeight() / 2, getWidth(), getHeight());
+        GalacticTraitors.getTextView().drawStringInWorld(text, new Point(point.x, point.y + getHeight() / 4),
+                TextView.Align.center, getWidth() * .8f, .3f, Color.BLACK);
     }
 
     @Override
     public void dispose() {
         unselectedTexture.dispose();
         selectedTexture.dispose();
+        GalacticTraitors.getInputProcessor().removeCallback(this);
     }
 
+    @Override
+    public void mouseEnter() {
+        selected = true;
+    }
+
+    @Override
+    public void mouseExit() {
+        selected = false;
+    }
+
+    @Override
+    public void mouseDown() {
+        //Do nothing
+    }
+
+    @Override
+    public void mouseUp() {
+        onClick.run();
+    }
 }
