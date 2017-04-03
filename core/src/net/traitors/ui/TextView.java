@@ -31,8 +31,8 @@ public class TextView extends Stage {
      */
     public void drawStringOnScreen(CharSequence text, Point pos, Align align, float width, float height, Color color) {
         pos = new Point(pos.x * getWidth(), pos.y * getHeight());
-        width *= getWidth();
-        height *= getHeight() / 40;
+        width *= getWidth() / GalacticTraitors.getCamera().zoom;
+        height *= getHeight() / 40 / GalacticTraitors.getCamera().zoom;
         switch (align) {
             case left:
                 break;

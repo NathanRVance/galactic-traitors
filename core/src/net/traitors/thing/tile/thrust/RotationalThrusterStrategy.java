@@ -18,11 +18,13 @@ import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class RotationalThrusterStrategy implements ThrustStrategy {
 
     private final float coneWidth = .5f;
     private final float coneLen = coneWidth / 2;
-    private float rotation = 0;
     private Thing base;
     private TextureRegion cone;
     private Tile tile;
@@ -72,48 +74,47 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
     @Override
     public void setBase(final Thing base) {
         this.base = base;
-        rotation = base.getRotation();
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .01f;
                     }
                 })
                 .setOriginOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(base.getWidth() / 2 + coneLen, MathUtils.random(-coneWidth * .4f, coneWidth * .4f) - .05f);
                     }
                 })
                 .setRotationOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(0, 0);
                     }
                 })
                 .setThickness(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return MathUtils.random(.01f, .05f);
                     }
                 })
                 .setLength(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return MathUtils.random(.01f, .1f);
                     }
                 })
                 .setSpeed(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return MathUtils.random(5, 10);
                     }
                 })
                 .setColor(Color.RED)
                 .setLongevity(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 1;
                     }
                 });
@@ -122,21 +123,34 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
 
     @Override
     public void applyThrust(Thing user, final float extent) {
-        if(extent == 0) return;
-        float thrustRotation = (rotationStrategy.getRotation(rotation - user.getRotation() + (float) Math.PI / 4, 0) > Math.PI / 4) ?
+        if (extent == 0) return;
+        float thrustRotation = (rotationStrategy.getRotation(base.getRotation() - user.getRotation() + (float) Math.PI / 4, 0) > Math.PI / 4) ?
                 //Activate top thruster
-                rotation + (float) Math.PI / 2
+                base.getRotation() + (float) Math.PI / 2
                 : //Activate bottom thruster
-                rotation;
+                base.getRotation();
         projectileFactory.setCooldown(new FloatStrategy() {
             @Override
-            public float getFloat() {
+            public float toFloat() {
                 return (1 / extent) * .01f;
             }
         });
         projectileFactory.use(base, base.getPlatform().convertToWorldRotation(thrustRotation));
         Point force = new Point(forceMagnitude * -1 * extent, 0).rotate(thrustRotation);
         base.getPlatform().applyForce(force, base.getPoint(), GameScreen.getStuff().getDelta());
+    }
+
+    /**
+     * Gets info for all the thrusters this strategy can fire
+     *
+     * @return set of points, direction is this frame, and magnitude is max thrust.
+     * Note that direction is direction of force, not of user's facing position!
+     */
+    public Set<Point> getThrusters() {
+        Set<Point> ret = new HashSet<>();
+        ret.add(new Point(forceMagnitude * -1, 0).rotate(base.getRotation()));
+        ret.add(new Point(forceMagnitude * -1, 0).rotate(base.getRotation() + (float) Math.PI / 2));
+        return ret;
     }
 
     @Override
@@ -151,7 +165,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
                 worldPoint.y + conep.y - coneWidth / 2,
                 0,
                 coneWidth / 2,
-                coneLen, coneWidth, 1, 1, base.getPlatform().convertToWorldRotation(rotation) * MathUtils.radiansToDegrees);
+                coneLen, coneWidth, 1, 1, base.getPlatform().convertToWorldRotation(base.getRotation()) * MathUtils.radiansToDegrees);
 
         //draw cone again
         conep = new Point(0, base.getHeight() / 2);
@@ -161,7 +175,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
                 worldPoint.y + conep.y - coneWidth / 2,
                 0,
                 coneWidth / 2,
-                coneLen, coneWidth, 1, 1, base.getPlatform().convertToWorldRotation(rotation + (float) Math.PI / 2) * MathUtils.radiansToDegrees);
+                coneLen, coneWidth, 1, 1, base.getPlatform().convertToWorldRotation(base.getRotation() + (float) Math.PI / 2) * MathUtils.radiansToDegrees);
         //draw tile
         tile.setPlatform(base.getPlatform());
         tile.setRotation(base.getRotation());

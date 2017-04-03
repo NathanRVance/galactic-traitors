@@ -9,10 +9,12 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
+import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.platform.ship.ShipComponent;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
+import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
@@ -25,6 +27,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
     private float rotation = 0;
     private transient ProjectileFactory projectileFactory;
     private transient RotationStrategy rotationStrategy;
+    private Ship ship;
 
     public GunTile(float width, float height, float rotation, Tile base) {
         super(width, height);
@@ -72,44 +75,44 @@ public class GunTile extends AbstractThing implements ShipComponent {
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .2f;
                     }
                 })
                 .setOriginOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(getWidth() / 2 * 1.2f + barrelLength, -.1f);
                     }
                 })
                 .setRotationOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(getWidth() / 2 * 1.2f, 0);
                     }
                 })
                 .setThickness(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .2f;
                     }
                 })
                 .setLength(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .7f;
                     }
                 })
                 .setSpeed(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 20;
                     }
                 })
                 .setColor(Color.RED)
                 .setLongevity(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 5;
                     }
                 });
@@ -172,5 +175,10 @@ public class GunTile extends AbstractThing implements ShipComponent {
         base.dispose();
         dome.getTexture().dispose();
         barrel.getTexture().dispose();
+    }
+
+    @Override
+    public void setShip(Ship ship) {
+        this.ship = ship;
     }
 }

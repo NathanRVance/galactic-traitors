@@ -3,6 +3,8 @@ package net.traitors.util;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
+import net.traitors.thing.platform.Platform;
+
 public class Point {
 
     public final float x;
@@ -107,5 +109,35 @@ public class Point {
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y;
+    }
+
+    //Speshul fysixy shtuffsh bellow
+
+    /**
+     * This point is the force
+     * @param radius the radius this force is applied on
+     * @param platform the platform this force is applied on
+     * @return the angular acceleration in s^-2
+     */
+    public float angAccel(Point radius, Platform platform) {
+        // radius X force = torque
+        //   [x1,        y1,        z1]
+        // X [x2,        y2,        z2]
+        // = [y1z2-z1y2, z1x2-x1z2, x1y2-y1x2]
+        // We only care about the z component of the cross product for torque
+        float torque = radius.x * y - radius.y * x;
+        // torque = moment of inertia * angular acceleration
+        // moment of inertia for thin rectangular plate = m * (h^2 + w^2) / 12
+        float I = platform.getMass() * (platform.getHeight() * platform.getHeight() + platform.getWidth() * platform.getWidth()) / 12;
+        return torque / I;
+    }
+
+    /**
+     * This point is the force
+     * @param platform the platforme this force is applied on
+     * @return the translational acceleration, in world coordinates, in m/s^2
+     */
+    public Point transAccel(Platform platform) {
+        return scale(1 / platform.getMass()).rotate(platform.getWorldRotation());
     }
 }

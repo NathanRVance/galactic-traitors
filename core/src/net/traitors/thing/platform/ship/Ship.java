@@ -26,6 +26,10 @@ public class Ship extends AbstractPlatform {
 
     }
 
+    public ShipComputer getComputer() {
+        return computer;
+    }
+
     @Override
     public SaveData getSaveData() {
         SaveData sd = super.getSaveData();
@@ -94,6 +98,7 @@ public class Ship extends AbstractPlatform {
         for (ShipComponent component : components) {
             component.act(delta); //Updates cooldowns
         }
+        computer.act(delta);
     }
 
     @Override
@@ -149,6 +154,13 @@ public class Ship extends AbstractPlatform {
                     }
                 }
             }
+
+            for(ShipComponent component : ship.components) {
+                component.setShip(ship);
+                ship.computer.addComponent(component);
+            }
+            ship.computer.setShip(ship);
+
             return ship;
         }
 

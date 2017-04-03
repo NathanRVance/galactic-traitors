@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.GalacticTraitors;
@@ -14,13 +16,13 @@ import net.traitors.util.Point;
 
 class Button extends AbstractThing implements Disposable, MouseoverCallback {
 
-    private String text;
+    private CharSequence text;
     private Runnable onClick;
     private boolean selected = false;
-    private Texture unselectedTexture;
-    private Texture selectedTexture;
+    private TextureRegion unselectedTexture;
+    private TextureRegion selectedTexture;
 
-    Button(float width, float height, String text, Runnable onClick) {
+    Button(float width, float height, CharSequence text, Runnable onClick) {
         super(width, height);
         this.text = text;
         this.onClick = onClick;
@@ -28,7 +30,7 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
         selectedTexture = makeTexture(Color.CYAN, Color.LIGHT_GRAY);
     }
 
-    private Texture makeTexture(Color border, Color center) {
+    private TextureRegion makeTexture(Color border, Color center) {
         int width = (int) (getWidth() * 100);
         int height = (int) (getHeight() * 100);
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA4444);
@@ -36,25 +38,27 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
         pixmap.fill();
 
         pixmap.setColor(center);
-        int edgeThickness = height / 10;
+        int edgeThickness = width / 30;
         pixmap.fillRectangle(edgeThickness, edgeThickness, width - edgeThickness * 2, height - edgeThickness * 2);
 
-        return new Texture(pixmap);
+        return new TextureRegion(new Texture(pixmap));
     }
 
     @Override
     public void draw(Batch batch) {
         Point point = getWorldPoint();
-        Texture button = (selected) ? selectedTexture : unselectedTexture;
-        batch.draw(button, point.x - getWidth() / 2, point.y - getHeight() / 2, getWidth(), getHeight());
-        GalacticTraitors.getTextView().drawStringInWorld(text, new Point(point.x, point.y + getHeight() / 4),
+        float rotation = getWorldRotation();
+        TextureRegion button = (selected) ? selectedTexture : unselectedTexture;
+        batch.draw(button, point.x - getWidth() / 2, point.y - getHeight() / 2, getWidth() / 2, getHeight() / 2,
+                getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
+        GalacticTraitors.getTextView().drawStringInWorld(text, new Point(0, getHeight() / 4).rotate(rotation).add(point),
                 TextView.Align.center, getWidth() * .8f, .3f, Color.BLACK);
     }
 
     @Override
     public void dispose() {
-        unselectedTexture.dispose();
-        selectedTexture.dispose();
+        unselectedTexture.getTexture().dispose();
+        selectedTexture.getTexture().dispose();
         GalacticTraitors.getInputProcessor().removeCallback(this);
     }
 

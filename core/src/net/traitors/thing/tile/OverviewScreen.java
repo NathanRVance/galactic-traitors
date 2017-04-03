@@ -13,7 +13,9 @@ import net.traitors.GameScreen;
 import net.traitors.menu.Menu;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
+import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.platform.ship.ShipComponent;
+import net.traitors.thing.usable.StringStrategy;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
@@ -23,6 +25,7 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     private static boolean drawingMyself = false;
     private BetterCamera myCamera = new BetterCamera();
     private FrameBuffer frameBuffer;
+    private Ship ship;
 
     public OverviewScreen(float width, float height) {
         super(width, height);
@@ -94,19 +97,32 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
 
     @Override
     public void use(Thing user, Point touchPoint) {
-        Menu menu = new Menu.MenuBuilder(2).addButton("Cool stuff", new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Fart");
-            }
-        }).build("Awesome Menu");
+        Menu menu = new Menu.MenuBuilder(2)
+                .addButton(new StringStrategy() {
+                               @Override
+                               public String toString() {
+                                   return "Autostop (" + (ship.getComputer().isAutostop() ? "on" : "off") + ")";
+                               }
+                           },
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                ship.getComputer().toggleAutostop();
+                            }
+                        }).build("Ship Control");
         menu.setPlatform(getPlatform());
         menu.setPoint(getPoint());
+        menu.setRotation(0);
         GameScreen.getStuff().addActor(menu);
     }
 
     @Override
     public float getCooldownPercent() {
         return 0;
+    }
+
+    @Override
+    public void setShip(Ship ship) {
+        this.ship = ship;
     }
 }

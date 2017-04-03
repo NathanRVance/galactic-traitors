@@ -73,7 +73,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
         rotation = rotationStrategy.getRotation(user.getRotation(), base.getRotation());
         projectileFactory.setCooldown(new FloatStrategy() {
             @Override
-            public float getFloat() {
+            public float toFloat() {
                 return (1 / extent) * .01f;
             }
         });
@@ -116,45 +116,45 @@ public class MainThrusterStrategy implements ThrustStrategy {
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .01f;
                     }
                 })
                 .setOriginOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(base.getWidth() * .95f,
                                 MathUtils.random(-base.getWidth() * .4f, base.getWidth() * .4f) - .1f);
                     }
                 })
                 .setRotationOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(base.getWidth() / 2, 0);
                     }
                 })
                 .setThickness(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return MathUtils.random(.01f, .1f);
                     }
                 })
                 .setLength(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return MathUtils.random(.01f, .1f);
                     }
                 })
                 .setSpeed(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return MathUtils.random(5, 10);
                     }
                 })
                 .setColor(Color.RED)
                 .setLongevity(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 1;
                     }
                 });

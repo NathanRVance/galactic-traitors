@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
@@ -18,9 +20,10 @@ public class Menu extends AbstractPlatform {
 
     private static final float buttonSpacing = .1f;
     private static final List<Menu> OTHERS = new ArrayList<>();
+    private float titleSpacing;
     private String title;
     private List<Button> buttons;
-    private Texture background;
+    private TextureRegion background;
 
     private Menu(float width, float height, String title, List<Button> buttons) {
         super(width, height);
@@ -35,14 +38,14 @@ public class Menu extends AbstractPlatform {
         pixmap.setColor(Color.GRAY);
         int border = 5;
         pixmap.fillRectangle(border, border, w - border * 2, h - border * 2);
-        background = new Texture(pixmap);
+        background = new TextureRegion(new Texture(pixmap));
     }
 
     private void init() {
-        float yoffset = super.getHeight() / 2 - .3f;
+        float yoffset = super.getHeight() / 2 - titleSpacing;
         for (Button button : buttons) {
             button.setPlatform(this);
-            button.setPoint(new Point(0, yoffset - button.getHeight()));
+            button.setPoint(new Point(0, yoffset - button.getHeight() / 2));
             GalacticTraitors.getInputProcessor().addCallback(button);
             yoffset -= buttonSpacing + button.getHeight();
         }
@@ -63,8 +66,12 @@ public class Menu extends AbstractPlatform {
     @Override
     public void draw(Batch batch) {
         Point p = getWorldPoint();
-        batch.draw(background, p.x - super.getWidth() / 2, p.y - super.getHeight() / 2, super.getWidth(), super.getHeight());
-        GalacticTraitors.getTextView().drawStringInWorld(title, p.add(new Point(0, super.getHeight() / 2 - .1f)),
+        float rotation = getWorldRotation();
+        batch.draw(background, p.x - super.getWidth() / 2, p.y - super.getHeight() / 2,
+                super.getWidth() / 2, super.getHeight() / 2, super.getWidth(), super.getHeight(),
+                1, 1, rotation * MathUtils.radiansToDegrees);
+        GalacticTraitors.getTextView().drawStringInWorld(title,
+                new Point(0, super.getHeight() / 2 - titleSpacing / 3).rotate(rotation).add(p),
                 TextView.Align.center, super.getWidth() * .9f, .3f, Color.BLACK);
         for (Button button : buttons) {
             button.draw(batch);
@@ -83,7 +90,7 @@ public class Menu extends AbstractPlatform {
 
     @Override
     public void dispose() {
-        background.dispose();
+        background.getTexture().dispose();
         for (Button button : buttons) {
             button.dispose();
         }
@@ -92,34 +99,37 @@ public class Menu extends AbstractPlatform {
     public static class MenuBuilder {
 
         private final float width;
-        private List<String> buttonText = new ArrayList<>();
+        private List<CharSequence> buttonText = new ArrayList<>();
         private List<Runnable> buttonActions = new ArrayList<>();
 
         public MenuBuilder(float width) {
             this.width = width;
         }
 
-        public MenuBuilder addButton(String text, Runnable action) {
+        public MenuBuilder addButton(CharSequence text, Runnable action) {
             buttonText.add(text);
             buttonActions.add(action);
             return this;
         }
 
         public Menu build(String title) {
-            float height = .55f; //title
+            //Admitately arbitrary value to multiply by, could be function of font size
+            float titleSpacing = calcButtonHeight(title) * 1.375f;
+            float height = titleSpacing;
             height += (buttonText.size() + 1) * buttonSpacing; //spacing between buttons
             List<Button> buttons = new ArrayList<>();
             for (int i = 0; i < buttonText.size(); i++) {
-                String text = buttonText.get(i);
-                float h = calcButtonHeight(text);
+                CharSequence text = buttonText.get(i);
+                float h = calcButtonHeight(text.toString());
                 height += h;
-                buttons.add(new Button(calcButtonWidth(text), calcButtonHeight(text), text, buttonActions.get(i)));
+                buttons.add(new Button(calcButtonWidth(), calcButtonHeight(text.toString()), text, buttonActions.get(i)));
             }
             String closeButtonText = "Done";
             float closeButtonHeight = calcButtonHeight(closeButtonText);
             height += closeButtonHeight;
             final Menu menu = new Menu(width, height, title, buttons);
-            Button b = new Button(calcButtonWidth(closeButtonText), closeButtonHeight, closeButtonText, new Runnable() {
+            menu.titleSpacing = titleSpacing;
+            Button b = new Button(calcButtonWidth(), closeButtonHeight, closeButtonText, new Runnable() {
                 @Override
                 public void run() {
                     menu.dismiss();
@@ -130,12 +140,12 @@ public class Menu extends AbstractPlatform {
             return menu;
         }
 
-        private float calcButtonWidth(String text) {
+        private float calcButtonWidth() {
             return width * .9f;
         }
 
         private float calcButtonHeight(String text) {
-            return .5f;
+            return .4f * (text.length() / 13 + 1);
         }
 
     }

@@ -4,6 +4,6 @@ import net.traitors.util.Point;
 
 public interface PointStrategy {
 
-    Point getPoint();
+    Point toPoint();
 
 }

@@ -12,44 +12,44 @@ public class ProjectileFactory implements Usable {
     //Start with some reasonable defaults
     private FloatStrategy cooldown = new FloatStrategy() {
                 @Override
-                public float getFloat() {
+                public float toFloat() {
                     return 1;
                 }
             };
     private PointStrategy originOffset = new PointStrategy() {
         @Override
-        public Point getPoint() {
+        public Point toPoint() {
             return new Point();
         }
     };
     private PointStrategy rotationOffset = new PointStrategy() {
         @Override
-        public Point getPoint() {
+        public Point toPoint() {
             return new Point();
         }
     };
     private FloatStrategy thickness = new FloatStrategy() {
         @Override
-        public float getFloat() {
+        public float toFloat() {
             return .1f;
         }
     };
     private FloatStrategy length = new FloatStrategy() {
         @Override
-        public float getFloat() {
+        public float toFloat() {
             return .5f;
         }
     };
     private FloatStrategy speed = new FloatStrategy() {
         @Override
-        public float getFloat() {
+        public float toFloat() {
             return 20;
         }
     };
     private Color color = Color.RED;
     private FloatStrategy longevity = new FloatStrategy() {
         @Override
-        public float getFloat() {
+        public float toFloat() {
             return 2;
         }
     };
@@ -65,14 +65,14 @@ public class ProjectileFactory implements Usable {
         if (timeToNextFire <= 0) {
             //Make a plasma blast
             float userRot = user.getWorldRotation();
-            Point velocity = new Point(speed.getFloat(), 0).rotate(rotation).add(user.getWorldVelocity());
-            Point rotOff = rotationOffset.getPoint().rotate(userRot);
-            Point origOff = originOffset.getPoint().rotate(userRot);
+            Point velocity = new Point(speed.toFloat(), 0).rotate(rotation).add(user.getWorldVelocity());
+            Point rotOff = rotationOffset.toPoint().rotate(userRot);
+            Point origOff = originOffset.toPoint().rotate(userRot);
             Point startPoint = user.getWorldPoint().add(origOff.subtract(rotOff).rotate(rotation - userRot).add(rotOff));
-            Projectile projectile = new Projectile(length.getFloat(), thickness.getFloat(),
-                    color, startPoint, velocity, longevity.getFloat());
+            Projectile projectile = new Projectile(length.toFloat(), thickness.toFloat(),
+                    color, startPoint, velocity, longevity.toFloat());
             GameScreen.getStuff().addActor(projectile);
-            timeToNextFire = cooldown.getFloat();
+            timeToNextFire = cooldown.toFloat();
         }
     }
 
@@ -80,7 +80,7 @@ public class ProjectileFactory implements Usable {
     public float getCooldownPercent() {
         if (timeToNextFire <= 0)
             return 1;
-        return 1 - timeToNextFire / cooldown.getFloat();
+        return 1 - timeToNextFire / cooldown.toFloat();
     }
 
     public void updateCooldown(float delta) {

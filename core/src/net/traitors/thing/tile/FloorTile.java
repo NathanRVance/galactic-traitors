@@ -17,7 +17,8 @@ public class FloorTile extends AbstractThing implements Tile {
     public void draw(Batch batch) {
         Point worldPoint = getWorldPoint();
         float worldRotation = getWorldRotation();
-        batch.draw(TextureCreator.getTileTexture(), worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2, getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation * MathUtils.radiansToDegrees);
+        batch.draw(TextureCreator.getTileTexture(), worldPoint.x - getWidth() / 2, worldPoint.y - getHeight() / 2,
+                getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, worldRotation * MathUtils.radiansToDegrees);
     }
 
     @Override

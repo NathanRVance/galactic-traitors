@@ -1,6 +1,7 @@
 package net.traitors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
@@ -54,6 +55,8 @@ public class GameScreen implements Screen {
         stuff.getPlayer().setPoint(new Point(-4, 10));
         stuff.addActor(GalacticTraitors.getCamera());
 
+        Gdx.input.setInputProcessor(new InputMultiplexer(GalacticTraitors.getInputProcessor(), uiControls));
+        //GalacticTraitors.getInputProcessor().addProcessor(uiControls);
         GalacticTraitors.getInputProcessor().addProcessor(new InputProcessor() {
             @Override
             public boolean scrolled(int amount) {
@@ -61,7 +64,6 @@ public class GameScreen implements Screen {
                 return false;
             }
         });
-        GalacticTraitors.getInputProcessor().addProcessor(uiControls);
 
         MultiplayerConnect.start();
     }
@@ -85,13 +87,11 @@ public class GameScreen implements Screen {
 
         GalacticTraitors.getBatch().setProjectionMatrix(GalacticTraitors.getCamera().combined);
         GalacticTraitors.getBatch().begin();
-        //textView.drawStringInWorld(camera, game.font, "Num Taps: " + numTaps, new Point(1, 1), TextView.Align.left, 1);
         stuff.drawStuff(GalacticTraitors.getBatch(), GalacticTraitors.getCamera());
         GalacticTraitors.getBatch().end();
 
         GalacticTraitors.getTextView().draw();
         uiControls.draw();
-        //setSerializedStuff();
         MultiplayerConnect.tick(delta);
     }
 
@@ -109,10 +109,10 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
         GalacticTraitors.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
+        GalacticTraitors.getInputProcessor().removeProcessor(uiControls);
         uiControls = new TouchControls();
-        //Gdx.input.setInputProcessor(new InputMultiplexer(uiControls, new InputProcessor(stuff.getCamera())));
+        GalacticTraitors.getInputProcessor().addProcessor(uiControls);
         stuff.getPlayer().getInventory().update();
-        //textView = new TextView();
     }
 
     @Override

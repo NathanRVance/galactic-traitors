@@ -48,38 +48,38 @@ public class Gun extends AbstractThing implements Item {
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 1;
                     }
                 })
                 .setOriginOffset(new PointStrategy() {
                     @Override
-                    public Point getPoint() {
+                    public Point toPoint() {
                         return new Point(.4f, -.25f);
                     }
                 })
                 .setThickness(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .1f;
                     }
                 })
                 .setLength(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return .5f;
                     }
                 })
                 .setSpeed(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 20;
                     }
                 })
                 .setColor(Color.RED)
                 .setLongevity(new FloatStrategy() {
                     @Override
-                    public float getFloat() {
+                    public float toFloat() {
                         return 1;
                     }
                 });

@@ -113,20 +113,7 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
 
     @Override
     public void applyForce(Point force, Point radius, float delta) {
-        // radius X force = torque
-        //   [x1,        y1,        z1]
-        // X [x2,        y2,        z2]
-        // = [y1z2-z1y2, z1x2-x1z2, x1y2-y1x2]
-        // We only care about the z component of the cross product for torque
-        float torque = radius.x * force.y - radius.y * force.x;
-        // torque = moment of inertia * angular acceleration
-        // moment of inertia for thin rectangular plate = m * (h^2 + w^2) / 12
-        float I = getMass() * (getHeight() * getHeight() + getWidth() * getWidth()) / 12;
-        float angAccel = torque / I;
-        setRotationalVelocity(getRotationalVelocity() + angAccel * delta);
-
-        // a = f / m
-        Point a = force.scale(1 / getMass()).rotate(getWorldRotation());
-        setTranslationalVelocity(getTranslationalVelocity().add(a.scale(delta)));
+        setRotationalVelocity(getRotationalVelocity() + force.angAccel(radius, this) * delta);
+        setTranslationalVelocity(getTranslationalVelocity().add(force.transAccel(this).scale(delta)));
     }
 }
