@@ -22,7 +22,7 @@ public class GalacticTraitors extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        textView = new TextView(new BitmapFont(Gdx.files.internal("gamefont.fnt")));
+        textView = new TextView(new BitmapFont(Gdx.files.internal("gamefont.fnt"), Gdx.files.internal("gamefont.png"), false));
         Pixmap cursor = TextureCreator.getCursor();
         Gdx.graphics.setCursor(Gdx.graphics.newCursor(cursor, cursor.getHeight() / 2, cursor.getWidth() / 2));
         cursor.dispose();
@@ -45,7 +45,7 @@ public class GalacticTraitors extends Game {
 
     public void resize() {
         textView.dispose();
-        textView = new TextView(new BitmapFont(Gdx.files.internal("gamefont.fnt")));
+        textView = new TextView(new BitmapFont(Gdx.files.internal("gamefont.fnt"), Gdx.files.internal("gamefont.png"), false));
     }
 
     public static SpriteBatch getBatch() {

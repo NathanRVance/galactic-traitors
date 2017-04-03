@@ -36,7 +36,7 @@ public class MenuScreen implements Screen {
         GalacticTraitors.getBatch().end();
 
         GalacticTraitors.getTextView().drawStringOnScreen("Welcome to Galactic Traitors!", new Point(.5f, .5f),
-                TextView.Align.center, .5f, .1f, Color.WHITE);
+                TextView.Align.center, .5f, .1f, Color.WHITE, 0);
         GalacticTraitors.getTextView().draw();
 
         if (Gdx.input.isTouched()) {

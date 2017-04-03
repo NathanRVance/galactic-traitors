@@ -52,7 +52,7 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
         batch.draw(button, point.x - getWidth() / 2, point.y - getHeight() / 2, getWidth() / 2, getHeight() / 2,
                 getWidth(), getHeight(), 1, 1, rotation * MathUtils.radiansToDegrees);
         GalacticTraitors.getTextView().drawStringInWorld(text, new Point(0, getHeight() / 4).rotate(rotation).add(point),
-                TextView.Align.center, getWidth() * .8f, .3f, Color.BLACK);
+                TextView.Align.center, getWidth() * .8f, .3f, Color.BLACK, getWorldRotation());
     }
 
     @Override

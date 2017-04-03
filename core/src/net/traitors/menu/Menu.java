@@ -72,7 +72,7 @@ public class Menu extends AbstractPlatform {
                 1, 1, rotation * MathUtils.radiansToDegrees);
         GalacticTraitors.getTextView().drawStringInWorld(title,
                 new Point(0, super.getHeight() / 2 - titleSpacing / 3).rotate(rotation).add(p),
-                TextView.Align.center, super.getWidth() * .9f, .3f, Color.BLACK);
+                TextView.Align.center, super.getWidth() * .9f, .3f, Color.BLACK, getWorldRotation());
         for (Button button : buttons) {
             button.draw(batch);
         }
