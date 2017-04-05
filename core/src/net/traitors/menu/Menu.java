@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
 import net.traitors.thing.platform.AbstractPlatform;
+import net.traitors.thing.platform.Platform;
 import net.traitors.ui.TextView;
 import net.traitors.util.Point;
 
@@ -21,14 +22,15 @@ public class Menu extends AbstractPlatform {
     private static final float buttonSpacing = .1f;
     private static final List<Menu> OTHERS = new ArrayList<>();
     private float titleSpacing;
-    private String title;
+    private CharSequence title;
     private List<Button> buttons;
     private TextureRegion background;
 
-    private Menu(float width, float height, String title, List<Button> buttons) {
+    private Menu(float width, float height, CharSequence title, List<Button> buttons, Platform platform) {
         super(width, height);
         this.title = title;
         this.buttons = buttons;
+        super.setPlatform(platform);
 
         int w = (int) (width * 100);
         int h = (int) (height * 100);
@@ -44,7 +46,7 @@ public class Menu extends AbstractPlatform {
     private void init() {
         float yoffset = super.getHeight() / 2 - titleSpacing;
         for (Button button : buttons) {
-            button.setPlatform(this);
+            button.setPlatformPackagePrivate(this);
             button.setPoint(new Point(0, yoffset - button.getHeight() / 2));
             GalacticTraitors.getInputProcessor().addCallback(button);
             yoffset -= buttonSpacing + button.getHeight();
@@ -61,6 +63,11 @@ public class Menu extends AbstractPlatform {
     private void dismiss() {
         GameScreen.getStuff().removeActor(this);
         dispose();
+    }
+
+    @Override
+    public void setPlatform(Platform platform) {
+        //Do nothing
     }
 
     @Override
@@ -101,6 +108,7 @@ public class Menu extends AbstractPlatform {
         private final float width;
         private List<CharSequence> buttonText = new ArrayList<>();
         private List<Runnable> buttonActions = new ArrayList<>();
+        private Platform platform;
 
         public MenuBuilder(float width) {
             this.width = width;
@@ -112,7 +120,12 @@ public class Menu extends AbstractPlatform {
             return this;
         }
 
-        public Menu build(String title) {
+        public MenuBuilder setPlatform(Platform platform) {
+            this.platform = platform;
+            return this;
+        }
+
+        public Menu build(CharSequence title) {
             //Admitately arbitrary value to multiply by, could be function of font size
             float titleSpacing = calcButtonHeight(title) * 1.375f;
             float height = titleSpacing;
@@ -127,7 +140,7 @@ public class Menu extends AbstractPlatform {
             String closeButtonText = "Done";
             float closeButtonHeight = calcButtonHeight(closeButtonText);
             height += closeButtonHeight;
-            final Menu menu = new Menu(width, height, title, buttons);
+            final Menu menu = new Menu(width, height, title, buttons, platform);
             menu.titleSpacing = titleSpacing;
             Button b = new Button(calcButtonWidth(), closeButtonHeight, closeButtonText, new Runnable() {
                 @Override
@@ -144,7 +157,7 @@ public class Menu extends AbstractPlatform {
             return width * .9f;
         }
 
-        private float calcButtonHeight(String text) {
+        private float calcButtonHeight(CharSequence text) {
             return .4f * (text.length() / 13 + 1);
         }
 

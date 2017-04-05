@@ -14,7 +14,6 @@ import net.traitors.thing.platform.ship.ShipComponent;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
-import net.traitors.thing.usable.Usable;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
@@ -157,6 +156,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
     public void use(Thing user, Point touchPoint) {
         rotation = rotationStrategy.getRotation(user.getRotation(), getRotation());
         projectileFactory.use(this, getPlatform().convertToWorldRotation(rotation));
+        getPlatform().applyPointForce(new Point(100, 0).rotate(rotation + (float) Math.PI), getPoint());
     }
 
     @Override

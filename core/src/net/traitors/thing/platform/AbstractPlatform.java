@@ -6,7 +6,7 @@ import net.traitors.util.save.SaveData;
 
 public abstract class AbstractPlatform extends AbstractThing implements Platform {
 
-    private Point translationalVelocity = new Point();
+    private float rotationalAcceleration = 0f;
     private float rotationalVelocity = 0f;
 
     protected AbstractPlatform() {
@@ -25,9 +25,6 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     @Override
     public SaveData getSaveData() {
         SaveData sd = super.getSaveData();
-        //Save translational velocity
-        sd.writeFloat(translationalVelocity.x);
-        sd.writeFloat(translationalVelocity.y);
         //Save rotational velocity
         sd.writeFloat(rotationalVelocity);
         return sd;
@@ -36,20 +33,8 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
-        //Load translational velocity
-        translationalVelocity = new Point(saveData.readFloat(), saveData.readFloat());
         //Load rotational velocity
         rotationalVelocity = saveData.readFloat();
-    }
-
-    @Override
-    public Point getTranslationalVelocity() {
-        return translationalVelocity;
-    }
-
-    @Override
-    public void setTranslationalVelocity(Point velocity) {
-        translationalVelocity = velocity;
     }
 
     @Override
@@ -65,7 +50,8 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     @Override
     public void act(float delta) {
         super.act(delta);
-        setPoint(getPoint().add(getTranslationalVelocity().scale(delta)));
+        setRotationalVelocity(getRotationalVelocity() + rotationalAcceleration * delta);
+        rotationalAcceleration = 0f;
         setRotation((getRotation() + rotationalVelocity * delta) % (float) (Math.PI * 2));
     }
 
@@ -112,8 +98,10 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     }
 
     @Override
-    public void applyForce(Point force, Point radius, float delta) {
-        setRotationalVelocity(getRotationalVelocity() + force.angAccel(radius, this) * delta);
-        setTranslationalVelocity(getTranslationalVelocity().add(force.transAccel(this).scale(delta)));
+    public void applyPointForce(Point force, Point radius) {
+        //Rotational component
+        rotationalAcceleration += force.angAccel(radius, this);
+        //Translational component
+        applyForce(force);
     }
 }

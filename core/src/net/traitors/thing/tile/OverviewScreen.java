@@ -15,6 +15,7 @@ import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.platform.ship.ShipComponent;
+import net.traitors.thing.usable.FirstUseUsable;
 import net.traitors.thing.usable.StringStrategy;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
@@ -26,6 +27,45 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     private BetterCamera myCamera = new BetterCamera();
     private FrameBuffer frameBuffer;
     private Ship ship;
+    private FirstUseUsable usable = new FirstUseUsable() {
+        @Override
+        protected void firstUse(Thing user, Point touchPoint) {
+            Menu menu = new Menu.MenuBuilder(2)
+                    .setPlatform(getPlatform())
+                    .addButton(new StringStrategy() {
+                                   @Override
+                                   public String toString() {
+                                       return "Autostop (" + (ship.getComputer().isAutostop() ? "on" : "off") + ")";
+                                   }
+                               },
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    ship.getComputer().toggleAutostop();
+                                }
+                            })
+                    .addButton("Heading", new Runnable() {
+                        @Override
+                        public void run() {
+                            Menu menu = new Menu.MenuBuilder(2)
+                                    .setPlatform(getPlatform())
+                                    .build(new StringStrategy() {
+                                        @Override
+                                        public String toString() {
+                                            return "Velocity: " + ship.getTranslationalVelocity()
+                                                    + "\nRotating at: " + ship.getRotationalVelocity();
+                                        }
+                                    });
+                            menu.setPoint(getPoint());
+                            menu.setRotation(0);
+                            GameScreen.getStuff().addActor(menu);
+                        }
+                    }).build("Ship Control");
+            menu.setPoint(getPoint());
+            menu.setRotation(0);
+            GameScreen.getStuff().addActor(menu);
+        }
+    };
 
     public OverviewScreen(float width, float height) {
         super(width, height);
@@ -97,23 +137,13 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
 
     @Override
     public void use(Thing user, Point touchPoint) {
-        Menu menu = new Menu.MenuBuilder(2)
-                .addButton(new StringStrategy() {
-                               @Override
-                               public String toString() {
-                                   return "Autostop (" + (ship.getComputer().isAutostop() ? "on" : "off") + ")";
-                               }
-                           },
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                ship.getComputer().toggleAutostop();
-                            }
-                        }).build("Ship Control");
-        menu.setPlatform(getPlatform());
-        menu.setPoint(getPoint());
-        menu.setRotation(0);
-        GameScreen.getStuff().addActor(menu);
+        usable.use(user, touchPoint);
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        usable.act(delta);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package net.traitors.util.save;
 
+import net.traitors.util.Point;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +57,24 @@ public class SaveData {
 
     public float readFloat() {
         return Float.parseFloat(getToDelimiter());
+    }
+
+    public void writePoint(Point p) {
+        if(p == null) {
+            writeBoolean(false);
+        } else {
+            writeBoolean(true);
+            writeFloat(p.x);
+            writeFloat(p.y);
+        }
+    }
+
+    public Point readPoint() {
+        if(readBoolean()) {
+            return new Point(readFloat(), readFloat());
+        } else {
+            return null;
+        }
     }
 
     public void writeString(String s) {

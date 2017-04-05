@@ -5,9 +5,6 @@ import net.traitors.util.Point;
 
 public interface Platform extends Thing {
 
-    Point getTranslationalVelocity();
-
-    void setTranslationalVelocity(Point velocity);
 
     float getRotationalVelocity();
 
@@ -23,12 +20,11 @@ public interface Platform extends Thing {
 
     /**
      * Applies a force to this platform, which will affect its translational and rotational
-     * velocities.
+     * velocities. Note: forces expire after next call to act!
      *
      * @param force    the force vector applied, in Newtons, in platform coordinates
      * @param position position on this platform that the force is applied, in platform coordinates
-     * @param delta    time for which this force is applied
      */
-    void applyForce(Point force, Point position, float delta);
+    void applyPointForce(Point force, Point position);
 
 }

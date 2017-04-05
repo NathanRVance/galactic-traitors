@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Disposable;
 import net.traitors.GalacticTraitors;
 import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.AbstractThing;
+import net.traitors.thing.platform.Platform;
 import net.traitors.ui.TextView;
 import net.traitors.util.Point;
 
@@ -45,6 +46,15 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
     }
 
     @Override
+    public void setPlatform(Platform platform) {
+        //Do nothing
+    }
+
+    void setPlatformPackagePrivate(Platform platform) {
+        super.setPlatform(platform);
+    }
+
+    @Override
     public void draw(Batch batch) {
         Point point = getWorldPoint();
         float rotation = getWorldRotation();
@@ -74,11 +84,11 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
 
     @Override
     public void mouseDown() {
-        //Do nothing
+        onClick.run();
     }
 
     @Override
     public void mouseUp() {
-        onClick.run();
+        //Do nothing
     }
 }

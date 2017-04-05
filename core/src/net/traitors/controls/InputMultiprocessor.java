@@ -17,6 +17,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
     private List<MouseoverCallback> callbacks = new ArrayList<>();
     private Map<MouseoverCallback, Boolean> wasIn = new HashMap<>();
     private List<MouseoverCallback> asyncRemove = new ArrayList<>();
+    private List<MouseoverCallback> asyncAdd = new ArrayList<>();
 
     private int currentX = 0;
     private int currentY = 0;
@@ -34,8 +35,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
     }
 
     public synchronized void addCallback(MouseoverCallback callback) {
-        callbacks.add(callback);
-        wasIn.put(callback, false);
+        asyncAdd.add(callback);
     }
 
     public synchronized void removeCallback(MouseoverCallback callback) {
@@ -46,12 +46,18 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
         mouseMoved(currentX, currentY);
     }
 
-    private void resolveRemove() {
+    private void resolveAsync() {
         for (MouseoverCallback callback : asyncRemove) {
             callbacks.remove(callback);
             wasIn.remove(callback);
         }
         asyncRemove.clear();
+
+        for(MouseoverCallback callback : asyncAdd) {
+            callbacks.add(callback);
+            wasIn.put(callback, false);
+        }
+        asyncAdd.clear();
     }
 
     @Override
@@ -83,7 +89,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
     @Override
     public synchronized boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        resolveRemove();
+        resolveAsync();
         for (InputProcessor processor : inputs) {
             if (processor.touchDown(screenX, screenY, pointer, button))
                 return true;
@@ -100,7 +106,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
     @Override
     public synchronized boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        resolveRemove();
+        resolveAsync();
         for (InputProcessor processor : inputs) {
             if (processor.touchUp(screenX, screenY, pointer, button))
                 return true;
@@ -128,7 +134,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
     public synchronized boolean mouseMoved(int screenX, int screenY) {
         currentX = screenX;
         currentY = screenY;
-        resolveRemove();
+        resolveAsync();
         for (InputProcessor processor : inputs) {
             if (processor.mouseMoved(screenX, screenY))
                 return true;

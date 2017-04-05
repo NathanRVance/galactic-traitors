@@ -195,8 +195,9 @@ public class Stuff implements Savable {
             actor.act(delta);
         }
 
-        for (Player player : players) {
-            player.act(delta);
+        inputs.set(MultiplayerConnect.getPlayerID(), Controls.getUserInput());
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).move(delta, inputs.get(i));
         }
 
         Point playerWorldPoint = getPlayer().getWorldPoint();
@@ -205,12 +206,6 @@ public class Stuff implements Savable {
         if (GalacticTraitors.getCamera().getRotatingWith() instanceof NullPlatform)
             GalacticTraitors.getCamera().setRotateDepth(1);
         GalacticTraitors.getCamera().update();
-
-        inputs.set(MultiplayerConnect.getPlayerID(), Controls.getUserInput());
-        for (int i = 0; i < players.size(); i++) {
-            players.get(i).move(delta, inputs.get(i));
-        }
-
 
         resolveBuffers();
         if (MultiplayerConnect.isServer())

@@ -3,6 +3,7 @@ package net.traitors.util;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
+import net.traitors.thing.Thing;
 import net.traitors.thing.platform.Platform;
 
 public class Point {
@@ -39,6 +40,7 @@ public class Point {
      * @return angle in radians
      */
     public float angle() {
+        if(isZero()) return 0;
         float angle = (float) Math.asin(y / distanceFromZero());
         if (x < 0) angle = (float) Math.PI - angle;
         return angle;
@@ -48,7 +50,7 @@ public class Point {
      * Rotate this point around (0, 0) by the specified amount
      *
      * @param rotation amount to rotate, in radians
-     * @return rotated point (this)
+     * @return rotated point
      */
     public Point rotate(float rotation) {
         if (!isZero()) {
@@ -133,11 +135,11 @@ public class Point {
     }
 
     /**
-     * This point is the force
-     * @param platform the platforme this force is applied on
+     * This point is the force, in platform coordinates
+     * @param thing the thing this force is applied on
      * @return the translational acceleration, in world coordinates, in m/s^2
      */
-    public Point transAccel(Platform platform) {
-        return scale(1 / platform.getMass()).rotate(platform.getWorldRotation());
+    public Point transAccel(Thing thing) {
+        return scale(1 / thing.getMass()).rotate(thing.getWorldRotation());
     }
 }

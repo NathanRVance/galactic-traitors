@@ -14,8 +14,9 @@ public abstract class AbstractThing implements Thing {
     private float height;
     private float mass;
     private Point point = new Point();
-    private Point lastWorldPoint = new Point();
-    private Point velocity = new Point();
+    private Point lastWorldPoint = null;
+    private Point translationalVelocity = new Point();
+    private Point translationalAcceleration = new Point();
     private float rotation = 0;
     private Platform platform;
     private Platform nullPlatform = new NullPlatform();
@@ -42,12 +43,9 @@ public abstract class AbstractThing implements Thing {
         sd.writeFloat(width);
         sd.writeFloat(height);
         sd.writeFloat(mass);
-        sd.writeFloat(point.x);
-        sd.writeFloat(point.y);
-        sd.writeFloat(lastWorldPoint.x);
-        sd.writeFloat(lastWorldPoint.y);
-        sd.writeFloat(velocity.x);
-        sd.writeFloat(velocity.y);
+        sd.writePoint(point);
+        sd.writePoint(lastWorldPoint);
+        sd.writePoint(translationalVelocity);
         sd.writeFloat(rotation);
         return sd;
     }
@@ -57,9 +55,9 @@ public abstract class AbstractThing implements Thing {
         width = saveData.readFloat();
         height = saveData.readFloat();
         mass = saveData.readFloat();
-        point = new Point(saveData.readFloat(), saveData.readFloat());
-        lastWorldPoint = new Point(saveData.readFloat(), saveData.readFloat());
-        velocity = new Point(saveData.readFloat(), saveData.readFloat());
+        point = saveData.readPoint();
+        lastWorldPoint = saveData.readPoint();
+        translationalVelocity = saveData.readPoint();
         rotation = saveData.readFloat();
     }
 
@@ -105,7 +103,17 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public Point getWorldVelocity() {
-        return velocity;
+        return translationalVelocity.add(getPlatform().getTranslationalVelocity());
+    }
+
+    @Override
+    public Point getTranslationalVelocity() {
+        return translationalVelocity;
+    }
+
+    @Override
+    public void setTranslationalVelocity(Point velocity) {
+        translationalVelocity = velocity;
     }
 
     @Override
@@ -141,20 +149,26 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public void draw(Batch batch, BetterCamera camera) {
-        if (camera.isWatching(this, getWidth())) {
+        if (camera.isWatching(this, Math.max(getWidth(), getHeight()))) {
             draw(batch);
         }
     }
 
     @Override
     public void act(float delta) {
-        velocity = getWorldPoint().subtract(lastWorldPoint).scale(1 / delta);
-        lastWorldPoint = getWorldPoint();
+        setTranslationalVelocity(getTranslationalVelocity().add(translationalAcceleration.scale(delta)));
+        translationalAcceleration = new Point();
+        setPoint(getPoint().add(getTranslationalVelocity().scale(delta)));
     }
 
     @Override
     public boolean contains(Point point) {
         point = point.subtract(getWorldPoint()).rotate(-1 * getWorldRotation());
         return Math.abs(point.x) <= getWidth() / 2 && Math.abs(point.y) <= getHeight() / 2;
+    }
+
+    @Override
+    public void applyForce(Point force) {
+        translationalAcceleration = translationalAcceleration.add(force.transAccel(this));
     }
 }

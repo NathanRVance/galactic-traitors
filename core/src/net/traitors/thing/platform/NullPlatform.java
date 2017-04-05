@@ -59,8 +59,8 @@ public class NullPlatform implements Platform {
     }
 
     @Override
-    public void applyForce(Point force, Point position, float delta) {
-
+    public void applyPointForce(Point force, Point position) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -146,6 +146,11 @@ public class NullPlatform implements Platform {
     @Override
     public boolean contains(Point point) {
         return true;
+    }
+
+    @Override
+    public void applyForce(Point force) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

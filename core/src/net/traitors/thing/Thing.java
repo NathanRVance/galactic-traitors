@@ -72,12 +72,17 @@ public interface Thing extends Actor, Disposable {
      */
     Point getWorldVelocity();
 
+    Point getTranslationalVelocity();
+
+    void setTranslationalVelocity(Point velocity);
+
     float getWidth();
 
     float getHeight();
 
     /**
      * Gets the mass of this thing
+     *
      * @return mass in kg
      */
     float getMass();
@@ -109,5 +114,13 @@ public interface Thing extends Actor, Disposable {
      * @return whether or not the point falls within this thing
      */
     boolean contains(Point point);
+
+    /**
+     * Applies a force to this platform, which will affect its translational velocity.
+     * Note: forces expire after next call to act!
+     *
+     * @param force the force vector applied, in Newtons, in platform coordinates
+     */
+    void applyForce(Point force);
 
 }

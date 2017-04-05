@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class ShipComputer implements Savable, Actor {
 
-    Map<Point, ThrusterTile> thrusters = new HashMap<>();
+    private Map<Point, ThrusterTile> thrusters = new HashMap<>();
     private Set<ShipComponent> components = new HashSet<>();
     private Set<Set<ShipComponent>> syncedComponents = new HashSet<>();
     private Ship ship;
@@ -100,23 +100,18 @@ public class ShipComputer implements Savable, Actor {
     }
 
     /**
-     * Causes use(Thing user) on all synced components to be called with the same user.
+     * Causes use(Thing user) on all synced components to be called with the same user. This method is called
+     * by Ship and not by the components themselves, otherwise we could get into an infinite loop!
      *
      * @param component the component that was just used
      * @param user      the user that used this component
      */
-    public void componentUsed(ShipComponent component, Thing user, Point touchPoint) {
-        //So that we don't get an infinite loop of components syncing with each other, we keep track
-        //of the ones that have already entered the call stack.
-        if (components.contains(component)) {
-            for (Set<ShipComponent> comps : syncedComponents) {
-                if (comps.contains(component)) {
-                    for (ShipComponent c : comps) {
-                        if (c != component) {
-                            components.remove(c);
-                            c.use(user, touchPoint);
-                            components.add(c);
-                        }
+    void componentUsed(ShipComponent component, Thing user, Point touchPoint) {
+        for (Set<ShipComponent> comps : syncedComponents) {
+            if (comps.contains(component)) {
+                for (ShipComponent c : comps) {
+                    if (c != component) {
+                        c.use(user, touchPoint);
                     }
                 }
             }
@@ -147,11 +142,10 @@ public class ShipComputer implements Savable, Actor {
             if (transVel.distanceFromZero() > .001 && transVel.distanceFromZero() > transVel.add(dTransVel).distanceFromZero()) {
                 //Point slows down translation
                 tt.getThrustStrategy().applyThrust(user, 1);
-            }
-            else if (Math.abs(rotVel) > .001 && (rotVel < 0) != (dAngVel < 0)) {
+            } else if (Math.abs(rotVel) > .001 && (rotVel < 0) != (dAngVel < 0)) {
                 //dAngVel * x = - rotVel
                 float percentUse = rotVel / dAngVel * -1;
-                if( percentUse > 1) percentUse = 1;
+                if (percentUse > 1) percentUse = 1;
                 tt.getThrustStrategy().applyThrust(user, percentUse);
             }
         }

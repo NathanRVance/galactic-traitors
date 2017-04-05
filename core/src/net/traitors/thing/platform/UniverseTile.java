@@ -17,6 +17,11 @@ public class UniverseTile extends AbstractPlatform {
     }
 
     @Override
+    public void act(float delta) {
+
+    }
+
+    @Override
     public void draw(Batch batch) {
 
     }

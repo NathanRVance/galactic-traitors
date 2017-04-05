@@ -12,6 +12,7 @@ import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
+import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
@@ -135,24 +136,24 @@ public class Player extends AbstractThing {
     }
 
     public void move(float delta, Controls.UserInput input) {
+        if (input == null) input = new Controls.UserInput();
         float x = 0;
         float y = 0;
         float speedMult = 1;
-        if (input == null) input = new Controls.UserInput();
         if (input.keysPressed.contains(Controls.Key.UP)) {
-            y += BASE_MOVE_SPEED * delta;
+            y++;
         }
         if (input.keysPressed.contains(Controls.Key.DOWN)) {
-            y -= BASE_MOVE_SPEED * delta;
+            y--;
         }
         if (input.keysPressed.contains(Controls.Key.RIGHT)) {
-            x += BASE_MOVE_SPEED * delta;
+            x++;
         }
         if (input.keysPressed.contains(Controls.Key.LEFT)) {
-            x -= BASE_MOVE_SPEED * delta;
+            x--;
         }
         if (input.keysPressed.contains(Controls.Key.SPRINT)) {
-            speedMult = 3;
+            speedMult = 2;
         }
         Point d = new Point(x, y);
         d = d.rotate(GalacticTraitors.getCamera().getCameraAngle() - getPlatform().getWorldRotation());
@@ -160,14 +161,20 @@ public class Player extends AbstractThing {
         float totMove = d.distanceFromZero();
         if (totMove != 0) {
             setAnimationLength(BASE_ANIMATION_LENGTH / speedMult);
-            d = d.scale(BASE_MOVE_SPEED * delta * speedMult / totMove);
-            Point destination = getPoint().add(d);
-            rotateToFace(destination);
-            setPoint(destination);
+            d = d.scale(BASE_MOVE_SPEED * speedMult / totMove);
+            rotateToFace(getPoint().add(d));
+            if (!(getPlatform() instanceof UniverseTile)) {
+                setTranslationalVelocity(d);
+            }
             incAnimation(delta);
         } else {
+            if (!(getPlatform() instanceof UniverseTile)) {
+                setTranslationalVelocity(new Point());
+            }
             resetAnimation();
         }
+
+        setPoint(getPoint().add(getTranslationalVelocity().scale(delta)));
 
         if (input.pointsTouched.size() == 1) {
             worldTouched(input.pointsTouched.get(0));

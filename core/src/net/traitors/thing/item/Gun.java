@@ -18,9 +18,13 @@ import net.traitors.util.save.SaveData;
 
 public class Gun extends AbstractThing implements Item {
 
+    private final float kickbackTime = .05f;
     private Texture inventoryImage;
     private TextureRegion handImage;
     private ProjectileFactory projectileFactory;
+    private Point kickbackForce = new Point(-2000, 0);
+    private float kickingTimer = 0;
+    private Thing kicking;
 
     public Gun(float width, float height) {
         super(width, height);
@@ -118,6 +122,10 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public void use(Thing thing, Point touchPoint) {
+        if(projectileFactory.getCooldownPercent() == 1) {
+            kickingTimer = kickbackTime;
+            kicking = thing;
+        }
         projectileFactory.use(thing, touchPoint);
     }
 
@@ -130,6 +138,10 @@ public class Gun extends AbstractThing implements Item {
     public void act(float delta) {
         super.act(delta);
         projectileFactory.updateCooldown(delta);
+        if (kickingTimer > 0) {
+            kickingTimer -= delta;
+            kicking.applyForce(kickbackForce);
+        }
     }
 
     @Override

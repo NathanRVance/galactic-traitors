@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
-import net.traitors.GameScreen;
 import net.traitors.thing.Thing;
 import net.traitors.thing.tile.RotationStrategy;
 import net.traitors.thing.tile.Tile;
@@ -69,7 +68,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
 
     @Override
     public void applyThrust(Thing user, final float extent) {
-        if(extent == 0) return;
+        if (extent == 0) return;
         rotation = rotationStrategy.getRotation(user.getRotation(), base.getRotation());
         projectileFactory.setCooldown(new FloatStrategy() {
             @Override
@@ -79,7 +78,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
         });
         projectileFactory.use(base, base.getPlatform().convertToWorldRotation(rotation));
         Point force = new Point(forceMagnitude * -1 * extent, 0).rotate(rotation);
-        base.getPlatform().applyForce(force, base.getPoint(), GameScreen.getStuff().getDelta());
+        base.getPlatform().applyPointForce(force, base.getPoint());
     }
 
     @Override
