@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
+import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.platform.AbstractPlatform;
 import net.traitors.thing.platform.Platform;
 import net.traitors.ui.TextView;
@@ -17,7 +18,7 @@ import net.traitors.util.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Menu extends AbstractPlatform {
+public class Menu extends AbstractPlatform implements MouseoverCallback {
 
     private static final float buttonSpacing = .1f;
     private static final List<Menu> OTHERS = new ArrayList<>();
@@ -51,6 +52,7 @@ public class Menu extends AbstractPlatform {
             GalacticTraitors.getInputProcessor().addCallback(button);
             yoffset -= buttonSpacing + button.getHeight();
         }
+        GalacticTraitors.getInputProcessor().addCallback(this);
         synchronized (OTHERS) {
             //THERE CAN ONLY BE ONE
             for (Menu menu : OTHERS) {
@@ -61,6 +63,7 @@ public class Menu extends AbstractPlatform {
     }
 
     private void dismiss() {
+        GalacticTraitors.getInputProcessor().removeCallback(this);
         GameScreen.getStuff().removeActor(this);
         dispose();
     }
@@ -101,6 +104,26 @@ public class Menu extends AbstractPlatform {
         for (Button button : buttons) {
             button.dispose();
         }
+    }
+
+    @Override
+    public void mouseEnter() {
+        //Do nothing
+    }
+
+    @Override
+    public void mouseExit() {
+        //Do nothing
+    }
+
+    @Override
+    public boolean mouseDown() {
+        return true; //Consume
+    }
+
+    @Override
+    public boolean mouseUp() {
+        return true; //Consume
     }
 
     public static class MenuBuilder {

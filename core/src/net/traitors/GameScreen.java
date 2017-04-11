@@ -1,7 +1,6 @@
 package net.traitors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
@@ -55,8 +54,7 @@ public class GameScreen implements Screen {
         stuff.getPlayer().setPoint(new Point(-4, 10));
         stuff.addActor(GalacticTraitors.getCamera());
 
-        Gdx.input.setInputProcessor(new InputMultiplexer(GalacticTraitors.getInputProcessor(), uiControls));
-        //GalacticTraitors.getInputProcessor().addProcessor(uiControls);
+        GalacticTraitors.getInputProcessor().addProcessor(uiControls);
         GalacticTraitors.getInputProcessor().addProcessor(new InputProcessor() {
             @Override
             public boolean scrolled(int amount) {

@@ -83,12 +83,13 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
     }
 
     @Override
-    public void mouseDown() {
+    public boolean mouseDown() {
         onClick.run();
+        return true;
     }
 
     @Override
-    public void mouseUp() {
-        //Do nothing
+    public boolean mouseUp() {
+        return false;
     }
 }

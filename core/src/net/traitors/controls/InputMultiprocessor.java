@@ -18,6 +18,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
     private Map<MouseoverCallback, Boolean> wasIn = new HashMap<>();
     private List<MouseoverCallback> asyncRemove = new ArrayList<>();
     private List<MouseoverCallback> asyncAdd = new ArrayList<>();
+    private Point[] points = new Point[10]; //Arbitrary limit for number of touches at once
 
     private int currentX = 0;
     private int currentY = 0;
@@ -53,11 +54,19 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
         }
         asyncRemove.clear();
 
-        for(MouseoverCallback callback : asyncAdd) {
+        for (MouseoverCallback callback : asyncAdd) {
             callbacks.add(callback);
             wasIn.put(callback, false);
         }
         asyncAdd.clear();
+    }
+
+    List<Point> getWorldTouches() {
+        List<Point> ret = new ArrayList<>();
+        for (Point point : points) {
+            if (point != null) ret.add(point);
+        }
+        return ret;
     }
 
     @Override
@@ -98,7 +107,12 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
         Point p = getTouchInWorld(screenX, screenY);
         for (MouseoverCallback callback : callbacks) {
             if (callback.contains(p))
-                callback.mouseDown();
+                if (callback.mouseDown()) return true;
+        }
+
+        //Not consumed, so add to points
+        if (pointer < points.length) {
+            points[pointer] = p;
         }
 
         return false;
@@ -106,6 +120,11 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
     @Override
     public synchronized boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        //Whether or not consumed, delete from points
+        if (pointer < points.length) {
+            points[pointer] = null;
+        }
+
         resolveAsync();
         for (InputProcessor processor : inputs) {
             if (processor.touchUp(screenX, screenY, pointer, button))
@@ -115,7 +134,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
         Point p = getTouchInWorld(screenX, screenY);
         for (MouseoverCallback callback : callbacks) {
             if (callback.contains(p))
-                callback.mouseUp();
+                if (callback.mouseUp()) return true;
         }
 
         return false;
@@ -123,6 +142,11 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
     @Override
     public synchronized boolean touchDragged(int screenX, int screenY, int pointer) {
+        //We're tracking it, and it moved!
+        if (pointer < points.length && points[pointer] != null) {
+            points[pointer] = getTouchInWorld(screenX, screenY);
+        }
+
         for (InputProcessor processor : inputs) {
             if (processor.touchDragged(screenX, screenY, pointer))
                 return true;

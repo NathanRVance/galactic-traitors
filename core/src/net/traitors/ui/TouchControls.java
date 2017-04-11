@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class TouchControls extends Stage implements Touchable {
 
-    public static final int maxFingers = 10;
+    private static final int maxFingers = 10;
     //Has to be reasonably big, but I have no clue why. Maybe roundoff error?
     private static final float arbitraryNumber = 100;
     private boolean[] wasTouched = new boolean[maxFingers];
@@ -110,9 +110,5 @@ public class TouchControls extends Stage implements Touchable {
             if (t.isTouched()) return true;
         }
         return false;
-    }
-
-    public boolean isTouched(int finger) {
-        return touched[finger] != null;
     }
 }

@@ -164,7 +164,7 @@ public abstract class AbstractThing implements Thing {
     @Override
     public boolean contains(Point point) {
         point = point.subtract(getWorldPoint()).rotate(-1 * getWorldRotation());
-        return Math.abs(point.x) <= getWidth() / 2 && Math.abs(point.y) <= getHeight() / 2;
+        return Math.abs(point.x) <= width / 2 && Math.abs(point.y) <= height / 2;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     private BetterCamera myCamera = new BetterCamera();
     private FrameBuffer frameBuffer;
     private Ship ship;
-    private FirstUseUsable usable = new FirstUseUsable() {
+    private final FirstUseUsable usable = new FirstUseUsable() {
         @Override
         protected void firstUse(Thing user, Point touchPoint) {
             Menu menu = new Menu.MenuBuilder(2)

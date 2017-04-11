@@ -8,8 +8,16 @@ public interface MouseoverCallback extends Thing {
 
     void mouseExit();
 
-    void mouseDown();
+    /**
+     * The mouse has just been clicked while over this thing
+     * @return true to consume event, otherwise false
+     */
+    boolean mouseDown();
 
-    void mouseUp();
+    /**
+     * The mouse has just been released while over this thing
+     * @return true to consume event, otherwise false
+     */
+    boolean mouseUp();
 
 }

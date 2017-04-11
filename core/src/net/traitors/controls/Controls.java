@@ -2,7 +2,6 @@ package net.traitors.controls;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Camera;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.ui.TouchControls;
@@ -52,23 +51,13 @@ public class Controls {
         }
     }
 
-    private static List<Point> getWorldTouches(Camera camera) {
-        List<Point> points = new ArrayList<>(TouchControls.maxFingers);
-        for (int i = 0; i < TouchControls.maxFingers; i++) {
-            if (Gdx.input.isTouched(i) && (touchControls == null || !touchControls.isTouched(i))) {
-                points.add(new Point(Gdx.input.getX(i), Gdx.input.getY(i)).unproject(camera));
-            }
-        }
-        return points;
-    }
-
     public static void registerTouchControls(TouchControls touchControls) {
         Controls.touchControls = touchControls;
     }
 
     public static UserInput getUserInput() {
         UserInput ret = new UserInput();
-        ret.pointsTouched = getWorldTouches(GalacticTraitors.getCamera());
+        ret.pointsTouched = GalacticTraitors.getInputProcessor().getWorldTouches();
         ret.keysPressed = new HashSet<>();
         for (Key key : Key.values()) {
             if (isKeyPressed(key)) {
