@@ -2,6 +2,7 @@ package net.traitors.thing.platform.ship;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
@@ -138,7 +139,7 @@ public class ShipComputer implements Savable, Actor {
 
             //Prepare to use thruster
             ThrusterTile tt = thrusters.get(force);
-            VirtualUser user = new VirtualUser(tt.getPoint(), force.angle() + (float) Math.PI);
+            VirtualUser user = new VirtualUser(getLayer(), tt.getPoint(), force.angle() + (float) Math.PI);
             if (transVel.distanceFromZero() > .001 && transVel.distanceFromZero() > transVel.add(dTransVel).distanceFromZero()) {
                 //Point slows down translation
                 tt.getThrustStrategy().applyThrust(user, 1);
@@ -159,10 +160,15 @@ public class ShipComputer implements Savable, Actor {
         }
     }
 
+    @Override
+    public Layer getLayer() {
+        return ship.getLayer();
+    }
+
     private static class VirtualUser extends AbstractThing {
 
-        private VirtualUser(Point point, float rotation) {
-            super();
+        private VirtualUser(Layer layer, Point point, float rotation) {
+            super(layer);
             setPoint(point);
             setRotation(rotation);
         }

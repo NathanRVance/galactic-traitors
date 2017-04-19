@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GameScreen;
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
@@ -18,17 +19,13 @@ public class Projectile extends AbstractThing {
     private Point location;
     private Color color;
 
-    public Projectile(float width, float height, Color color, Point start, Point velocity, float longevity) {
-        super(width, height);
+    public Projectile(Layer layer, float width, float height, Color color, Point start, Point velocity, float longevity) {
+        super(layer, width, height);
         setPoint(start);
         location = null;
         this.velocity = velocity;
         this.longevity = longevity;
         this.color = color;
-    }
-
-    public Projectile() {
-
     }
 
     @Override
@@ -74,7 +71,7 @@ public class Projectile extends AbstractThing {
         location = location.add(velocity.scale(delta));
         longevity -= delta;
         if (longevity < 0) {
-            GameScreen.getStuff().removeActor(this);
+            GameScreen.removeActor(this);
         }
 
         //TODO: Check if touching something (other than player who shot me) and deal damage

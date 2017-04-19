@@ -3,7 +3,7 @@ package net.traitors.thing.player;
 import net.traitors.GameScreen;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.item.Item;
-import net.traitors.ui.touchable.InventoryBar;
+import net.traitors.ui.ScreenElements.InventoryBar;
 import net.traitors.util.net.MultiplayerConnect;
 import net.traitors.util.save.Savable;
 import net.traitors.util.save.SaveData;
@@ -20,12 +20,6 @@ public class Inventory implements Savable {
 
     public Inventory(int playerID) {
         this.playerID = playerID;
-        //Populate with default inventory
-        inventory.add(new Gun(.1f, .1f));
-    }
-
-    public Inventory() {
-
     }
 
     @Override
@@ -39,7 +33,7 @@ public class Inventory implements Savable {
     @Override
     public void loadSaveData(SaveData saveData) {
         playerID = saveData.readInt();
-        for(Item item : saveData.readList(inventory, Item.class)) {
+        for (Item item : saveData.readList(inventory, Item.class)) {
             inventory.add(item);
         }
         held = (Item) saveData.getFlaggedSavable();

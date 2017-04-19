@@ -3,14 +3,15 @@ package net.traitors.thing.tile;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
 
 public class FloorTile extends AbstractThing implements Tile {
 
-    public FloorTile() {
-        super(1, 1);
+    public FloorTile(Layer layer) {
+        super(layer, 1, 1);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.usable.FloatStrategy;
@@ -26,12 +27,8 @@ public class Gun extends AbstractThing implements Item {
     private float kickingTimer = 0;
     private Thing kicking;
 
-    public Gun(float width, float height) {
-        super(width, height);
-        setup();
-    }
-
-    public Gun() {
+    public Gun(Layer layer, float width, float height) {
+        super(layer, width, height);
         setup();
     }
 

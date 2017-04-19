@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.Ship;
@@ -29,15 +30,11 @@ public class GunTile extends AbstractThing implements ShipComponent {
     private Ship ship;
 
     public GunTile(float width, float height, float rotation, Tile base) {
-        super(width, height);
+        super(base.getLayer(), width, height);
         setRotation(rotation);
         this.rotation = rotation;
         this.base = base;
 
-        setup();
-    }
-
-    public GunTile() {
         setup();
     }
 

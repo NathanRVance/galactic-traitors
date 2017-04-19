@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.GalacticTraitors;
+import net.traitors.Layer;
 import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.platform.Platform;
@@ -23,8 +24,8 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
     private TextureRegion unselectedTexture;
     private TextureRegion selectedTexture;
 
-    Button(float width, float height, CharSequence text, Runnable onClick) {
-        super(width, height);
+    Button(Layer layer, float width, float height, CharSequence text, Runnable onClick) {
+        super(layer, width, height);
         this.text = text;
         this.onClick = onClick;
         unselectedTexture = makeTexture(Color.DARK_GRAY, Color.LIGHT_GRAY);
@@ -83,7 +84,12 @@ class Button extends AbstractThing implements Disposable, MouseoverCallback {
     }
 
     @Override
-    public boolean mouseDown() {
+    public boolean mouseDragged(Point touchLoc) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseDown(Point touchLoc) {
         onClick.run();
         return true;
     }

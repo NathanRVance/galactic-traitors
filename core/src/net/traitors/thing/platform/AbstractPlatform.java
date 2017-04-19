@@ -1,5 +1,6 @@
 package net.traitors.thing.platform;
 
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
@@ -9,17 +10,17 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     private float rotationalAcceleration = 0f;
     private float rotationalVelocity = 0f;
 
-    protected AbstractPlatform() {
-        super(0, 0, Float.MAX_VALUE);
+    protected AbstractPlatform(Layer layer) {
+        super(layer, 0, 0, Float.MAX_VALUE);
     }
 
-    public AbstractPlatform(float width, float height) {
+    public AbstractPlatform(Layer layer, float width, float height) {
         //By default, assume 1 meter thick and a mass of 1000 kg / m^3
-        super(width, height, width * height * 1000);
+        super(layer, width, height, width * height * 1000);
     }
 
-    public AbstractPlatform(float width, float height, float mass) {
-        super(width, height, mass);
+    public AbstractPlatform(Layer layer, float width, float height, float mass) {
+        super(layer, width, height, mass);
     }
 
     @Override

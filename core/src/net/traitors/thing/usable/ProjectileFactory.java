@@ -69,9 +69,9 @@ public class ProjectileFactory implements Usable {
             Point rotOff = rotationOffset.toPoint().rotate(userRot);
             Point origOff = originOffset.toPoint().rotate(userRot);
             Point startPoint = user.getWorldPoint().add(origOff.subtract(rotOff).rotate(rotation - userRot).add(rotOff));
-            Projectile projectile = new Projectile(length.toFloat(), thickness.toFloat(),
+            Projectile projectile = new Projectile(user.getLayer(), length.toFloat(), thickness.toFloat(),
                     color, startPoint, velocity, longevity.toFloat());
-            GameScreen.getStuff().addActor(projectile);
+            GameScreen.getWorldLayer().addActor(projectile);
             timeToNextFire = cooldown.toFloat();
         }
     }

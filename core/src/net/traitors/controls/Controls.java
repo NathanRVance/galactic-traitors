@@ -1,10 +1,8 @@
 package net.traitors.controls;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 import net.traitors.GalacticTraitors;
-import net.traitors.ui.TouchControls;
 import net.traitors.util.Point;
 import net.traitors.util.save.Savable;
 import net.traitors.util.save.SaveData;
@@ -18,52 +16,37 @@ import java.util.Set;
 
 public class Controls {
 
-    private static Map<Key, Integer> keymap = new HashMap<>();
-    private static TouchControls touchControls;
+    private static Map<Integer, Key> keymap = new HashMap<>();
+    private static Set<Key> pressed = new HashSet<>();
 
     static {
-        keymap.put(Key.UP, Input.Keys.COMMA);
-        keymap.put(Key.DOWN, Input.Keys.O);
-        keymap.put(Key.LEFT, Input.Keys.A);
-        keymap.put(Key.RIGHT, Input.Keys.E);
-        keymap.put(Key.SPRINT, Input.Keys.SHIFT_LEFT);
+        keymap.put(Input.Keys.COMMA, Key.UP);
+        keymap.put(Input.Keys.O, Key.DOWN);
+        keymap.put(Input.Keys.A, Key.LEFT);
+        keymap.put(Input.Keys.E, Key.RIGHT);
+        keymap.put(Input.Keys.SHIFT_LEFT, Key.SPRINT);
     }
 
-    private static boolean isKeyPressed(Key key) {
-        return Gdx.input.isKeyPressed(keymap.get(key)) || isPressedByTouchpad(key);
+    public static void keyPressed(Key key) {
+        pressed.add(key);
     }
 
-    private static boolean isPressedByTouchpad(Key key) {
-        if (touchControls == null) return false;
-        switch (key) {
-            case SPRINT:
-                return Math.sqrt(Math.pow(touchControls.getTouchpadPercentX(), 2) + Math.pow(touchControls.getTouchpadPercentY(), 2)) > .95;
-            case UP:
-                return touchControls.getTouchpadPercentY() > .25;
-            case DOWN:
-                return touchControls.getTouchpadPercentY() < -.25;
-            case LEFT:
-                return touchControls.getTouchpadPercentX() < -.25;
-            case RIGHT:
-                return touchControls.getTouchpadPercentX() > .25;
-            default:
-                return false;
-        }
+    public static void keyPressed(int keycode) {
+        pressed.add(keymap.get(keycode));
     }
 
-    public static void registerTouchControls(TouchControls touchControls) {
-        Controls.touchControls = touchControls;
+    public static void keyReleased(Key key) {
+        pressed.remove(key);
+    }
+
+    public static void keyReleased(int keycode) {
+        pressed.remove(keymap.get(keycode));
     }
 
     public static UserInput getUserInput() {
         UserInput ret = new UserInput();
         ret.pointsTouched = GalacticTraitors.getInputProcessor().getWorldTouches();
-        ret.keysPressed = new HashSet<>();
-        for (Key key : Key.values()) {
-            if (isKeyPressed(key)) {
-                ret.keysPressed.add(key);
-            }
-        }
+        ret.keysPressed = new HashSet<>(pressed);
         return ret;
     }
 

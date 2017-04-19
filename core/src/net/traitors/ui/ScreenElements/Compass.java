@@ -1,4 +1,4 @@
-package net.traitors.ui.touchable;
+package net.traitors.ui.ScreenElements;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -6,29 +6,32 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
+import net.traitors.GalacticTraitors;
+import net.traitors.GameScreen;
+import net.traitors.Layer;
+import net.traitors.controls.MouseoverCallback;
+import net.traitors.thing.AbstractThing;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.PixmapRotateRec;
+import net.traitors.util.Point;
 
-class Compass extends Widget implements Selectable {
+public class Compass extends AbstractThing implements Selectable, MouseoverCallback {
 
     private static TextureRegion compassSelected;
     private static TextureRegion compassUnselected;
-    private BetterCamera camera;
     private boolean selected = false;
-    private boolean touched = false;
     private Texture needle;
     private int trackDepth;
+    private SelectableSwitch<Compass> selectableSwitch;
 
     //Variables for dragging
     private float startX = 0;
     private boolean doingDrag = false;
 
-    Compass(final SelectableSwitch<Compass> selectableSwitch, final BetterCamera camera) {
-        this.camera = camera;
+    public Compass(Layer layer, SelectableSwitch<Compass> selectableSwitch, float dim) {
+        super(layer, dim, dim);
+        this.selectableSwitch = selectableSwitch;
         if (compassSelected == null) {
             compassSelected = getCompass(Color.BLUE);
         }
@@ -36,56 +39,82 @@ class Compass extends Widget implements Selectable {
             compassUnselected = getCompass(Color.GRAY);
         }
         needle = getNeedle();
-
-        addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (touched) return false;
-                touched = true;
-                camera.syncRotations();
-                selectableSwitch.selectableTapped(Compass.this, true);
-                startX = x;
-                return true;
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                if (Math.abs(startX - x) > getWidth() / 10) doingDrag = true;
-                if (doingDrag)
-                    camera.setOffset((float) (x / getWidth() * Math.PI * 2 + Math.PI));
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                touched = false;
-                doingDrag = false;
-            }
-
-        });
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
-        Color c = getColor();
-        batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
+    public void mouseEnter() {
 
-        TextureRegion compass = (isSelected()) ? compassSelected : compassUnselected;
-        batch.draw(compass, getX(), getY(), getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1, (-camera.getCameraAngle() + camera.getThingAtDepth(trackDepth).getWorldRotation()) * MathUtils.radiansToDegrees);
-
-
-        float needleWidth = getWidth() / 25;
-        batch.draw(needle, getX() + getWidth() / 2 - needleWidth / 2, getY() + getHeight() / 2, needleWidth, getHeight() / 3);
     }
 
     @Override
-    public boolean isTouched() {
-        return touched;
+    public void mouseExit() {
+
+    }
+
+    @Override
+    public boolean mouseDown(Point touchLoc) {
+        GalacticTraitors.getCamera().syncRotations();
+        selectableSwitch.selectableTapped(this, true);
+        startX = touchLoc.x;
+        return true;
+    }
+
+    @Override
+    public boolean mouseDragged(Point touchLoc) {
+        float currentX = touchLoc.x;
+        if (Math.abs(startX - currentX) > getWidth() / 10) doingDrag = true;
+        if (doingDrag) {
+            GalacticTraitors.getCamera().setOffset((float) (currentX / getWidth() * Math.PI * 2 + Math.PI));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean mouseUp() {
+        doingDrag = false;
+        return false;
     }
 
     void setTrackDepth(int trackDepth) {
         this.trackDepth = trackDepth;
-        if(camera.getRotateDepth() == trackDepth || isSelected())
+        if (GalacticTraitors.getCamera().getRotateDepth() == trackDepth || isSelected())
             select();
+    }
+
+    @Override
+    public void draw(Batch batch) {
+        TextureRegion compass = (isSelected()) ? compassSelected : compassUnselected;
+        BetterCamera camera = GameScreen.getWorldLayer().getDefaultCamera();
+        batch.draw(compass, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2,
+                getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1,
+                (-camera.getCameraAngle() + camera.getThingAtDepth(trackDepth).getWorldRotation()) * MathUtils.radiansToDegrees);
+
+
+        float needleWidth = getWidth() / 25;
+        batch.draw(needle, getWorldPoint().x - needleWidth / 2, getWorldPoint().y, needleWidth, getHeight() / 3);
+    }
+
+    @Override
+    public void dispose() {
+        compassSelected.getTexture().dispose();
+        compassUnselected.getTexture().dispose();
+        needle.dispose();
+    }
+
+    @Override
+    public void select() {
+        GameScreen.getWorldLayer().getDefaultCamera().setRotateDepth(trackDepth);
+        selected = true;
+    }
+
+    @Override
+    public void unselect() {
+        selected = false;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return selected;
     }
 
     private TextureRegion getCompass(Color ringColor) {
@@ -169,21 +198,5 @@ class Compass extends Widget implements Selectable {
         pixmap.setColor(Color.RED);
         pixmap.fill();
         return new Texture(pixmap);
-    }
-
-    @Override
-    public void select() {
-        camera.setRotateDepth(trackDepth);
-        selected = true;
-    }
-
-    @Override
-    public void unselect() {
-        selected = false;
-    }
-
-    @Override
-    public boolean isSelected() {
-        return selected;
     }
 }

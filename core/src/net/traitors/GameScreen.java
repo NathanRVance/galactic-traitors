@@ -5,56 +5,25 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
 import net.traitors.controls.InputProcessor;
-import net.traitors.thing.Stuff;
-import net.traitors.thing.platform.Platform;
-import net.traitors.thing.platform.UniverseTile;
-import net.traitors.thing.platform.ship.Ship;
-import net.traitors.thing.platform.ship.ShipFactory;
-import net.traitors.ui.TouchControls;
-import net.traitors.util.Point;
+import net.traitors.thing.Actor;
+import net.traitors.thing.player.Player;
 import net.traitors.util.net.MultiplayerConnect;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameScreen implements Screen {
-    private static Stuff stuff;
-    private static TouchControls uiControls;
-    //private TextView textView;
+    private static WorldLayer worldLayer;
+    private static ScreenLayer uiControls;
+
+    private static List<Layer> layers = new ArrayList<>();
 
     public GameScreen() {
-        uiControls = new TouchControls();
-        stuff = new Stuff();
+        uiControls = NewGame.getScreenLayer();
+        layers.add(uiControls);
+        worldLayer = NewGame.getWorldLayer();
+        layers.add(worldLayer);
 
-        Ship ship = new ShipFactory().buildStandardShip();
-        ship.setPoint(new Point(-5, 10));
-        stuff.addActor(ship);
-
-        Platform world = new UniverseTile();
-        world.setPoint(new Point(0, 0));
-        stuff.addActor(world);
-
-        ship = new ShipFactory().buildTileGrid(50, 2);
-        ship.setPoint(new Point(0, -20));
-        //ship.setRotationalVelocity(-.3f);
-        stuff.addActor(ship);
-
-        ship = new ShipFactory().buildTileGrid(4, 3);
-        ship.setPoint(new Point(1, 2));
-        ship.setRotationalVelocity(-1);
-        stuff.addActor(ship);
-
-        ship = new ShipFactory().buildTileGrid(3, 3);
-        ship.setPoint(new Point(1, 1));
-        ship.setRotationalVelocity(-1);
-        stuff.addActor(ship);
-
-        ship = new ShipFactory().buildTileGrid(1, 1);
-        ship.setPoint(new Point(1, 2));
-        ship.setRotationalVelocity(1);
-        stuff.addActor(ship);
-
-        stuff.getPlayer().setPoint(new Point(-4, 10));
-        stuff.addActor(GalacticTraitors.getCamera());
-
-        GalacticTraitors.getInputProcessor().addProcessor(uiControls);
         GalacticTraitors.getInputProcessor().addProcessor(new InputProcessor() {
             @Override
             public boolean scrolled(int amount) {
@@ -66,12 +35,22 @@ public class GameScreen implements Screen {
         MultiplayerConnect.start();
     }
 
-    public static Stuff getStuff() {
-        return stuff;
+    public static void removeActor(Actor actor) {
+        for (Layer layer : layers) {
+            layer.removeActor(actor);
+        }
     }
 
-    public static TouchControls getTouchControls() {
+    public static WorldLayer getWorldLayer() {
+        return worldLayer;
+    }
+
+    public static ScreenLayer getTouchControls() {
         return uiControls;
+    }
+
+    public static Player getPlayer() {
+        return getWorldLayer().getPlayer();
     }
 
     @Override
@@ -83,19 +62,20 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        GalacticTraitors.getBatch().setProjectionMatrix(GalacticTraitors.getCamera().combined);
         GalacticTraitors.getBatch().begin();
-        stuff.drawStuff(GalacticTraitors.getBatch(), GalacticTraitors.getCamera());
+        GalacticTraitors.getBatch().setProjectionMatrix(worldLayer.getDefaultCamera().combined);
+        worldLayer.draw();
+        GalacticTraitors.getBatch().setProjectionMatrix(uiControls.getDefaultCamera().combined);
+        uiControls.draw();
         GalacticTraitors.getBatch().end();
 
         GalacticTraitors.getTextView().draw();
-        uiControls.draw();
         MultiplayerConnect.tick(delta);
     }
 
     private void doMoves(float delta) {
-        uiControls.act();
-        stuff.doStuff(delta);
+        uiControls.act(delta);
+        worldLayer.act(delta);
     }
 
     @Override
@@ -107,10 +87,10 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         float aspectRatio = (float) width / (float) height;
         GalacticTraitors.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
-        GalacticTraitors.getInputProcessor().removeProcessor(uiControls);
-        uiControls = new TouchControls();
-        GalacticTraitors.getInputProcessor().addProcessor(uiControls);
-        stuff.getPlayer().getInventory().update();
+        for (Layer layer : layers) {
+            layer.resize(width, height);
+        }
+        worldLayer.getPlayer().getInventory().update();
     }
 
     @Override
@@ -130,6 +110,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        uiControls.dispose();
+        for (Layer layer : layers) {
+            layer.dispose();
+        }
     }
 }

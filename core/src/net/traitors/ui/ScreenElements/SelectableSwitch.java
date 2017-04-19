@@ -1,9 +1,9 @@
-package net.traitors.ui.touchable;
+package net.traitors.ui.ScreenElements;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectableSwitch <T extends Selectable> implements Touchable {
+public class SelectableSwitch<T extends Selectable> {
 
     private List<T> selectables = new ArrayList<>();
 
@@ -30,13 +30,5 @@ public class SelectableSwitch <T extends Selectable> implements Touchable {
         if(selected) {
             selectable.select();
         }
-    }
-
-    @Override
-    public boolean isTouched() {
-        for (T selectable : selectables) {
-            if (selectable.isTouched()) return true;
-        }
-        return false;
     }
 }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
+import net.traitors.Layer;
 import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.platform.AbstractPlatform;
 import net.traitors.thing.platform.Platform;
@@ -27,8 +28,8 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
     private List<Button> buttons;
     private TextureRegion background;
 
-    private Menu(float width, float height, CharSequence title, List<Button> buttons, Platform platform) {
-        super(width, height);
+    private Menu(Layer layer, float width, float height, CharSequence title, List<Button> buttons, Platform platform) {
+        super(layer, width, height);
         this.title = title;
         this.buttons = buttons;
         super.setPlatform(platform);
@@ -64,7 +65,7 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
 
     private void dismiss() {
         GalacticTraitors.getInputProcessor().removeCallback(this);
-        GameScreen.getStuff().removeActor(this);
+        GameScreen.removeActor(this);
         dispose();
     }
 
@@ -117,8 +118,13 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
     }
 
     @Override
-    public boolean mouseDown() {
+    public boolean mouseDown(Point touchLoc) {
         return true; //Consume
+    }
+
+    @Override
+    public boolean mouseDragged(Point touchLoc) {
+        return false;
     }
 
     @Override
@@ -148,7 +154,7 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
             return this;
         }
 
-        public Menu build(CharSequence title) {
+        public Menu build(Layer layer, CharSequence title) {
             //Admitately arbitrary value to multiply by, could be function of font size
             float titleSpacing = calcButtonHeight(title) * 1.375f;
             float height = titleSpacing;
@@ -158,14 +164,14 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
                 CharSequence text = buttonText.get(i);
                 float h = calcButtonHeight(text.toString());
                 height += h;
-                buttons.add(new Button(calcButtonWidth(), calcButtonHeight(text.toString()), text, buttonActions.get(i)));
+                buttons.add(new Button(layer, calcButtonWidth(), calcButtonHeight(text.toString()), text, buttonActions.get(i)));
             }
             String closeButtonText = "Done";
             float closeButtonHeight = calcButtonHeight(closeButtonText);
             height += closeButtonHeight;
-            final Menu menu = new Menu(width, height, title, buttons, platform);
+            final Menu menu = new Menu(layer, width, height, title, buttons, platform);
             menu.titleSpacing = titleSpacing;
-            Button b = new Button(calcButtonWidth(), closeButtonHeight, closeButtonText, new Runnable() {
+            Button b = new Button(layer, calcButtonWidth(), closeButtonHeight, closeButtonText, new Runnable() {
                 @Override
                 public void run() {
                     menu.dismiss();

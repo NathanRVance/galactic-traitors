@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.GameScreen;
+import net.traitors.Layer;
 import net.traitors.menu.Menu;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
@@ -28,6 +29,11 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     private FrameBuffer frameBuffer;
     private Ship ship;
     private final FirstUseUsable usable = new FirstUseUsable() {
+        @Override
+        public Layer getLayer() {
+            return ship.getLayer();
+        }
+
         @Override
         protected void firstUse(Thing user, Point touchPoint) {
             Menu menu = new Menu.MenuBuilder(2)
@@ -49,7 +55,7 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
                         public void run() {
                             Menu menu = new Menu.MenuBuilder(2)
                                     .setPlatform(getPlatform())
-                                    .build(new StringStrategy() {
+                                    .build(getLayer(), new StringStrategy() {
                                         @Override
                                         public String toString() {
                                             return "Velocity: " + ship.getTranslationalVelocity()
@@ -58,22 +64,18 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
                                     });
                             menu.setPoint(getPoint());
                             menu.setRotation(0);
-                            GameScreen.getStuff().addActor(menu);
+                            ship.getLayer().addActor(menu); // FIXME: 4/13/17
                         }
-                    }).build("Ship Control");
+                    }).build(getLayer(), "Ship Control");
             menu.setPoint(getPoint());
             menu.setRotation(0);
-            GameScreen.getStuff().addActor(menu);
+            ship.getLayer().addActor(menu); // FIXME: 4/13/17
         }
     };
 
-    public OverviewScreen(float width, float height) {
-        super(width, height);
+    public OverviewScreen(Layer layer, float width, float height) {
+        super(layer, width, height);
         setup();
-    }
-
-    public OverviewScreen() {
-
     }
 
     @Override
@@ -113,7 +115,7 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
             //Start the batch
             batch.begin();
             //Draw everything to the framebuffer
-            GameScreen.getStuff().drawStuff(batch, myCamera);
+            ship.getLayer().draw(myCamera);
             batch.end();
             frameBuffer.end();
             //Reset things so the rest of the render cycle isn't messed up

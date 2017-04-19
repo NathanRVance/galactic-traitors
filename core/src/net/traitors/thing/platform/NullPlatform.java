@@ -2,6 +2,7 @@ package net.traitors.thing.platform;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.Layer;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
@@ -149,6 +150,11 @@ public class NullPlatform implements Platform {
     }
 
     @Override
+    public boolean contains(Point point, float margin) {
+        return true;
+    }
+
+    @Override
     public void applyForce(Point force) {
         throw new UnsupportedOperationException();
     }
@@ -156,6 +162,11 @@ public class NullPlatform implements Platform {
     @Override
     public void act(float delta) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Layer getLayer() {
+        return null;
     }
 
     @Override

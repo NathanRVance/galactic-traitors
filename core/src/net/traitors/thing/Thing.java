@@ -116,6 +116,15 @@ public interface Thing extends Actor, Disposable {
     boolean contains(Point point);
 
     /**
+     * Checks if the point is contained within this thing
+     *
+     * @param point  point to consider, in world coordinates
+     * @param margin distance point can be from edge
+     * @return whether or not the point falls within this thing
+     */
+    boolean contains(Point point, float margin);
+
+    /**
      * Applies a force to this platform, which will affect its translational velocity.
      * Note: forces expire after next call to act!
      *

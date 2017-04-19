@@ -1,11 +1,11 @@
-package net.traitors.thing;
+package net.traitors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.traitors.GalacticTraitors;
 import net.traitors.controls.Controls;
+import net.traitors.thing.Actor;
+import net.traitors.thing.Thing;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class Stuff implements Savable {
+public class WorldLayer implements Savable, Layer {
 
     private final List<Controls.UserInput> inputs = new ArrayList<>();
     private List<Actor> actors = new ArrayList<>();
@@ -36,7 +36,7 @@ public class Stuff implements Savable {
     private SaveData dataToLoad = null;
     private long ID = 0;
 
-    public Stuff() {
+    public WorldLayer() {
         addPlayer();
         resolveBuffers();
     }
@@ -50,7 +50,7 @@ public class Stuff implements Savable {
         SaveData sd = new SaveData();
         sd.writeLong(ID++);
         sd.writeList(actors, null);
-        sd.writeSaveData(GalacticTraitors.getCamera().getSaveData());
+        sd.writeSaveData(getDefaultCamera().getSaveData());
         sd.writeFloat(delta);
         sd.writeInt(inputs.size());
         for (Controls.UserInput input : inputs) {
@@ -88,7 +88,7 @@ public class Stuff implements Savable {
                 }
             }
             resolveBuffers();
-            GalacticTraitors.getCamera().loadSaveData(saveData.readSaveData());
+            getDefaultCamera().loadSaveData(saveData.readSaveData());
             delta = saveData.readFloat();
             int numInputs = saveData.readInt();
             for (int i = 0; i < numInputs; i++) {
@@ -103,12 +103,50 @@ public class Stuff implements Savable {
         }
     }
 
+    @Override
     public void addActor(Actor actor) {
         addBuffer.add(actor);
     }
 
+    @Override
     public void removeActor(Actor actor) {
         removeBuffer.add(actor);
+    }
+
+    @Override
+    public boolean hasActor(Actor actor) {
+        return actors.contains(actor);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        float aspectRatio = (float) width / (float) height;
+        getDefaultCamera().setToOrtho(false, 5 * aspectRatio, 5);
+    }
+
+    @Override
+    public BetterCamera getDefaultCamera() {
+        return GalacticTraitors.getCamera();
+    }
+
+    @Override
+    public Point getBotCorner() {
+        return new Point(getDefaultCamera().position.x - getWidth() / 2, getDefaultCamera().position.y - getHeight() / 2);
+    }
+
+    @Override
+    public float getWidth() {
+        return getDefaultCamera().viewportWidth;
+    }
+
+    @Override
+    public float getHeight() {
+        return getDefaultCamera().viewportHeight;
+    }
+
+    @Override
+    public Point screenToLayerCoords(Point screenPoint) {
+        return screenPoint.unproject(getDefaultCamera());
     }
 
     private void resolveBuffers() {
@@ -163,7 +201,7 @@ public class Stuff implements Savable {
 
     private void addPlayer() {
         System.out.println("Adding player");
-        Player p = new Player(Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, players.size());
+        Player p = new Player(this, Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, players.size());
         addActor(p);
         inputs.add(new Controls.UserInput());
     }
@@ -180,13 +218,15 @@ public class Stuff implements Savable {
         return delta;
     }
 
-    public void drawStuff(Batch batch, BetterCamera camera) {
+    @Override
+    public void draw(BetterCamera camera) {
         for (int i = stuff.size() - 1; i >= 0; i--) {
-            stuff.get(i).draw(batch, camera);
+            stuff.get(i).draw(GalacticTraitors.getBatch(), camera);
         }
     }
 
-    public void doStuff(float delta) {
+    @Override
+    public void act(float delta) {
         resolveBuffers();
         this.delta = delta;
         placeStuff(stuff);
@@ -195,17 +235,18 @@ public class Stuff implements Savable {
             actor.act(delta);
         }
 
+        //TODO: Most of this stuff should get moved elsewhere. This isn't layer's responsibility
         inputs.set(MultiplayerConnect.getPlayerID(), Controls.getUserInput());
         for (int i = 0; i < players.size(); i++) {
             players.get(i).move(delta, inputs.get(i));
         }
 
         Point playerWorldPoint = getPlayer().getWorldPoint();
-        GalacticTraitors.getCamera().translate(playerWorldPoint.x - GalacticTraitors.getCamera().position.x,
-                playerWorldPoint.y - GalacticTraitors.getCamera().position.y);
-        if (GalacticTraitors.getCamera().getRotatingWith() instanceof NullPlatform)
-            GalacticTraitors.getCamera().setRotateDepth(1);
-        GalacticTraitors.getCamera().update();
+        getDefaultCamera().translate(playerWorldPoint.x - getDefaultCamera().position.x,
+                playerWorldPoint.y - getDefaultCamera().position.y);
+        if (getDefaultCamera().getRotatingWith() instanceof NullPlatform)
+            getDefaultCamera().setRotateDepth(1);
+        getDefaultCamera().update();
 
         resolveBuffers();
         if (MultiplayerConnect.isServer())
@@ -214,9 +255,14 @@ public class Stuff implements Savable {
             resolveSavedData();
     }
 
+    @Override
+    public void draw() {
+        draw(getDefaultCamera());
+    }
+
     public Item getItemAt(Point point) {
         for (Thing thing : stuff) {
-            if (thing instanceof Item && thing.contains(point)) {
+            if (thing instanceof Item && thing.contains(point, .5f)) {
                 return (Item) thing;
             }
         }
@@ -240,6 +286,15 @@ public class Stuff implements Savable {
                     thing.setPlatform((Platform) stuff.get(j));
                     break;
                 }
+            }
+        }
+    }
+
+    @Override
+    public void dispose() {
+        for(Actor actor : actors) {
+            if(actor instanceof Disposable) {
+                ((Disposable) actor).dispose();
             }
         }
     }

@@ -1,8 +1,8 @@
 package net.traitors.util.save;
 
+import net.traitors.WorldLayer;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
-import net.traitors.thing.Stuff;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.platform.AbstractPlatform;
 import net.traitors.thing.platform.NullPlatform;
@@ -19,9 +19,7 @@ import net.traitors.thing.tile.ThrusterTile;
 import net.traitors.thing.tile.thrust.MainThrusterStrategy;
 import net.traitors.thing.tile.thrust.RotationalThrusterStrategy;
 import net.traitors.util.BetterCamera;
-
-import java.util.HashMap;
-import java.util.Map;
+import net.traitors.util.BiMap;
 
 public class SavableTypeMap {
 
@@ -44,7 +42,7 @@ public class SavableTypeMap {
         classBiMap.put("RotationalThrusterStrategy", RotationalThrusterStrategy.class);
         classBiMap.put("Ship", Ship.class);
         classBiMap.put("ShipComputer", ShipComputer.class);
-        classBiMap.put("Stuff", Stuff.class);
+        classBiMap.put("Stuff", WorldLayer.class);
         classBiMap.put("ThrusterTile", ThrusterTile.class);
         classBiMap.put("UniverseTile", UniverseTile.class);
         classBiMap.put("UserInput", Controls.UserInput.class);
@@ -57,26 +55,6 @@ public class SavableTypeMap {
 
     public static Class<? extends Savable> getClass(String type) {
         return classBiMap.get(type);
-    }
-
-
-    private static class BiMap<T, V> {
-
-        private Map<T, V> tvMap = new HashMap<>();
-        private Map<V, T> vtMap = new HashMap<>();
-
-        public void put(T t, V v) {
-            tvMap.put(t, v);
-            vtMap.put(v, t);
-        }
-
-        public V get(T t) {
-            return tvMap.get(t);
-        }
-
-        public T getReverse(V v) {
-            return vtMap.get(v);
-        }
     }
 
 }

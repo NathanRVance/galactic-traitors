@@ -39,7 +39,7 @@ class MultiServerSocket implements Disposable {
                     synchronized (sockets) {
                         sockets.add(s);
                         outputs.add(new PrintStream(s.getOutputStream()));
-                        GameScreen.getStuff().addPlayerAsync();
+                        GameScreen.getWorldLayer().addPlayerAsync();
                         //Tell the client what ID its player is
                         outputs.get(outputs.size() - 1).println(outputs.size());
                         System.out.println("Told it");

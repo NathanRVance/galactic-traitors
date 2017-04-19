@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GameScreen;
+import net.traitors.Layer;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.NullPlatform;
@@ -49,12 +50,12 @@ public class BetterCamera extends OrthographicCamera implements Actor {
         return -1 * (float) (Math.atan2(up.x, up.y));
     }
 
-    public void setRotateDepth(int depth) {
-        rotateDepth = depth;
-    }
-
     public int getRotateDepth() {
         return rotateDepth;
+    }
+
+    public void setRotateDepth(int depth) {
+        rotateDepth = depth;
     }
 
     public Thing getRotatingWith() {
@@ -62,10 +63,10 @@ public class BetterCamera extends OrthographicCamera implements Actor {
     }
 
     public Thing getThingAtDepth(int depth) {
-        Thing thing = GameScreen.getStuff().getPlayer();
-        for(int i = 0; i < depth; i++) {
+        Thing thing = GameScreen.getPlayer();
+        for (int i = 0; i < depth; i++) {
             thing = thing.getPlatform();
-            if(thing == null) return nullPlatform;
+            if (thing == null) return nullPlatform;
         }
         return thing;
     }
@@ -105,6 +106,11 @@ public class BetterCamera extends OrthographicCamera implements Actor {
             offset = getCameraAngle() - getRotatingWith().getWorldRotation();
         }
         rotateTo(getRotatingWith().getWorldRotation() + offset);
+    }
+
+    @Override
+    public Layer getLayer() {
+        return getRotatingWith().getLayer();
     }
 
 

@@ -2,6 +2,7 @@ package net.traitors.thing.tile;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.ship.Ship;
@@ -15,15 +16,11 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     private ThrustStrategy thrustStrategy;
     private Ship ship;
 
-    public ThrusterTile(float width, float height, float rotation, ThrustStrategy thrustStrategy) {
-        super(width, height);
+    public ThrusterTile(Layer layer, float width, float height, float rotation, ThrustStrategy thrustStrategy) {
+        super(layer, width, height);
         setRotation(rotation);
         this.thrustStrategy = thrustStrategy;
         thrustStrategy.setBase(this);
-    }
-
-    public ThrusterTile() {
-
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.traitors.thing;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.Layer;
 import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.platform.Platform;
 import net.traitors.util.BetterCamera;
@@ -20,21 +21,25 @@ public abstract class AbstractThing implements Thing {
     private float rotation = 0;
     private Platform platform;
     private Platform nullPlatform = new NullPlatform();
+    private Layer layer;
 
-    public AbstractThing(float width, float height, float mass) {
+    public AbstractThing(Layer layer, float width, float height, float mass) {
         this.width = width;
         this.height = height;
         this.mass = mass;
+        this.layer = layer;
     }
 
-    public AbstractThing(float width, float height) {
+    public AbstractThing(Layer layer, float width, float height) {
         this.width = width;
         this.height = height;
         this.mass = width * height;
+        this.layer = layer;
     }
 
-    protected AbstractThing() {
+    protected AbstractThing(Layer layer) {
         //This must be followed by a call to loadSaveData
+        this.layer = layer;
     }
 
     @Override
@@ -162,9 +167,19 @@ public abstract class AbstractThing implements Thing {
     }
 
     @Override
+    public Layer getLayer() {
+        return layer;
+    }
+
+    @Override
     public boolean contains(Point point) {
+        return contains(point, 0);
+    }
+
+    @Override
+    public boolean contains(Point point, float margin) {
         point = point.subtract(getWorldPoint()).rotate(-1 * getWorldRotation());
-        return Math.abs(point.x) <= width / 2 && Math.abs(point.y) <= height / 2;
+        return Math.abs(point.x) <= width / 2 + margin && Math.abs(point.y) <= height / 2 + margin;
     }
 
     @Override

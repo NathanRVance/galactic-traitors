@@ -2,6 +2,7 @@ package net.traitors.thing.platform.ship;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
+import net.traitors.Layer;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.AbstractPlatform;
 import net.traitors.thing.tile.FloorTile;
@@ -18,12 +19,8 @@ public class Ship extends AbstractPlatform {
     private Set<ShipComponent> components = new HashSet<>();
     private ShipComputer computer = new ShipComputer();
 
-    private Ship(int width, int height) {
-        super(width, height);
-    }
-
-    public Ship() {
-
+    private Ship(Layer layer, int width, int height) {
+        super(layer, width, height);
     }
 
     public ShipComputer getComputer() {
@@ -115,8 +112,8 @@ public class Ship extends AbstractPlatform {
         private Ship ship;
         private boolean[][] occupied;
 
-        ShipBuilder(int width, int height) {
-            ship = new Ship(width, height);
+        ShipBuilder(Layer layer, int width, int height) {
+            ship = new Ship(layer, width, height);
             ship.grid = new Tile[width][height];
             occupied = new boolean[width][height];
         }
@@ -149,7 +146,7 @@ public class Ship extends AbstractPlatform {
             for (int x = 0; x < ship.grid.length; x++) {
                 for (int y = 0; y < ship.grid[x].length; y++) {
                     if (!occupied[x][y]) {
-                        ship.grid[x][y] = new FloorTile();
+                        ship.grid[x][y] = new FloorTile(ship.getLayer());
                         prepTile(ship.grid[x][y], x, y);
                     }
                 }

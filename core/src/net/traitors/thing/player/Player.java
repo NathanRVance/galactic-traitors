@@ -8,9 +8,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
-import net.traitors.GameScreen;
+import net.traitors.Layer;
+import net.traitors.WorldLayer;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
+import net.traitors.thing.item.Gun;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
@@ -31,19 +33,21 @@ public class Player extends AbstractThing {
     private Inventory inventory;
     private Color[] colors = new Color[5];
 
-    public Player(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, int playerID) {
-        this();
+    public Player(Layer layer, Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, int playerID) {
+        this(layer);
         colors[0] = bodyColor;
         colors[1] = skinColor;
         colors[2] = hairColor;
         colors[3] = pantsColor;
         colors[4] = shoesColor;
         inventory = new Inventory(playerID);
+        //Populate with default inventory
+        inventory.addItem(new Gun(layer, .1f, .1f));
         generateAnimations();
     }
 
-    public Player() {
-        super(.5f, .5f, 70);
+    public Player(Layer layer) {
+        super(layer, .5f, .5f, 70);
     }
 
     private void generateAnimations() {
@@ -88,9 +92,9 @@ public class Player extends AbstractThing {
         point = getPlatform().convertToPlatformCoordinates(point);
         rotateToFace(point);
         if (getPoint().distance(point) < getWidth()) {
-            Item item = GameScreen.getStuff().getItemAt(getPlatform().convertToWorldCoordinates(point));
+            Item item = ((WorldLayer) getLayer()).getItemAt(getWorldPoint());
             if (item != null) {
-                GameScreen.getStuff().removeActor(item);
+                getLayer().removeActor(item);
                 inventory.addItem(item);
             }
         }
@@ -132,7 +136,7 @@ public class Player extends AbstractThing {
         }
         item.setPlatform(getPlatform());
         item.setPoint(getPoint());
-        GameScreen.getStuff().addActor(item);
+        getLayer().addActor(item);
     }
 
     public void move(float delta, Controls.UserInput input) {
