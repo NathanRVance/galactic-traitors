@@ -16,7 +16,7 @@ public abstract class AbstractThing implements Thing {
     private float mass;
     private Point point = new Point();
     private Point lastWorldPoint = null;
-    private Point translationalVelocity = new Point();
+    private Point translationalVelocity = new Point(); //TODO: Make it work across platforms
     private Point translationalAcceleration = new Point();
     private float rotation = 0;
     private Platform platform;
@@ -108,7 +108,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public Point getWorldVelocity() {
-        return translationalVelocity.add(getPlatform().getTranslationalVelocity());
+        return translationalVelocity.rotate(getPlatform().getRotation()).add(getPlatform().getWorldVelocity());
     }
 
     @Override
@@ -143,13 +143,19 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public void setPlatform(Platform platform) {
-        setPoint(getWorldPoint());
-        setRotation(getWorldRotation());
-        if (platform != null) {
-            setPoint(platform.convertToPlatformCoordinates(getPoint()));
-            setRotation(platform.convertToPlatformRotation(rotation));
+        if(platform != getPlatform()) {
+            //Rebase in world coordinates
+            setPoint(getWorldPoint());
+            setRotation(getWorldRotation());
+            setTranslationalVelocity(getWorldVelocity());
+            if (platform != null) {
+                //Convert to platform coordinates
+                setPoint(platform.convertToPlatformCoordinates(getPoint()));
+                setRotation(platform.convertToPlatformRotation(rotation));
+                setTranslationalVelocity(getTranslationalVelocity().subtract(platform.getWorldVelocity()).rotate(platform.getRotation() * -1));
+            }
+            this.platform = platform;
         }
-        this.platform = platform;
     }
 
     @Override

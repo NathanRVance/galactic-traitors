@@ -31,7 +31,7 @@ public class Controls {
         pressed.add(key);
     }
 
-    public static void keyPressed(int keycode) {
+    static void keyPressed(int keycode) {
         pressed.add(keymap.get(keycode));
     }
 
@@ -39,7 +39,7 @@ public class Controls {
         pressed.remove(key);
     }
 
-    public static void keyReleased(int keycode) {
+    static void keyReleased(int keycode) {
         pressed.remove(keymap.get(keycode));
     }
 

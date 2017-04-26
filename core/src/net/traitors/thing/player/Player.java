@@ -22,8 +22,8 @@ import net.traitors.util.save.SaveData;
 public class Player extends AbstractThing {
 
     //Animation stuff
-    private static final float BASE_ANIMATION_LENGTH = 1; //seconds
-    private static final float BASE_MOVE_SPEED = 1.4f; //meters per second
+    private static final float BASE_ANIMATION_LENGTH = .5f; //seconds
+    private static final float BASE_MOVE_SPEED = 2f; //meters per second
     private final int cycleLength = 200;
     private transient TextureRegion[] animation;
     private transient TextureRegion[] animationHolding;
@@ -157,7 +157,7 @@ public class Player extends AbstractThing {
             x--;
         }
         if (input.keysPressed.contains(Controls.Key.SPRINT)) {
-            speedMult = 2;
+            speedMult = 3;
         }
         Point d = new Point(x, y);
         d = d.rotate(GalacticTraitors.getCamera().getCameraAngle() - getPlatform().getWorldRotation());
@@ -177,8 +177,6 @@ public class Player extends AbstractThing {
             }
             resetAnimation();
         }
-
-        setPoint(getPoint().add(getTranslationalVelocity().scale(delta)));
 
         if (input.pointsTouched.size() == 1) {
             worldTouched(input.pointsTouched.get(0));

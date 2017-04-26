@@ -279,13 +279,17 @@ public class WorldLayer implements Savable, Layer {
         //Stuff toward the start of the list end up on top
         for (int i = 0; i < stuff.size(); i++) {
             Thing thing = stuff.get(i);
-            thing.setPlatform(null);
+            boolean foundPlatform = false;
             for (int j = i + 1; j < stuff.size(); j++) {
                 if (stuff.get(j) instanceof Platform
                         && stuff.get(j).contains(thing.getWorldPoint())) {
                     thing.setPlatform((Platform) stuff.get(j));
+                    foundPlatform = true;
                     break;
                 }
+            }
+            if(! foundPlatform) {
+                thing.setPlatform(null);
             }
         }
     }
