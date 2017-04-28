@@ -13,7 +13,7 @@ import net.traitors.thing.item.Item;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
-public class InventorySlot extends AbstractThing implements Selectable, MouseoverCallback {
+class InventorySlot extends AbstractThing implements Selectable, MouseoverCallback {
 
     private Item item;
     private boolean selected = false;
@@ -24,7 +24,7 @@ public class InventorySlot extends AbstractThing implements Selectable, Mouseove
     private Point initialTap = new Point();
     private SelectableSwitch<InventorySlot> selectableSwitch;
 
-    public InventorySlot(Layer layer, SelectableSwitch<InventorySlot> selectableSwitch, float width, float height) {
+    InventorySlot(Layer layer, SelectableSwitch<InventorySlot> selectableSwitch, float width, float height) {
         super(layer, width, height);
         this.selectableSwitch = selectableSwitch;
         PixmapRotateRec pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);

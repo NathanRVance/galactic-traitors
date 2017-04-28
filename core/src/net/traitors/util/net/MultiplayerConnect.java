@@ -22,12 +22,13 @@ public class MultiplayerConnect {
     private static MultiServerSocket serverSocket;
     private static Socket cliSock;
     private static PrintStream outputStream;
-    private static int playerID = 0;
     private static Controls.UserInput lastUserInput = new Controls.UserInput();
     private static String connectIP;
     private static boolean makeServer = false;
+    private static GameScreen gameScreen;
 
-    public static void start() {
+    public static void start(final GameScreen gameScreen) {
+        MultiplayerConnect.gameScreen = gameScreen;
         if (connectIP != null) {
             System.out.println("Connecting");
             new Thread(new Runnable() {
@@ -43,7 +44,7 @@ public class MultiplayerConnect {
                         while (!Thread.interrupted()) {
                             System.out.println("Listening for game state");
                             GameScreen.getWorldLayer().loadSaveData(new SaveData(inputStream.readLine()));
-                            MultiplayerConnect.playerID = playerID;
+                            gameScreen.setPlayerID(playerID);
                             System.out.println("Received game state");
                         }
                     } catch (IOException e) {
@@ -54,16 +55,12 @@ public class MultiplayerConnect {
         }
         if (makeServer) {
             System.out.println("Serving");
-            serverSocket = new MultiServerSocket(port);
+            serverSocket = new MultiServerSocket(port, gameScreen);
         }
     }
 
-    public static void connectToServer(final String IP) {
+    public void connectToServer(final String IP) {
         connectIP = IP;
-    }
-
-    public static int getPlayerID() {
-        return playerID;
     }
 
     public static void makeServer() {
@@ -101,11 +98,11 @@ public class MultiplayerConnect {
     }
 
     private static void serverTick() {
-        if (GameScreen.getWorldLayer().isClean()) {
+        if (GameScreen.isClean()) {
             serverSocket.pushData(GameScreen.getWorldLayer().getSaveData().toString());
         }
         List<Controls.UserInput> inputs = serverSocket.getInputs();
-        GameScreen.getWorldLayer().updateInputs(inputs);
+        gameScreen.updateInputs(inputs);
     }
 
     private static void clientTick() {

@@ -38,7 +38,7 @@ public class NewGame {
         ship.setRotationalVelocity(1);
         worldLayer.addActor(ship);
 
-        worldLayer.getPlayer().setPoint(new Point(-4, 10));
+        //worldLayer.getPlayer().setPoint(new Point(-4, 10));
         worldLayer.addActor(GalacticTraitors.getCamera());
         return worldLayer;
     }

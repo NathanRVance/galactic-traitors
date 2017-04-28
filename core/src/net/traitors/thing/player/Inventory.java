@@ -39,10 +39,6 @@ public class Inventory implements Savable {
         held = (Item) saveData.getFlaggedSavable();
     }
 
-    public int getPlayerID() {
-        return playerID;
-    }
-
     public Item getHeld() {
         return held;
     }
@@ -76,7 +72,7 @@ public class Inventory implements Savable {
     }
 
     public void update() {
-        if (playerID != MultiplayerConnect.getPlayerID()) return;
+        if (playerID != GameScreen.getPlayerID()) return;
         InventoryBar inventoryBar = GameScreen.getTouchControls().getInventoryBar();
         for (int i = 0; i < inventory.size() && i < inventoryBar.getCapacity(); i++) {
             inventoryBar.setItemAt(inventory.get(i), i);

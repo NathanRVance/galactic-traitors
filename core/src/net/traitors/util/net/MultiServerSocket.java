@@ -29,7 +29,7 @@ class MultiServerSocket implements Disposable {
     private ServerSocket serverSocket;
     private Thread serverThread;
 
-    MultiServerSocket(int port) {
+    MultiServerSocket(int port, final GameScreen gameScreen) {
         serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, port, null);
         serverThread = new Thread(new Runnable() {
             @Override
@@ -39,7 +39,7 @@ class MultiServerSocket implements Disposable {
                     synchronized (sockets) {
                         sockets.add(s);
                         outputs.add(new PrintStream(s.getOutputStream()));
-                        GameScreen.getWorldLayer().addPlayerAsync();
+                        gameScreen.addPlayer();
                         //Tell the client what ID its player is
                         outputs.get(outputs.size() - 1).println(outputs.size());
                         System.out.println("Told it");
