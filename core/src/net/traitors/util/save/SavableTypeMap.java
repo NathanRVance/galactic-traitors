@@ -1,6 +1,5 @@
 package net.traitors.util.save;
 
-import net.traitors.WorldLayer;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Gun;
@@ -42,7 +41,6 @@ public class SavableTypeMap {
         classBiMap.put("RotationalThrusterStrategy", RotationalThrusterStrategy.class);
         classBiMap.put("Ship", Ship.class);
         classBiMap.put("ShipComputer", ShipComputer.class);
-        classBiMap.put("Stuff", WorldLayer.class);
         classBiMap.put("ThrusterTile", ThrusterTile.class);
         classBiMap.put("UniverseTile", UniverseTile.class);
         classBiMap.put("UserInput", Controls.UserInput.class);

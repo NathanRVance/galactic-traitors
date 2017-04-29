@@ -1,10 +1,8 @@
 package net.traitors.thing.player;
 
 import net.traitors.GameScreen;
-import net.traitors.thing.item.Gun;
 import net.traitors.thing.item.Item;
 import net.traitors.ui.ScreenElements.InventoryBar;
-import net.traitors.util.net.MultiplayerConnect;
 import net.traitors.util.save.Savable;
 import net.traitors.util.save.SaveData;
 
@@ -16,23 +14,21 @@ public class Inventory implements Savable {
 
     private List<Item> inventory = new ArrayList<>();
     private Item held;
-    private int playerID;
+    private InventoryBar bar;
 
-    public Inventory(int playerID) {
-        this.playerID = playerID;
+    public Inventory(InventoryBar bar) {
+        this.bar = bar;
     }
 
     @Override
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
-        sd.writeInt(playerID);
         sd.writeList(inventory, held);
         return sd;
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        playerID = saveData.readInt();
         for (Item item : saveData.readList(inventory, Item.class)) {
             inventory.add(item);
         }
@@ -71,17 +67,16 @@ public class Inventory implements Savable {
         }
     }
 
-    public void update() {
-        if (playerID != GameScreen.getPlayerID()) return;
-        InventoryBar inventoryBar = GameScreen.getTouchControls().getInventoryBar();
-        for (int i = 0; i < inventory.size() && i < inventoryBar.getCapacity(); i++) {
-            inventoryBar.setItemAt(inventory.get(i), i);
+    private void update() {
+        if (bar == null) return;
+        for (int i = 0; i < inventory.size() && i < bar.getCapacity(); i++) {
+            bar.setItemAt(inventory.get(i), i);
         }
-        for (int i = inventory.size(); i < inventoryBar.getCapacity(); i++) {
-            inventoryBar.setItemAt(null, i);
+        for (int i = inventory.size(); i < bar.getCapacity(); i++) {
+            bar.setItemAt(null, i);
         }
         if (held != null) {
-            inventoryBar.setTapped(held);
+            bar.setTapped(held);
         }
     }
 

@@ -10,6 +10,7 @@ import net.traitors.controls.InputProcessor;
 import net.traitors.thing.Actor;
 import net.traitors.thing.platform.NullPlatform;
 import net.traitors.thing.player.Player;
+import net.traitors.ui.ScreenElements.InventoryBar;
 import net.traitors.util.Point;
 import net.traitors.util.net.MultiplayerConnect;
 
@@ -17,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameScreen implements Screen {
-    private static WorldLayer worldLayer;
-    private static ScreenLayer uiControls;
+    private Layer worldLayer;
+    private ScreenLayer uiControls;
     private static List<Layer> layers = new ArrayList<>();
     private static List<Controls.UserInput> inputs = new ArrayList<>();
     private static List<Player> players = new ArrayList<>();
@@ -26,10 +27,10 @@ public class GameScreen implements Screen {
     private int playersToAdd = 1; //Start by adding a player
 
     public GameScreen() {
-        uiControls = NewGame.getScreenLayer();
-        layers.add(uiControls);
         worldLayer = NewGame.getWorldLayer();
         layers.add(worldLayer);
+        uiControls = NewGame.getScreenLayer();
+        layers.add(uiControls);
 
         GalacticTraitors.getInputProcessor().addProcessor(new InputProcessor() {
             @Override
@@ -59,18 +60,6 @@ public class GameScreen implements Screen {
         this.playerID = playerID;
     }
 
-    public static int getPlayerID() {
-        return playerID;
-    }
-
-    public static WorldLayer getWorldLayer() {
-        return worldLayer;
-    }
-
-    public static ScreenLayer getTouchControls() {
-        return uiControls;
-    }
-
     public static Player getPlayer() {
         int pid = playerID;
         return players.size() < pid ? players.get(pid) : players.get(players.size() - 1);
@@ -92,10 +81,10 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         GalacticTraitors.getBatch().begin();
-        GalacticTraitors.getBatch().setProjectionMatrix(worldLayer.getDefaultCamera().combined);
-        worldLayer.draw();
-        GalacticTraitors.getBatch().setProjectionMatrix(uiControls.getDefaultCamera().combined);
-        uiControls.draw();
+        for(Layer layer : layers) {
+            GalacticTraitors.getBatch().setProjectionMatrix(layer.getDefaultCamera().combined);
+            layer.draw();
+        }
         GalacticTraitors.getBatch().end();
 
         GalacticTraitors.getTextView().draw();
@@ -105,15 +94,17 @@ public class GameScreen implements Screen {
     private void doMoves(float delta) {
         while (playersToAdd-- > 0) {
             System.out.println("Adding player");
-            Player p = new Player(worldLayer, Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, players.size());
+            InventoryBar bar = (players.size() == 0)? uiControls.getInventoryBar() : null;
+            Player p = new Player(worldLayer, Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, bar);
             worldLayer.addActor(p);
             players.add(p);
             inputs.add(new Controls.UserInput());
             p.setPoint(new Point(-4, 10));
         }
 
-        uiControls.act(delta);
-        worldLayer.act(delta);
+        for(Layer layer : layers) {
+            layer.act(delta);
+        }
 
         inputs.set(playerID, Controls.getUserInput());
         for (int i = 0; i < players.size(); i++) {
@@ -155,6 +146,7 @@ public class GameScreen implements Screen {
         for (Layer layer : layers) {
             layer.resize(width, height);
         }
+        GalacticTraitors.resize();
     }
 
     @Override

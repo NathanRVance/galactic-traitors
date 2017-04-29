@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
-import net.traitors.GameScreen;
 import net.traitors.Layer;
 import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.AbstractThing;
@@ -84,7 +83,7 @@ public class Compass extends AbstractThing implements Selectable, MouseoverCallb
     @Override
     public void draw(Batch batch) {
         TextureRegion compass = (isSelected()) ? compassSelected : compassUnselected;
-        BetterCamera camera = GameScreen.getWorldLayer().getDefaultCamera();
+        BetterCamera camera = GalacticTraitors.getCamera();
         batch.draw(compass, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2,
                 getWidth() / 2, getHeight() / 2, getWidth(), getHeight(), 1, 1,
                 (-camera.getCameraAngle() + camera.getThingAtDepth(trackDepth).getWorldRotation()) * MathUtils.radiansToDegrees);
@@ -103,7 +102,7 @@ public class Compass extends AbstractThing implements Selectable, MouseoverCallb
 
     @Override
     public void select() {
-        GameScreen.getWorldLayer().getDefaultCamera().setRotateDepth(trackDepth);
+        GalacticTraitors.getCamera().setRotateDepth(trackDepth);
         selected = true;
     }
 

@@ -43,7 +43,7 @@ public class MultiplayerConnect {
                         //Then do inputs
                         while (!Thread.interrupted()) {
                             System.out.println("Listening for game state");
-                            GameScreen.getWorldLayer().loadSaveData(new SaveData(inputStream.readLine()));
+                            //GameScreen.getWorldLayer().loadSaveData(new SaveData(inputStream.readLine()));
                             gameScreen.setPlayerID(playerID);
                             System.out.println("Received game state");
                         }
@@ -99,7 +99,7 @@ public class MultiplayerConnect {
 
     private static void serverTick() {
         if (GameScreen.isClean()) {
-            serverSocket.pushData(GameScreen.getWorldLayer().getSaveData().toString());
+            //serverSocket.pushData(GameScreen.getWorldLayer().getSaveData().toString());
         }
         List<Controls.UserInput> inputs = serverSocket.getInputs();
         gameScreen.updateInputs(inputs);

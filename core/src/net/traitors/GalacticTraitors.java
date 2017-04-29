@@ -29,7 +29,7 @@ public class GalacticTraitors extends Game {
         camera = new BetterCamera();
         inputProcessor = new InputMultiprocessor(camera);
         Gdx.input.setInputProcessor(inputProcessor);
-        this.setScreen(new MenuScreen(this));
+        setScreen(new MenuScreen(this));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class GalacticTraitors extends Game {
         textView.dispose();
     }
 
-    public void resize() {
+    public static void resize() {
         textView.dispose();
         textView = new TextView(new BitmapFont(Gdx.files.internal("gamefont.fnt"), Gdx.files.internal("gamefont.png"), false));
     }

@@ -8,8 +8,8 @@ import net.traitors.util.Point;
 
 public class NewGame {
 
-    public static WorldLayer getWorldLayer() {
-        WorldLayer worldLayer = new WorldLayer();
+    public static Layer getWorldLayer() {
+        Layer worldLayer = new LayerLayer(GalacticTraitors.getCamera());
         Ship ship = new ShipFactory().buildStandardShip(worldLayer);
         ship.setPoint(new Point(-5, 10));
         worldLayer.addActor(ship);

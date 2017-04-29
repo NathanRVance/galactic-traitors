@@ -9,13 +9,14 @@ import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.Layer;
-import net.traitors.WorldLayer;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
+import net.traitors.thing.Thing;
 import net.traitors.thing.item.Gun;
 import net.traitors.thing.item.Item;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
+import net.traitors.ui.ScreenElements.InventoryBar;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
@@ -33,14 +34,14 @@ public class Player extends AbstractThing {
     private Inventory inventory;
     private Color[] colors = new Color[5];
 
-    public Player(Layer layer, Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, int playerID) {
+    public Player(Layer layer, Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, InventoryBar bar) {
         this(layer);
         colors[0] = bodyColor;
         colors[1] = skinColor;
         colors[2] = hairColor;
         colors[3] = pantsColor;
         colors[4] = shoesColor;
-        inventory = new Inventory(playerID);
+        inventory = new Inventory(bar);
         //Populate with default inventory
         inventory.addItem(new Gun(layer, .1f, .1f));
         generateAnimations();
@@ -92,10 +93,10 @@ public class Player extends AbstractThing {
         point = getPlatform().convertToPlatformCoordinates(point);
         rotateToFace(point);
         if (getPoint().distance(point) < getWidth()) {
-            Item item = ((WorldLayer) getLayer()).getItemAt(getWorldPoint());
-            if (item != null) {
+            Thing item = getLayer().getThingAt(getWorldPoint());
+            if (item != null && item instanceof Item) {
                 getLayer().removeActor(item);
-                inventory.addItem(item);
+                inventory.addItem((Item) item);
             }
         }
         if (inventory.getHeld() != null) {

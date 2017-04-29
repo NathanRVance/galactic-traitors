@@ -4,17 +4,20 @@ import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
+import net.traitors.thing.platform.Platform;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.save.Savable;
 import net.traitors.util.save.SaveData;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class LayerLayer implements Savable, Layer {
 
-    protected List<Actor> actors = new ArrayList<>();
+    private List<Actor> actors = new ArrayList<>();
     protected List<Thing> stuff = new ArrayList<>();
     private BetterCamera camera;
 
@@ -66,8 +69,26 @@ public class LayerLayer implements Savable, Layer {
 
     @Override
     public void act(float delta) {
-        for(Actor actor : new ArrayList<>(actors)) { //Avoid modification issues
+        for (Actor actor : new ArrayList<>(actors)) { //Avoid modification issues
             actor.act(delta);
+        }
+
+        //Resolve platforms
+        //Stuff toward the end of the list end up on top
+        for (int i = stuff.size() - 1; i >= 0; i--) {
+            Thing thing = stuff.get(i);
+            boolean foundPlatform = false;
+            for (int j = i - 1; j >= 0; j--) {
+                if (stuff.get(j) instanceof Platform
+                        && stuff.get(j).contains(thing.getWorldPoint())) {
+                    thing.setPlatform((Platform) stuff.get(j));
+                    foundPlatform = true;
+                    break;
+                }
+            }
+            if (!foundPlatform) {
+                thing.setPlatform(null);
+            }
         }
     }
 
@@ -78,7 +99,7 @@ public class LayerLayer implements Savable, Layer {
 
     @Override
     public void draw(BetterCamera camera) {
-        for(Thing thing : new ArrayList<>(stuff)) { //Avoid modification issues
+        for (Thing thing : new ArrayList<>(stuff)) { //Avoid modification issues
             thing.draw(GalacticTraitors.getBatch(), camera);
         }
     }
@@ -86,15 +107,25 @@ public class LayerLayer implements Savable, Layer {
     @Override
     public void addActor(Actor actor) {
         actors.add(actor);
-        if(actor instanceof Thing) {
+        if (actor instanceof Thing) {
             stuff.add((Thing) actor);
+            Collections.sort(stuff, new Comparator<Thing>() {
+                @Override
+                public int compare(Thing thing1, Thing thing2) {
+                    float surfaceArea1 = thing1.getHeight() * thing1.getWidth();
+                    float surfaceArea2 = thing2.getHeight() * thing2.getWidth();
+                    if (surfaceArea1 > surfaceArea2) return -1;
+                    if (surfaceArea1 < surfaceArea2) return 1;
+                    return 0;
+                }
+            });
         }
     }
 
     @Override
     public void removeActor(Actor actor) {
         actors.remove(actor);
-        if(actor instanceof Thing) {
+        if (actor instanceof Thing) {
             stuff.remove(actor);
         }
     }
@@ -133,6 +164,16 @@ public class LayerLayer implements Savable, Layer {
     @Override
     public Point screenToLayerCoords(Point screenPoint) {
         return screenPoint.unproject(getDefaultCamera());
+    }
+
+    @Override
+    public Thing getThingAt(Point point) {
+        for (int i = stuff.size() - 1; i >= 0; i--) {
+            if (stuff.get(i).contains(point, .5f)) {
+                return stuff.get(i);
+            }
+        }
+        return null;
     }
 
     @Override

@@ -3,6 +3,7 @@ package net.traitors;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.traitors.thing.Actor;
+import net.traitors.thing.Thing;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 
@@ -31,5 +32,7 @@ public interface Layer extends Disposable {
     float getHeight();
 
     Point screenToLayerCoords(Point screenPoint);
+
+    Thing getThingAt(Point point);
 
 }
