@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
-import net.traitors.GameScreen;
 import net.traitors.Layer;
 import net.traitors.menu.Menu;
 import net.traitors.thing.AbstractThing;
@@ -28,12 +27,7 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     private BetterCamera myCamera = new BetterCamera();
     private FrameBuffer frameBuffer;
     private Ship ship;
-    private final FirstUseUsable usable = new FirstUseUsable() {
-        @Override
-        public Layer getLayer() {
-            return ship.getLayer();
-        }
-
+    private final FirstUseUsable usable = new FirstUseUsable(getLayer()) {
         @Override
         protected void firstUse(Thing user, Point touchPoint) {
             Menu menu = new Menu.MenuBuilder(2)
@@ -81,6 +75,7 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
+        setup();
     }
 
     private void setup() {

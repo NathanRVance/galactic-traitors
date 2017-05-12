@@ -29,23 +29,7 @@ public class Gun extends AbstractThing implements Item {
 
     public Gun(Layer layer, float width, float height) {
         super(layer, width, height);
-        setup();
-    }
 
-    @Override
-    public SaveData getSaveData() {
-        SaveData sd = super.getSaveData();
-        sd.writeFloat(projectileFactory.getTimeToNextFire());
-        return sd;
-    }
-
-    @Override
-    public void loadSaveData(SaveData saveData) {
-        super.loadSaveData(saveData);
-        projectileFactory.setTimeToNextFire(saveData.readFloat());
-    }
-
-    private void setup() {
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override
@@ -84,6 +68,19 @@ public class Gun extends AbstractThing implements Item {
                         return 1;
                     }
                 });
+    }
+
+    @Override
+    public SaveData getSaveData() {
+        SaveData sd = super.getSaveData();
+        sd.writeFloat(projectileFactory.getTimeToNextFire());
+        return sd;
+    }
+
+    @Override
+    public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
+        projectileFactory.setTimeToNextFire(saveData.readFloat());
     }
 
     @Override

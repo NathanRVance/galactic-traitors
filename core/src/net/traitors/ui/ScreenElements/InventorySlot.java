@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
-import net.traitors.GameScreen;
 import net.traitors.Layer;
 import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
+import net.traitors.thing.player.Player;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
 
@@ -23,6 +23,7 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     private Point imageOffset = new Point();
     private Point initialTap = new Point();
     private SelectableSwitch<InventorySlot> selectableSwitch;
+    private Player player;
 
     InventorySlot(Layer layer, SelectableSwitch<InventorySlot> selectableSwitch, float width, float height) {
         super(layer, width, height);
@@ -43,6 +44,10 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
         pixmap.setColor(Color.RED.r, Color.RED.g, Color.RED.b, .5f);
         pixmap.fill();
         cooldown = new Texture(pixmap);
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     @Override
@@ -82,13 +87,13 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     @Override
     public void select() {
         selected = true;
-        GameScreen.getPlayer().setHolding(getItem());
+        player.setHolding(getItem());
     }
 
     @Override
     public void unselect() {
-        if(selected) {
-            GameScreen.getPlayer().setHolding(null);
+        if (selected) {
+            player.setHolding(null);
         }
         selected = false;
     }
@@ -131,7 +136,7 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     public boolean mouseUp() {
         if (!imageOffset.isZero()) {
             selectableSwitch.selectableTapped(this, false); //unselect
-            GameScreen.getPlayer().dropItem(item);
+            player.dropItem(item);
             item = null;
         }
         imageOffset = new Point();

@@ -17,10 +17,11 @@ public class Ship extends AbstractPlatform {
 
     private Tile[][] grid;
     private Set<ShipComponent> components = new HashSet<>();
-    private ShipComputer computer = new ShipComputer();
+    private ShipComputer computer;
 
-    private Ship(Layer layer, int width, int height) {
+    public Ship(Layer layer, int width, int height) {
         super(layer, width, height);
+        computer = new ShipComputer(layer);
     }
 
     public ShipComputer getComputer() {
@@ -49,16 +50,15 @@ public class Ship extends AbstractPlatform {
         for (int col = 0; col < grid.length; col++) {
             grid[col] = new Tile[saveData.readInt()];
             for (int tile = 0; tile < grid[col].length; tile++) {
-                grid[col][tile] = (Tile) saveData.readSavable(
-                        (this.grid != null && this.grid.length >= col && this.grid[col].length >= tile) ?
-                                this.grid[col][tile] : null
-                );
+                grid[col][tile] = (Tile) saveData.readSavable();
                 if (grid[col][tile] instanceof ShipComponent) {
-                    components.add((ShipComponent) grid[col][tile]);
+                    ShipComponent component = (ShipComponent) grid[col][tile];
+                    components.add(component);
+                    component.setShip(this);
                 }
             }
         }
-        computer = new ShipComputer(components);
+        computer = new ShipComputer(getLayer(), components);
         computer.loadSaveData(saveData.readSaveData());
     }
 

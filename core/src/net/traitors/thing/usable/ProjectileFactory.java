@@ -2,7 +2,6 @@ package net.traitors.thing.usable;
 
 import com.badlogic.gdx.graphics.Color;
 
-import net.traitors.GameScreen;
 import net.traitors.thing.Thing;
 import net.traitors.thing.projectile.Projectile;
 import net.traitors.util.Point;
@@ -11,11 +10,11 @@ public class ProjectileFactory implements Usable {
 
     //Start with some reasonable defaults
     private FloatStrategy cooldown = new FloatStrategy() {
-                @Override
-                public float toFloat() {
-                    return 1;
-                }
-            };
+        @Override
+        public float toFloat() {
+            return 1;
+        }
+    };
     private PointStrategy originOffset = new PointStrategy() {
         @Override
         public Point toPoint() {
@@ -92,7 +91,7 @@ public class ProjectileFactory implements Usable {
         return timeToNextFire;
     }
 
-    public void setTimeToNextFire(float timeToNextFire){
+    public void setTimeToNextFire(float timeToNextFire) {
         this.timeToNextFire = timeToNextFire;
     }
 

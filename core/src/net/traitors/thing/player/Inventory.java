@@ -1,6 +1,5 @@
 package net.traitors.thing.player;
 
-import net.traitors.GameScreen;
 import net.traitors.thing.item.Item;
 import net.traitors.ui.ScreenElements.InventoryBar;
 import net.traitors.util.save.Savable;
@@ -16,52 +15,60 @@ public class Inventory implements Savable {
     private Item held;
     private InventoryBar bar;
 
-    public Inventory(InventoryBar bar) {
+    Inventory(InventoryBar bar) {
         this.bar = bar;
     }
 
     @Override
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
-        sd.writeList(inventory, held);
+        sd.writeList(inventory);
+        if(held != null) {
+            sd.writeBoolean(true);
+            sd.writeInt(inventory.indexOf(held));
+        } else {
+            sd.writeBoolean(false);
+        }
         return sd;
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        for (Item item : saveData.readList(inventory, Item.class)) {
+        for (Item item : (List<Item>) saveData.readList()) {
             inventory.add(item);
         }
-        held = (Item) saveData.getFlaggedSavable();
+        if(saveData.readBoolean()) {
+            held = inventory.get(saveData.readInt());
+        }
     }
 
-    public Item getHeld() {
+    Item getHeld() {
         return held;
     }
 
-    public void setHeld(Item item) {
+    void setHeld(Item item) {
         if (item != null && !inventory.contains(item)) {
             addItem(item);
         }
         held = item;
     }
 
-    public void addItem(Item item) {
+    void addItem(Item item) {
         inventory.add(item);
         update();
     }
 
-    public void removeItem(Item item) {
+    void removeItem(Item item) {
         inventory.remove(item);
         update();
     }
 
-    public void swapItems(Item item1, Item item2) {
+    void swapItems(Item item1, Item item2) {
         Collections.swap(inventory, inventory.indexOf(item1), inventory.indexOf(item2));
         update();
     }
 
-    public void updateCooldowns(float delta) {
+    void updateCooldowns(float delta) {
         for (Item item : inventory) {
             item.act(delta);
         }

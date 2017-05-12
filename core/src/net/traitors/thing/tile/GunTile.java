@@ -29,8 +29,8 @@ public class GunTile extends AbstractThing implements ShipComponent {
     private transient RotationStrategy rotationStrategy;
     private Ship ship;
 
-    public GunTile(float width, float height, float rotation, Tile base) {
-        super(base.getLayer(), width, height);
+    public GunTile(float width, float height, float rotation, Layer layer, Tile base) {
+        super(layer, width, height);
         setRotation(rotation);
         this.rotation = rotation;
         this.base = base;
@@ -49,7 +49,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
-        base = (Tile) saveData.readSavable(base);
+        base = (Tile) saveData.readSavable();
         projectileFactory.setTimeToNextFire(saveData.readFloat());
     }
 

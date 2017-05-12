@@ -44,6 +44,9 @@ public class GalacticTraitors extends Game {
     }
 
     public static void resize() {
+        float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
+        GalacticTraitors.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
+
         textView.dispose();
         textView = new TextView(new BitmapFont(Gdx.files.internal("gamefont.fnt"), Gdx.files.internal("gamefont.png"), false));
     }

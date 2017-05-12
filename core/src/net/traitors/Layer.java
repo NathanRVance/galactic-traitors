@@ -6,8 +6,9 @@ import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
+import net.traitors.util.save.Savable;
 
-public interface Layer extends Disposable {
+public interface Layer extends Disposable, Savable {
 
     void act(float delta);
 
@@ -18,8 +19,6 @@ public interface Layer extends Disposable {
     void addActor(Actor actor);
 
     void removeActor(Actor actor);
-
-    boolean hasActor(Actor actor);
 
     void resize(int width, int height);
 

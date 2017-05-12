@@ -9,7 +9,7 @@ import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
-public abstract class AbstractThing implements Thing {
+public abstract class AbstractThing extends AbstractActor implements Thing {
 
     private float width;
     private float height;
@@ -21,30 +21,29 @@ public abstract class AbstractThing implements Thing {
     private float rotation = 0;
     private Platform platform;
     private Platform nullPlatform = new NullPlatform();
-    private Layer layer;
 
     public AbstractThing(Layer layer, float width, float height, float mass) {
+        this(layer);
         this.width = width;
         this.height = height;
         this.mass = mass;
-        this.layer = layer;
     }
 
     public AbstractThing(Layer layer, float width, float height) {
+        this(layer);
         this.width = width;
         this.height = height;
         this.mass = width * height;
-        this.layer = layer;
     }
 
     protected AbstractThing(Layer layer) {
         //This must be followed by a call to loadSaveData
-        this.layer = layer;
+        super(layer);
     }
 
     @Override
     public SaveData getSaveData() {
-        SaveData sd = new SaveData();
+        SaveData sd = super.getSaveData();
         sd.writeFloat(width);
         sd.writeFloat(height);
         sd.writeFloat(mass);
@@ -57,6 +56,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public void loadSaveData(SaveData saveData) {
+        super.loadSaveData(saveData);
         width = saveData.readFloat();
         height = saveData.readFloat();
         mass = saveData.readFloat();
@@ -174,7 +174,7 @@ public abstract class AbstractThing implements Thing {
 
     @Override
     public Layer getLayer() {
-        return layer;
+        return super.getLayer();
     }
 
     @Override

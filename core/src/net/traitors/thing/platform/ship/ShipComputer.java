@@ -3,6 +3,7 @@ package net.traitors.thing.platform.ship;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.Layer;
+import net.traitors.thing.AbstractActor;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
@@ -17,7 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ShipComputer implements Savable, Actor {
+public class ShipComputer extends AbstractActor implements Savable, Actor {
 
     private Map<Point, ThrusterTile> thrusters = new HashMap<>();
     private Set<ShipComponent> components = new HashSet<>();
@@ -26,10 +27,12 @@ public class ShipComputer implements Savable, Actor {
 
     private boolean autostop = false;
 
-    public ShipComputer() {
+    ShipComputer(Layer layer) {
+        super(layer);
     }
 
-    ShipComputer(Set<ShipComponent> components) {
+    ShipComputer(Layer layer, Set<ShipComponent> components) {
+        this(layer);
         for (ShipComponent component : components) {
             components.add(component);
         }
@@ -158,11 +161,6 @@ public class ShipComputer implements Savable, Actor {
         if (isAutostop()) {
             autostop(delta);
         }
-    }
-
-    @Override
-    public Layer getLayer() {
-        return ship.getLayer();
     }
 
     private static class VirtualUser extends AbstractThing {

@@ -6,6 +6,7 @@ import net.traitors.GalacticTraitors;
 import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.item.Item;
+import net.traitors.thing.player.Player;
 import net.traitors.util.Point;
 
 import java.util.List;
@@ -20,6 +21,12 @@ public class InventoryBar extends AbstractThing {
             InventorySlot slot = new InventorySlot(layer, selectableSwitch, getWidth(), getWidth());
             selectableSwitch.addSelectable(slot);
             GalacticTraitors.getInputProcessor().addCallback(slot);
+        }
+    }
+
+    public void setPlayer(Player player) {
+        for(InventorySlot slot : selectableSwitch.getSelectables()) {
+            slot.setPlayer(player);
         }
     }
 
@@ -64,6 +71,9 @@ public class InventoryBar extends AbstractThing {
 
     @Override
     public void draw(Batch batch) {
+        //Forever, update ourselves to be to the right side of the layer
+        setPoint(getLayer().getBotCorner().add(new Point(getLayer().getWidth() - getWidth() / 2, getHeight() / 2)));
+        //Actually draw
         for(InventorySlot slot : selectableSwitch.getSelectables()) {
             slot.draw(batch);
         }

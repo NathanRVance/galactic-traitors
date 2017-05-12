@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
+import net.traitors.GameFactory;
 import net.traitors.Layer;
 import net.traitors.controls.Controls;
 import net.traitors.thing.AbstractThing;
@@ -34,6 +35,8 @@ public class Player extends AbstractThing {
     private Inventory inventory;
     private Color[] colors = new Color[5];
 
+    private boolean isMainPlayer;
+
     public Player(Layer layer, Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, InventoryBar bar) {
         this(layer);
         colors[0] = bodyColor;
@@ -45,6 +48,8 @@ public class Player extends AbstractThing {
         //Populate with default inventory
         inventory.addItem(new Gun(layer, .1f, .1f));
         generateAnimations();
+
+        isMainPlayer = bar != null;
     }
 
     public Player(Layer layer) {
@@ -60,7 +65,8 @@ public class Player extends AbstractThing {
     public SaveData getSaveData() {
         SaveData sd = super.getSaveData();
         //Save inventory
-        sd.writeSavable(inventory);
+        sd.writeBoolean(isMainPlayer);
+        sd.writeSaveData(inventory.getSaveData());
         //Save colors
         sd.writeInt(colors.length);
         for (Color color : colors) {
@@ -74,7 +80,9 @@ public class Player extends AbstractThing {
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
         //Read inventory
-        inventory = (Inventory) saveData.readSavable(inventory);
+        InventoryBar inventoryBar = saveData.readBoolean() ? GameFactory.getInventoryBar() : null;
+        inventory = new Inventory(inventoryBar);
+        inventory.loadSaveData(saveData.readSaveData());
         //Read colors
         colors = new Color[saveData.readInt()];
         for (int i = 0; i < colors.length; i++) {
@@ -140,8 +148,11 @@ public class Player extends AbstractThing {
         getLayer().addActor(item);
     }
 
-    public void move(float delta, Controls.UserInput input) {
-        if (input == null) input = new Controls.UserInput();
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        inventory.updateCooldowns(delta);
+        Controls.UserInput input = Controls.getInput(getID());
         float x = 0;
         float y = 0;
         float speedMult = 1;
@@ -158,7 +169,7 @@ public class Player extends AbstractThing {
             x--;
         }
         if (input.keysPressed.contains(Controls.Key.SPRINT)) {
-            speedMult = 3;
+            speedMult = 2;
         }
         Point d = new Point(x, y);
         d = d.rotate(GalacticTraitors.getCamera().getCameraAngle() - getPlatform().getWorldRotation());
@@ -182,16 +193,6 @@ public class Player extends AbstractThing {
         if (input.pointsTouched.size() == 1) {
             worldTouched(input.pointsTouched.get(0));
         }
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-        inventory.updateCooldowns(delta);
-    }
-
-    public Inventory getInventory() {
-        return inventory;
     }
 
     @Override

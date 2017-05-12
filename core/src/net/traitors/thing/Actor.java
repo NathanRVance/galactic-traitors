@@ -14,4 +14,18 @@ public interface Actor extends Savable {
 
     Layer getLayer();
 
+    /**
+     * Sets this actor's ID
+     *
+     * @param ID the ID for this actor
+     */
+    void setID(long ID);
+
+    /**
+     * Get the actor's ID
+     *
+     * @return the ID set in setID, or throw a runtime exception if it wasn't set
+     */
+    long getID();
+
 }

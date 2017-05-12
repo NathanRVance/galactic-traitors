@@ -65,7 +65,7 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
 
     private void dismiss() {
         GalacticTraitors.getInputProcessor().removeCallback(this);
-        GameScreen.removeActor(this);
+        getLayer().removeActor(this);
         dispose();
     }
 
@@ -137,6 +137,8 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
         private final float width;
         private List<CharSequence> buttonText = new ArrayList<>();
         private List<Runnable> buttonActions = new ArrayList<>();
+        private CharSequence closeButtonText;
+        private Runnable closeButtonAction;
         private Platform platform;
 
         public MenuBuilder(float width) {
@@ -154,6 +156,16 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
             return this;
         }
 
+        public MenuBuilder setCloseButtonText(CharSequence text) {
+            closeButtonText = text;
+            return this;
+        }
+
+        public MenuBuilder setCloseButtonAction(Runnable action) {
+            closeButtonAction = action;
+            return this;
+        }
+
         public Menu build(Layer layer, CharSequence title) {
             //Admitately arbitrary value to multiply by, could be function of font size
             float titleSpacing = calcButtonHeight(title) * 1.375f;
@@ -166,17 +178,17 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
                 height += h;
                 buttons.add(new Button(layer, calcButtonWidth(), calcButtonHeight(text.toString()), text, buttonActions.get(i)));
             }
-            String closeButtonText = "Done";
+            CharSequence closeButtonText = this.closeButtonText == null ? "Done" : this.closeButtonText;
             float closeButtonHeight = calcButtonHeight(closeButtonText);
             height += closeButtonHeight;
             final Menu menu = new Menu(layer, width, height, title, buttons, platform);
             menu.titleSpacing = titleSpacing;
-            Button b = new Button(layer, calcButtonWidth(), closeButtonHeight, closeButtonText, new Runnable() {
+            Button b = new Button(layer, calcButtonWidth(), closeButtonHeight, closeButtonText, closeButtonAction == null ? new Runnable() {
                 @Override
                 public void run() {
                     menu.dismiss();
                 }
-            });
+            } : closeButtonAction);
             menu.buttons.add(b);
             menu.init();
             return menu;

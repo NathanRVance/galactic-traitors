@@ -13,10 +13,10 @@ public class ShipFactory {
     public Ship buildStandardShip(Layer layer) {
         Ship.ShipBuilder shipBuilder = new Ship.ShipBuilder(layer, 4, 5);
         shipBuilder.addTile(new OverviewScreen(layer, 2, 3), 1, 1);
-        shipBuilder.addTile(new GunTile(1, 1, 0, new FloorTile(layer)), 3, 2);
-        shipBuilder.addTile(new GunTile(1, 1, (float) Math.PI, new FloorTile(layer)), 0, 2);
+        shipBuilder.addTile(new GunTile(1, 1, 0, layer, new FloorTile(layer)), 3, 2);
+        shipBuilder.addTile(new GunTile(1, 1, (float) Math.PI, layer, new FloorTile(layer)), 0, 2);
 
-        ShipComputer computer = new ShipComputer();
+        ShipComputer computer = new ShipComputer(layer);
         shipBuilder.setComputer(computer);
 
         ThrusterTile t1 = new ThrusterTile(layer, 1, 1, (float) Math.PI * 3 / 2,

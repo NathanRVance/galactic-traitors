@@ -50,7 +50,7 @@ class MultiServerSocket implements Disposable {
                             public void run() {
                                 try {
                                     while (!Thread.interrupted()) {
-                                        Controls.UserInput input = new Controls.UserInput();
+                                        Controls.UserInput input = new Controls.UserInput(-1);
                                         input.loadSaveData(new SaveData(inputStream.readLine()));
                                         incomingData.put(s, input);
                                         System.out.println("Received user input");
@@ -79,14 +79,13 @@ class MultiServerSocket implements Disposable {
         }
     }
 
-    List<Controls.UserInput> getInputs() {
-        List<Controls.UserInput> ret = new ArrayList<>(sockets.size());
+    void getInputs() {
         synchronized (sockets) {
             for (Socket socket : sockets) {
-                ret.add(incomingData.get(socket));
+                Controls.UserInput input = incomingData.get(socket);
+                Controls.setInput(input.ID, input);
             }
         }
-        return ret;
     }
 
     @Override

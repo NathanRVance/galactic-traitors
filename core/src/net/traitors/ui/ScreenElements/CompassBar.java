@@ -14,13 +14,13 @@ public class CompassBar extends AbstractThing {
 
     private SelectableSwitch<Compass> selectableSwitch = new SelectableSwitch<>();
 
-    public CompassBar(Layer layer, float height) {
-        super(layer, height, height);
+    public CompassBar(Layer layer, float dim) {
+        super(layer, dim, dim);
     }
 
     @Override
     public void act(float delta) {
-        Platform p = GameScreen.getPlayer().getPlatform();
+        Platform p = GalacticTraitors.getCamera().getTracking().getPlatform();
         int compassIndex = 0;
         while (!(p instanceof NullPlatform)) {
             if (selectableSwitch.getSelectables().size() <= compassIndex) {

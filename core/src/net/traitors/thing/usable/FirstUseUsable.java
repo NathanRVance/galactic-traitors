@@ -1,14 +1,20 @@
 package net.traitors.thing.usable;
 
+import net.traitors.Layer;
+import net.traitors.thing.AbstractActor;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
 import net.traitors.util.Point;
 import net.traitors.util.save.SaveData;
 
-public abstract class FirstUseUsable implements Usable, Actor {
+public abstract class FirstUseUsable extends AbstractActor implements Usable, Actor {
 
     private boolean used = false;
     private boolean repeatUse = false;
+
+    public FirstUseUsable(Layer layer) {
+        super(layer);
+    }
 
     @Override
     public void use(Thing user, Point touchPoint) {

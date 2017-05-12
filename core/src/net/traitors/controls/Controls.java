@@ -18,6 +18,8 @@ public class Controls {
 
     private static Map<Integer, Key> keymap = new HashMap<>();
     private static Set<Key> pressed = new HashSet<>();
+    private static Map<Long, UserInput> inputs = new HashMap<>();
+    private static long ID = -1;
 
     static {
         keymap.put(Input.Keys.COMMA, Key.UP);
@@ -25,6 +27,10 @@ public class Controls {
         keymap.put(Input.Keys.A, Key.LEFT);
         keymap.put(Input.Keys.E, Key.RIGHT);
         keymap.put(Input.Keys.SHIFT_LEFT, Key.SPRINT);
+    }
+
+    public static void setID(long ID) {
+        Controls.ID = ID;
     }
 
     public static void keyPressed(Key key) {
@@ -44,10 +50,26 @@ public class Controls {
     }
 
     public static UserInput getUserInput() {
-        UserInput ret = new UserInput();
+        UserInput ret = new UserInput(ID);
         ret.pointsTouched = GalacticTraitors.getInputProcessor().getWorldTouches();
         ret.keysPressed = new HashSet<>(pressed);
         return ret;
+    }
+
+    public static void setInput(long ID, UserInput input) {
+        inputs.put(ID, input);
+    }
+
+    public static UserInput getInput(long ID) {
+        if (inputs.containsKey(ID)) {
+            return inputs.get(ID);
+        } else {
+            return new UserInput(ID);
+        }
+    }
+
+    public static void update() {
+        inputs.put(ID, getUserInput());
     }
 
     public enum Key {
@@ -62,10 +84,16 @@ public class Controls {
 
         public List<Point> pointsTouched = new ArrayList<>();
         public Set<Key> keysPressed = new HashSet<>();
+        public long ID; //ID of actor this input is for
+
+        public UserInput(long ID) {
+            this.ID = ID;
+        }
 
         @Override
         public SaveData getSaveData() {
             SaveData sd = new SaveData();
+            sd.writeLong(ID);
             sd.writeInt(pointsTouched.size());
             for (Point p : pointsTouched) {
                 sd.writeFloat(p.x);
@@ -80,6 +108,7 @@ public class Controls {
 
         @Override
         public void loadSaveData(SaveData saveData) {
+            ID = saveData.readLong();
             int numPoints = saveData.readInt();
             pointsTouched = new ArrayList<>(numPoints);
             for (int i = 0; i < numPoints; i++) {

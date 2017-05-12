@@ -39,10 +39,6 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
         setup();
     }
 
-    public RotationalThrusterStrategy() {
-
-    }
-
     @Override
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
@@ -55,7 +51,7 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
     @Override
     public void loadSaveData(SaveData saveData) {
         setup();
-        tile = (Tile) saveData.readSavable(tile);
+        tile = (Tile) saveData.readSavable();
         forceMagnitude = saveData.readFloat();
         initTimeToNextFire = saveData.readFloat();
     }

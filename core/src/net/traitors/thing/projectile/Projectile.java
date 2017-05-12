@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 
-import net.traitors.GameScreen;
 import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.util.Point;
@@ -31,15 +30,13 @@ public class Projectile extends AbstractThing {
     @Override
     public SaveData getSaveData() {
         SaveData sd = super.getSaveData();
-        sd.writeFloat(velocity.x);
-        sd.writeFloat(velocity.y);
+        sd.writePoint(velocity);
         sd.writeFloat(longevity);
-        if(location == null) {
+        if (location == null) {
             sd.writeBoolean(false);
         } else {
             sd.writeBoolean(true);
-            sd.writeFloat(location.x);
-            sd.writeFloat(location.y);
+            sd.writePoint(location);
         }
         sd.writeInt(color.toIntBits());
         return sd;
@@ -48,10 +45,10 @@ public class Projectile extends AbstractThing {
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
-        velocity = new Point(saveData.readFloat(), saveData.readFloat());
+        velocity = saveData.readPoint();
         longevity = saveData.readFloat();
-        if(saveData.readBoolean()) {
-            location = new Point(saveData.readFloat(), saveData.readFloat());
+        if (saveData.readBoolean()) {
+            location = saveData.readPoint();
         }
         color = new Color(saveData.readInt());
     }
@@ -71,7 +68,7 @@ public class Projectile extends AbstractThing {
         location = location.add(velocity.scale(delta));
         longevity -= delta;
         if (longevity < 0) {
-            GameScreen.removeActor(this);
+            getLayer().removeActor(this);
         }
 
         //TODO: Check if touching something (other than player who shot me) and deal damage

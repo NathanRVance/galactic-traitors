@@ -3,33 +3,40 @@ package net.traitors.util;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 
-import net.traitors.GameScreen;
 import net.traitors.Layer;
 import net.traitors.thing.Actor;
 import net.traitors.thing.Thing;
 import net.traitors.thing.platform.NullPlatform;
-import net.traitors.thing.platform.Platform;
 import net.traitors.util.save.SaveData;
 
 public class BetterCamera extends OrthographicCamera implements Actor {
 
     private int rotateDepth;
     private float offset = 0;
-    private Thing cachedThing = null;
-    private Platform nullPlatform = new NullPlatform();
+    private Thing previousRotatingWith = null;
+    private Thing tracking = new NullPlatform();
+    private long ID = -1;
 
     @Override
     public SaveData getSaveData() {
-        SaveData sd = new SaveData();
-        sd.writeInt(rotateDepth);
-        sd.writeFloat(offset);
-        return sd;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        rotateDepth = saveData.readInt();
-        offset = saveData.readFloat();
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Set the thing this camera follows. Must be done every time saved data is loaded.
+     * @param tracking the thing to be tracked
+     */
+    public void setTracking(Thing tracking) {
+        this.tracking = tracking;
+    }
+
+    public Thing getTracking() {
+        return tracking;
     }
 
     /**
@@ -63,10 +70,9 @@ public class BetterCamera extends OrthographicCamera implements Actor {
     }
 
     public Thing getThingAtDepth(int depth) {
-        Thing thing = GameScreen.getPlayer();
+        Thing thing = tracking;
         for (int i = 0; i < depth; i++) {
             thing = thing.getPlatform();
-            if (thing == null) return nullPlatform;
         }
         return thing;
     }
@@ -88,7 +94,7 @@ public class BetterCamera extends OrthographicCamera implements Actor {
      * Face the "north" direction of the thing we're rotating with
      */
     public void syncRotations() {
-        offset = 0;
+        setOffset(0);
         zoom = 1;
     }
 
@@ -100,17 +106,37 @@ public class BetterCamera extends OrthographicCamera implements Actor {
      */
     @Override
     public void act(float delta) {
-        if (cachedThing != getRotatingWith()) {
+        //Translate
+        Point p = tracking.getWorldPoint();
+        translate(p.x - position.x, p.y - position.y);
+        if (getRotatingWith() instanceof NullPlatform) setRotateDepth(1);
+        update();
+
+        //Rotate
+        if (previousRotatingWith != getRotatingWith()) {
             //We're rotating with a new thing
-            cachedThing = getRotatingWith();
-            offset = getCameraAngle() - getRotatingWith().getWorldRotation();
+            previousRotatingWith = getRotatingWith();
+            setOffset(getCameraAngle() - previousRotatingWith.getWorldRotation());
         }
-        rotateTo(getRotatingWith().getWorldRotation() + offset);
+        rotateTo(previousRotatingWith.getWorldRotation() + getOffset());
     }
 
     @Override
     public Layer getLayer() {
         return getRotatingWith().getLayer();
+    }
+
+    @Override
+    public void setID(long ID) {
+        this.ID = ID;
+    }
+
+    @Override
+    public long getID() {
+        if(ID == -1) {
+            throw new RuntimeException("ID wasn't set!");
+        }
+        return ID;
     }
 
 

@@ -170,6 +170,16 @@ public class NullPlatform implements Platform {
     }
 
     @Override
+    public void setID(long ID) {
+
+    }
+
+    @Override
+    public long getID() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void dispose() {
 
     }

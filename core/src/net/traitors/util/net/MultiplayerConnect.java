@@ -6,13 +6,11 @@ import com.badlogic.gdx.net.Socket;
 
 import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
-import net.traitors.util.save.SaveData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.List;
 
 public class MultiplayerConnect {
 
@@ -22,7 +20,7 @@ public class MultiplayerConnect {
     private static MultiServerSocket serverSocket;
     private static Socket cliSock;
     private static PrintStream outputStream;
-    private static Controls.UserInput lastUserInput = new Controls.UserInput();
+    private static Controls.UserInput lastUserInput = new Controls.UserInput(-1);
     private static String connectIP;
     private static boolean makeServer = false;
     private static GameScreen gameScreen;
@@ -98,11 +96,10 @@ public class MultiplayerConnect {
     }
 
     private static void serverTick() {
-        if (GameScreen.isClean()) {
+        if (gameScreen.isClean()) {
             //serverSocket.pushData(GameScreen.getWorldLayer().getSaveData().toString());
         }
-        List<Controls.UserInput> inputs = serverSocket.getInputs();
-        gameScreen.updateInputs(inputs);
+        serverSocket.getInputs();
     }
 
     private static void clientTick() {

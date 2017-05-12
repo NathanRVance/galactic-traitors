@@ -7,7 +7,6 @@ import net.traitors.thing.Thing;
 import net.traitors.thing.platform.Platform;
 import net.traitors.util.BetterCamera;
 import net.traitors.util.Point;
-import net.traitors.util.save.Savable;
 import net.traitors.util.save.SaveData;
 
 import java.util.ArrayList;
@@ -15,15 +14,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class LayerLayer implements Savable, Layer {
+public class LayerLayer implements Layer {
 
     private List<Actor> actors = new ArrayList<>();
-    protected List<Thing> stuff = new ArrayList<>();
+    private List<Thing> stuff = new ArrayList<>();
     private BetterCamera camera;
-
-    private SaveData cachedSaveData = null;
-    private SaveData dataToLoad = null;
-    private long ID = 0;
+    private long ID = 0; //TODO: Move ID to the entry point in the hierarchy for saves
+    private long actorID = 0;
 
     public LayerLayer(BetterCamera camera) {
         this.camera = camera;
@@ -31,39 +28,24 @@ public class LayerLayer implements Savable, Layer {
 
     @Override
     public SaveData getSaveData() {
-        return cachedSaveData;
-    }
-
-    private void updateSaveData() {
         SaveData sd = new SaveData();
         sd.writeLong(ID++);
-        sd.writeList(actors, null);
-        sd.writeSaveData(getDefaultCamera().getSaveData());
-        cachedSaveData = sd;
+        sd.writeList(actors);
+        return sd;
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        dataToLoad = saveData;
-    }
+        saveData.setLayer(this);
+        long id = saveData.readLong();
+        if (id <= ID) return; //Sometimes updates arrive out of order.
+        ID = id;
+        //Wipe out everything
+        actors.clear();
+        stuff.clear();
 
-    private void resolveSavedData() {
-        if (dataToLoad != null) {
-            //Make a new temp variable so that dataToLoad can be replaced in another thread.
-            SaveData saveData = dataToLoad;
-            long id = saveData.readLong();
-            if (id <= ID) return; //Sometimes updates arrive out of order.
-            ID = id;
-            //Wipe out everything
-            actors.clear();
-            stuff.clear();
-
-            for (Actor actor : saveData.readList(actors, Actor.class)) {
-                if (!actors.contains(actor)) { //This instance could be recycled from in there
-                    addActor(actor);
-                }
-            }
-            getDefaultCamera().loadSaveData(saveData.readSaveData());
+        for (Actor actor : (List<Actor>) saveData.readList()) {
+            addActor(actor);
         }
     }
 
@@ -106,6 +88,7 @@ public class LayerLayer implements Savable, Layer {
 
     @Override
     public void addActor(Actor actor) {
+        actor.setID(actorID++);
         actors.add(actor);
         if (actor instanceof Thing) {
             stuff.add((Thing) actor);
@@ -128,11 +111,6 @@ public class LayerLayer implements Savable, Layer {
         if (actor instanceof Thing) {
             stuff.remove(actor);
         }
-    }
-
-    @Override
-    public boolean hasActor(Actor actor) {
-        return actors.contains(actor);
     }
 
     @Override

@@ -33,7 +33,7 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
-        thrustStrategy = (ThrustStrategy) saveData.readSavable(thrustStrategy);
+        thrustStrategy = (ThrustStrategy) saveData.readSavable();
         thrustStrategy.setBase(this);
     }
 

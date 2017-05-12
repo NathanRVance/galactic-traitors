@@ -5,7 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
 import net.traitors.GalacticTraitors;
-import net.traitors.GameScreen;
+import net.traitors.GameFactory;
 import net.traitors.Layer;
 import net.traitors.LayerLayer;
 import net.traitors.util.Point;
@@ -26,9 +26,16 @@ public class MenuScreen implements Screen {
         Menu menu = new Menu.MenuBuilder(3f).addButton("Start Game", new Runnable() {
             @Override
             public void run() {
-                game.setScreen(new GameScreen());
+                game.setScreen(new GameFactory().getGameScreen());
             }
-        }).build(menuLayer, "Galactic Traitors");
+        })
+                .setCloseButtonText("Exit")
+                .setCloseButtonAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        Gdx.app.exit();
+                    }
+                }).build(menuLayer, "Galactic Traitors");
         menu.setPoint(new Point(2, 2));
         menuLayer.addActor(menu);
     }
