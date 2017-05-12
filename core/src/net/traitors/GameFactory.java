@@ -19,11 +19,12 @@ public class GameFactory implements Savable {
 
     private static InventoryBar inventoryBar;
     private Layer worldLayer;
+    private static Layer screenLayer;
     private GameScreen gameScreen;
 
     public GameFactory() {
         //Screen layer
-        Layer screenLayer = new LayerLayer(new BetterCamera());
+        screenLayer = new LayerLayer(new BetterCamera());
         screenLayer.getDefaultCamera().setToOrtho(false, 5, 5);
         inventoryBar = new InventoryBar(screenLayer, 5, screenLayer.getHeight());
         //Point is set in InventoryBar draw method
@@ -83,6 +84,10 @@ public class GameFactory implements Savable {
 
     public static InventoryBar getInventoryBar() {
         return inventoryBar;
+    }
+
+    public static Layer getScreenLayer() {
+        return screenLayer;
     }
 
     Player makePlayer(boolean isMainPlayer) {

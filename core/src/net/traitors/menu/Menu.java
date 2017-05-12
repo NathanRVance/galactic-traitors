@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
-import net.traitors.GameScreen;
 import net.traitors.Layer;
 import net.traitors.controls.MouseoverCallback;
 import net.traitors.thing.platform.AbstractPlatform;
@@ -83,7 +82,7 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
                 1, 1, rotation * MathUtils.radiansToDegrees);
         GalacticTraitors.getTextView().drawStringInWorld(title,
                 new Point(0, super.getHeight() / 2 - titleSpacing / 3).rotate(rotation).add(p),
-                TextView.Align.center, super.getWidth() * .9f, .3f, Color.BLACK, getWorldRotation());
+                TextView.Align.center, super.getWidth() * .9f, .3f, Color.BLACK, getWorldRotation(), getLayer());
         for (Button button : buttons) {
             button.draw(batch);
         }

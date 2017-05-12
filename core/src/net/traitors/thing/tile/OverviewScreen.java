@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.GalacticTraitors;
+import net.traitors.GameFactory;
 import net.traitors.Layer;
 import net.traitors.menu.Menu;
 import net.traitors.thing.AbstractThing;
@@ -27,11 +28,10 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
     private BetterCamera myCamera = new BetterCamera();
     private FrameBuffer frameBuffer;
     private Ship ship;
-    private final FirstUseUsable usable = new FirstUseUsable(getLayer()) {
+    private final FirstUseUsable usable = new FirstUseUsable(GameFactory.getScreenLayer()) {
         @Override
         protected void firstUse(Thing user, Point touchPoint) {
             Menu menu = new Menu.MenuBuilder(2)
-                    .setPlatform(getPlatform())
                     .addButton(new StringStrategy() {
                                    @Override
                                    public String toString() {
@@ -48,7 +48,6 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
                         @Override
                         public void run() {
                             Menu menu = new Menu.MenuBuilder(2)
-                                    .setPlatform(getPlatform())
                                     .build(getLayer(), new StringStrategy() {
                                         @Override
                                         public String toString() {
@@ -56,14 +55,14 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
                                                     + "\nRotating at: " + ship.getRotationalVelocity();
                                         }
                                     });
-                            menu.setPoint(getPoint());
+                            menu.setPoint(getLayer().getBotCorner().add(new Point(getLayer().getWidth() / 2, getLayer().getHeight() / 2)));
                             menu.setRotation(0);
-                            ship.getLayer().addActor(menu); // FIXME: 4/13/17
+                            getLayer().addActor(menu);
                         }
                     }).build(getLayer(), "Ship Control");
-            menu.setPoint(getPoint());
+            menu.setPoint(getLayer().getBotCorner().add(new Point(getLayer().getWidth() / 2, getLayer().getHeight() / 2)));
             menu.setRotation(0);
-            ship.getLayer().addActor(menu); // FIXME: 4/13/17
+            getLayer().addActor(menu);
         }
     };
 

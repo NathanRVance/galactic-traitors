@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 import net.traitors.GalacticTraitors;
+import net.traitors.Layer;
 import net.traitors.util.Point;
 
 public class TextView extends Stage {
@@ -70,13 +71,14 @@ public class TextView extends Stage {
      * @param width  width of string, in world units. Will wrap text that extends beyond
      * @param height height of each character (not of string)
      * @param rot    world rotation of string
+     * @param layer  the layer this string is drawn on
      */
-    public void drawStringInWorld(CharSequence text, Point pos, Align align, float width, float height, Color color, float rot) {
-        pos = pos.project(GalacticTraitors.getCamera());
+    public void drawStringInWorld(CharSequence text, Point pos, Align align, float width, float height, Color color, float rot, Layer layer) {
+        pos = pos.project(layer.getDefaultCamera());
         pos = new Point(pos.x / getWidth(), pos.y / getHeight());
-        width /= GalacticTraitors.getCamera().viewportWidth;
-        height /= GalacticTraitors.getCamera().viewportHeight;
-        drawStringOnScreen(text, pos, align, width, height, color, rot - GalacticTraitors.getCamera().getCameraAngle() );
+        width /= layer.getDefaultCamera().viewportWidth;
+        height /= layer.getDefaultCamera().viewportHeight;
+        drawStringOnScreen(text, pos, align, width, height, color, rot - layer.getDefaultCamera().getCameraAngle() );
     }
 
     @Override

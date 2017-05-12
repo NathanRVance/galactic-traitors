@@ -137,9 +137,9 @@ public class Point {
     /**
      * This point is the force, in platform coordinates
      * @param thing the thing this force is applied on
-     * @return the translational acceleration, in world coordinates, in m/s^2
+     * @return the translational acceleration, in platform coordinates, in m/s^2
      */
     public Point transAccel(Thing thing) {
-        return scale(1 / thing.getMass()).rotate(thing.getWorldRotation());
+        return scale(1 / thing.getMass()).rotate(thing.getRotation());
     }
 }
