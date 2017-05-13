@@ -29,7 +29,7 @@ public class Controls {
         keymap.put(Input.Keys.SHIFT_LEFT, Key.SPRINT);
     }
 
-    public static void setID(long ID) {
+    public static void setPlayerID(long ID) {
         Controls.ID = ID;
     }
 
@@ -38,7 +38,8 @@ public class Controls {
     }
 
     static void keyPressed(int keycode) {
-        pressed.add(keymap.get(keycode));
+        if (keymap.containsKey(keycode))
+            pressed.add(keymap.get(keycode));
     }
 
     public static void keyReleased(Key key) {

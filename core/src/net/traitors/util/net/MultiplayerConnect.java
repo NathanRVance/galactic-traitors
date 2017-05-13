@@ -6,6 +6,7 @@ import com.badlogic.gdx.net.Socket;
 
 import net.traitors.GameScreen;
 import net.traitors.controls.Controls;
+import net.traitors.util.save.SaveData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,10 +24,9 @@ public class MultiplayerConnect {
     private static Controls.UserInput lastUserInput = new Controls.UserInput(-1);
     private static String connectIP;
     private static boolean makeServer = false;
-    private static GameScreen gameScreen;
+    private static SaveData data;
 
     public static void start(final GameScreen gameScreen) {
-        MultiplayerConnect.gameScreen = gameScreen;
         if (connectIP != null) {
             System.out.println("Connecting");
             new Thread(new Runnable() {
@@ -37,12 +37,11 @@ public class MultiplayerConnect {
                         outputStream = new PrintStream(cliSock.getOutputStream());
                         final BufferedReader inputStream = new BufferedReader(new InputStreamReader(cliSock.getInputStream()));
                         //First get our playerID
-                        int playerID = Integer.parseInt(inputStream.readLine());
+                        Controls.setPlayerID(Integer.parseInt(inputStream.readLine()));
                         //Then do inputs
                         while (!Thread.interrupted()) {
                             System.out.println("Listening for game state");
-                            //GameScreen.getWorldLayer().loadSaveData(new SaveData(inputStream.readLine()));
-                            gameScreen.setPlayerID(playerID);
+                            data = new SaveData(inputStream.readLine());
                             System.out.println("Received game state");
                         }
                     } catch (IOException e) {
@@ -57,7 +56,7 @@ public class MultiplayerConnect {
         }
     }
 
-    public void connectToServer(final String IP) {
+    public static void connectToServer(final String IP) {
         connectIP = IP;
     }
 
@@ -95,9 +94,17 @@ public class MultiplayerConnect {
         }
     }
 
+    public static void sendData(SaveData saveData) {
+        MultiplayerConnect.data = saveData;
+    }
+
+    public static SaveData retrieveData() {
+        return data;
+    }
+
     private static void serverTick() {
-        if (gameScreen.isClean()) {
-            //serverSocket.pushData(GameScreen.getWorldLayer().getSaveData().toString());
+        if (data != null) {
+            serverSocket.pushData(data.toString());
         }
         serverSocket.getInputs();
     }

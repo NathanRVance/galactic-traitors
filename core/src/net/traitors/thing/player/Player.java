@@ -26,9 +26,9 @@ public class Player extends AbstractThing {
     //Animation stuff
     private static final float BASE_ANIMATION_LENGTH = .5f; //seconds
     private static final float BASE_MOVE_SPEED = 2f; //meters per second
-    private final int cycleLength = 200;
-    private transient TextureRegion[] animation;
-    private transient TextureRegion[] animationHolding;
+    private static final int cycleLength = 200;
+    private TextureRegion[] animation;
+    private TextureRegion[] animationHolding;
     private float animationLength = 1; //Time, in seconds, it takes to run through the animation
     private float animationPoint = 0;
 
@@ -47,9 +47,12 @@ public class Player extends AbstractThing {
         inventory = new Inventory(bar);
         //Populate with default inventory
         inventory.addItem(new Gun(layer, .1f, .1f));
-        generateAnimations();
 
         isMainPlayer = bar != null;
+        if(isMainPlayer) {
+            bar.setPlayer(this);
+            GalacticTraitors.getCamera().setTracking(this);
+        }
     }
 
     public Player(Layer layer) {
@@ -80,7 +83,12 @@ public class Player extends AbstractThing {
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
         //Read inventory
-        InventoryBar inventoryBar = saveData.readBoolean() ? GameFactory.getInventoryBar() : null;
+        isMainPlayer = saveData.readBoolean();
+        InventoryBar inventoryBar = isMainPlayer ? GameFactory.getInventoryBar() : null;
+        if(isMainPlayer) {
+            inventoryBar.setPlayer(this);
+            GalacticTraitors.getCamera().setTracking(this);
+        }
         inventory = new Inventory(inventoryBar);
         inventory.loadSaveData(saveData.readSaveData());
         //Read colors
@@ -197,6 +205,7 @@ public class Player extends AbstractThing {
 
     @Override
     public void draw(Batch batch) {
+        if(animation == null) generateAnimations();
         Point worldPointLowLeft = getWorldPoint().subtract(new Point(getWidth() / 2, getHeight() / 2));
         float rotation = getPlatform().getWorldRotation() + getRotation() + (float) Math.PI / 2;
         if (inventory.getHeld() == null) {

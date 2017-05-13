@@ -20,7 +20,8 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
         super(layer, width, height);
         setRotation(rotation);
         this.thrustStrategy = thrustStrategy;
-        thrustStrategy.setBase(this);
+        if (thrustStrategy != null)
+            thrustStrategy.setBase(this);
     }
 
     @Override

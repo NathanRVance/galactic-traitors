@@ -68,7 +68,8 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
 
     public OverviewScreen(Layer layer, float width, float height) {
         super(layer, width, height);
-        setup();
+        if(width != 0 && height != 0)
+            setup();
     }
 
     @Override

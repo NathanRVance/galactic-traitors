@@ -21,6 +21,7 @@ public class GameFactory implements Savable {
     private Layer worldLayer;
     private static Layer screenLayer;
     private GameScreen gameScreen;
+    private long ID; //Save ID
 
     public GameFactory() {
         //Screen layer
@@ -74,12 +75,24 @@ public class GameFactory implements Savable {
 
     @Override
     public SaveData getSaveData() {
-        return null;
+        SaveData sd = new SaveData();
+        sd.writeLong(ID++);
+        sd.writeSaveData(worldLayer.getSaveData());
+        return sd;
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-
+        if (saveData == null) return;
+        try {
+            long id = saveData.readLong();
+            if (id <= ID) return; //Sometimes updates arrive out of order.
+            ID = id;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        worldLayer.loadSaveData(saveData.readSaveData());
     }
 
     public static InventoryBar getInventoryBar() {
@@ -91,13 +104,9 @@ public class GameFactory implements Savable {
     }
 
     Player makePlayer(boolean isMainPlayer) {
-        InventoryBar bar = (isMainPlayer)? inventoryBar : null;
+        InventoryBar bar = (isMainPlayer) ? inventoryBar : null;
         Player p = new Player(worldLayer, Color.GREEN, new Color(0xdd8f4fff), Color.BROWN, Color.BLUE, Color.BLACK, bar);
         worldLayer.addActor(p);
-        if(isMainPlayer) {
-            GalacticTraitors.getCamera().setTracking(p);
-            inventoryBar.setPlayer(p);
-        }
         return p;
     }
 

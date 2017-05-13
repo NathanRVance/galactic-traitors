@@ -19,7 +19,6 @@ public class LayerLayer implements Layer {
     private List<Actor> actors = new ArrayList<>();
     private List<Thing> stuff = new ArrayList<>();
     private BetterCamera camera;
-    private long ID = 0; //TODO: Move ID to the entry point in the hierarchy for saves
     private long actorID = 0;
 
     public LayerLayer(BetterCamera camera) {
@@ -29,7 +28,6 @@ public class LayerLayer implements Layer {
     @Override
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
-        sd.writeLong(ID++);
         sd.writeList(actors);
         return sd;
     }
@@ -37,13 +35,9 @@ public class LayerLayer implements Layer {
     @Override
     public void loadSaveData(SaveData saveData) {
         saveData.setLayer(this);
-        long id = saveData.readLong();
-        if (id <= ID) return; //Sometimes updates arrive out of order.
-        ID = id;
         //Wipe out everything
         actors.clear();
         stuff.clear();
-
         for (Actor actor : (List<Actor>) saveData.readList()) {
             addActor(actor);
         }

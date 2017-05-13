@@ -3,17 +3,22 @@ package net.traitors.menu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.utils.StringBuilder;
 
 import net.traitors.GalacticTraitors;
 import net.traitors.GameFactory;
 import net.traitors.Layer;
 import net.traitors.LayerLayer;
+import net.traitors.controls.InputProcessor;
+import net.traitors.thing.usable.StringStrategy;
 import net.traitors.util.Point;
+import net.traitors.util.net.MultiplayerConnect;
 
 public class MenuScreen implements Screen {
 
     private final GalacticTraitors game;
     private Layer menuLayer;
+    private EditText et;
 
     public MenuScreen(GalacticTraitors game) {
         this.game = game;
@@ -23,21 +28,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void show() {
-        Menu menu = new Menu.MenuBuilder(3f).addButton("Start Game", new Runnable() {
-            @Override
-            public void run() {
-                game.setScreen(new GameFactory().getGameScreen());
-            }
-        })
-                .setCloseButtonText("Exit")
-                .setCloseButtonAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        Gdx.app.exit();
-                    }
-                }).build(menuLayer, "Galactic Traitors");
-        menu.setPoint(new Point(2, 2));
-        menuLayer.addActor(menu);
+
     }
 
     @Override
@@ -57,9 +48,44 @@ public class MenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        float aspectRatio = (float) width / (float) height;
-        GalacticTraitors.getCamera().setToOrtho(false, 5 * aspectRatio, 5);
-        game.resize();
+        GalacticTraitors.resize();
+        menuLayer.resize(width, height);
+        et = new EditText("Connect to IP");
+
+        Menu menu = new Menu.MenuBuilder(3f)
+                .addButton("Host Game", new Runnable() {
+                    @Override
+                    public void run() {
+                        MultiplayerConnect.makeServer();
+                        game.setScreen(new GameFactory().getGameScreen());
+                    }
+                })
+                .addButton(et, new Runnable() {
+                    @Override
+                    public void run() {
+                        et.setText("");
+                        GalacticTraitors.getInputProcessor().addProcessor(new InputProcessor() {
+                            @Override
+                            public boolean keyTyped(char character) {
+                                if (character == '\b') et.delete();
+                                else if (character == '\r') {
+                                    MultiplayerConnect.connectToServer(et.getContents());
+                                    game.setScreen(new GameFactory().getGameScreen());
+                                } else et.addChar(character);
+                                return true;
+                            }
+                        });
+                    }
+                })
+                .setCloseButtonText("Exit")
+                .setCloseButtonAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        Gdx.app.exit();
+                    }
+                }).build(menuLayer, "Galactic Traitors");
+        menu.setPoint(menuLayer.getBotCorner().add(new Point(menuLayer.getWidth() / 2, menuLayer.getHeight() / 2)));
+        menuLayer.addActor(menu);
     }
 
     @Override
@@ -80,5 +106,37 @@ public class MenuScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    private static class EditText extends StringStrategy {
+
+        private StringBuilder sb;
+        private boolean showingToolTip = true;
+
+        EditText(String toolTip) {
+            sb = new StringBuilder(toolTip);
+        }
+
+        void addChar(char ch) {
+            sb.append(ch);
+        }
+
+        void delete() {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        void setText(String text) {
+            showingToolTip = false;
+            sb = new StringBuilder(text);
+        }
+
+        @Override
+        public String toString() {
+            return sb.toString() + (! showingToolTip && (System.currentTimeMillis() / 750 )% 2 == 0? "|" : "");
+        }
+
+        String getContents() {
+            return sb.toString();
+        }
     }
 }

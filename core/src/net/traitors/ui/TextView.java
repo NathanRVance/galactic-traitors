@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
-import net.traitors.GalacticTraitors;
 import net.traitors.Layer;
 import net.traitors.util.Point;
 
@@ -42,10 +41,10 @@ public class TextView extends Stage {
      * @param height height of each character (not of string), 0 < height <= 1
      * @param rot    rotation of string on screen
      */
-    public void drawStringOnScreen(CharSequence text, Point pos, Align align, float width, float height, Color color, float rot) {
+    public void drawStringOnScreen(CharSequence text, Point pos, Align align, float width, float height, Color color, float rot, Layer layer) {
         pos = new Point(pos.x * getWidth(), pos.y * getHeight());
-        width *= getWidth() / GalacticTraitors.getCamera().zoom;
-        height *= getHeight() / 40 / GalacticTraitors.getCamera().zoom;
+        width *= getWidth() / layer.getDefaultCamera().zoom;
+        height *= getHeight() / 40 / layer.getDefaultCamera().zoom;
         switch (align) {
             case left:
                 break;
@@ -78,7 +77,7 @@ public class TextView extends Stage {
         pos = new Point(pos.x / getWidth(), pos.y / getHeight());
         width /= layer.getDefaultCamera().viewportWidth;
         height /= layer.getDefaultCamera().viewportHeight;
-        drawStringOnScreen(text, pos, align, width, height, color, rot - layer.getDefaultCamera().getCameraAngle() );
+        drawStringOnScreen(text, pos, align, width, height, color, rot - layer.getDefaultCamera().getCameraAngle(), layer);
     }
 
     @Override
@@ -135,7 +134,7 @@ public class TextView extends Stage {
             fontRot.setToRotation(new Vector3(0, 0, 1), rot * MathUtils.radiansToDegrees)
                     .trn(point.x + width / 2, point.y, 0);
             batch.setTransformMatrix(fontRot);
-            font.draw(batch, text, -width / 2, 0, width, align.value, true);
+            font.draw(batch, text.toString(), -width / 2, 0, width, align.value, true);
         }
 
     }

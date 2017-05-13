@@ -9,7 +9,6 @@ import net.traitors.controls.InputProcessor;
 import net.traitors.thing.player.Player;
 import net.traitors.util.Point;
 import net.traitors.util.net.MultiplayerConnect;
-import net.traitors.util.save.SaveData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +16,7 @@ import java.util.List;
 public class GameScreen implements Screen {
 
     private GameFactory gameFactory;
-    private List<Layer> layers = new ArrayList<>();
-    private boolean mainPlayerNotAdded = true;
-    private int playersToAdd = 1; //Start by adding a player
+    private final List<Layer> layers = new ArrayList<>();
 
     GameScreen(GameFactory gameFactory) {
         this.gameFactory = gameFactory;
@@ -33,23 +30,31 @@ public class GameScreen implements Screen {
         });
 
         MultiplayerConnect.start(this);
+
+        addPlayer(true);
     }
 
     void addLayer(Layer layer) {
         layers.add(layer);
     }
 
-    public void addPlayer() {
-        playersToAdd++;
-    }
-
-    public void setPlayerID(long playerID) {
-        Controls.setID(playerID);
+    public long addPlayer(boolean isMain) {
+        Player p;
+        synchronized (layers) {
+            p = gameFactory.makePlayer(isMain);
+        }
+        if (isMain) {
+            Controls.setPlayerID(p.getID());
+        }
+        p.setPoint(new Point(-4, 10));
+        return p.getID();
     }
 
     @Override
     public synchronized void render(float delta) {
-        doMoves(delta);
+        synchronized (layers) {
+            doMoves(delta);
+        }
 
         GalacticTraitors.getInputProcessor().bump();
 
@@ -57,31 +62,24 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         GalacticTraitors.getBatch().begin();
-        for (Layer layer : layers) {
-            GalacticTraitors.getBatch().setProjectionMatrix(layer.getDefaultCamera().combined);
-            layer.draw();
+        synchronized (layers) {
+            for (Layer layer : layers) {
+                GalacticTraitors.getBatch().setProjectionMatrix(layer.getDefaultCamera().combined);
+                layer.draw();
+            }
         }
         GalacticTraitors.getBatch().end();
-
         GalacticTraitors.getTextView().draw();
-        MultiplayerConnect.tick(delta);
 
-        //Test stuff
-        SaveData testSaveData = layers.get(0).getSaveData();
-        layers.get(0).loadSaveData(testSaveData);
+        //Multiplayer stuff
+        MultiplayerConnect.tick(delta);
+        if (MultiplayerConnect.isClient())
+            gameFactory.loadSaveData(MultiplayerConnect.retrieveData());
+        if (MultiplayerConnect.isServer())
+            MultiplayerConnect.sendData(gameFactory.getSaveData());
     }
 
     private void doMoves(float delta) {
-        while (playersToAdd-- > 0) {
-            System.out.println("Adding player");
-            Player p = gameFactory.makePlayer(mainPlayerNotAdded);
-            if (mainPlayerNotAdded) {
-                setPlayerID(p.getID());
-                mainPlayerNotAdded = false;
-            }
-            p.setPoint(new Point(-4, 10));
-        }
-
         Controls.update();
 
         for (Layer layer : layers) {
@@ -89,21 +87,6 @@ public class GameScreen implements Screen {
         }
 
         GalacticTraitors.getCamera().act(delta);
-
-        //TODO: Implement me
-        /*if (MultiplayerConnect.isServer())
-            updateSaveData();
-        if (MultiplayerConnect.isClient())
-            resolveSavedData();*/
-    }
-
-    /**
-     * Checks if we can send data to multiplayer clients
-     *
-     * @return true if sendable, false otherwise
-     */
-    public boolean isClean() {
-        return false; // FIXME: 4/27/17
     }
 
     @Override

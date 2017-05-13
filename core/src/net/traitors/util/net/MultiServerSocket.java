@@ -39,9 +39,8 @@ class MultiServerSocket implements Disposable {
                     synchronized (sockets) {
                         sockets.add(s);
                         outputs.add(new PrintStream(s.getOutputStream()));
-                        gameScreen.addPlayer();
                         //Tell the client what ID its player is
-                        outputs.get(outputs.size() - 1).println(outputs.size());
+                        outputs.get(outputs.size() - 1).println(gameScreen.addPlayer(false));
                         System.out.println("Told it");
                         final BufferedReader inputStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         incomingData.put(s, null);
@@ -83,7 +82,7 @@ class MultiServerSocket implements Disposable {
         synchronized (sockets) {
             for (Socket socket : sockets) {
                 Controls.UserInput input = incomingData.get(socket);
-                Controls.setInput(input.ID, input);
+                if(input != null) Controls.setInput(input.ID, input);
             }
         }
     }
