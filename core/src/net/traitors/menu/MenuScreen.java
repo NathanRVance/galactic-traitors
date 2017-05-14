@@ -56,7 +56,6 @@ public class MenuScreen implements Screen {
                 .addButton("Host Game", new Runnable() {
                     @Override
                     public void run() {
-                        MultiplayerConnect.makeServer();
                         game.setScreen(new GameFactory().getGameScreen());
                     }
                 })

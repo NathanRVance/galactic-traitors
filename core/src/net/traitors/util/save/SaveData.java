@@ -151,4 +151,9 @@ public class SaveData {
         return stringBuilder.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o != null && o instanceof SaveData && o.toString().equals(toString());
+    }
+
 }

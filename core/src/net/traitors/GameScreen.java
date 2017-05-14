@@ -9,6 +9,7 @@ import net.traitors.controls.InputProcessor;
 import net.traitors.thing.player.Player;
 import net.traitors.util.Point;
 import net.traitors.util.net.MultiplayerConnect;
+import net.traitors.util.net.MultiplayerSocket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class GameScreen implements Screen {
 
     private GameFactory gameFactory;
     private final List<Layer> layers = new ArrayList<>();
+    private MultiplayerSocket socket;
 
     GameScreen(GameFactory gameFactory) {
         this.gameFactory = gameFactory;
@@ -29,7 +31,7 @@ public class GameScreen implements Screen {
             }
         });
 
-        MultiplayerConnect.start(this);
+        socket = MultiplayerConnect.start(this, gameFactory);
 
         addPlayer(true);
     }
@@ -71,12 +73,8 @@ public class GameScreen implements Screen {
         GalacticTraitors.getBatch().end();
         GalacticTraitors.getTextView().draw();
 
-        //Multiplayer stuff
-        MultiplayerConnect.tick(delta);
-        if (MultiplayerConnect.isClient())
-            gameFactory.loadSaveData(MultiplayerConnect.retrieveData());
-        if (MultiplayerConnect.isServer())
-            MultiplayerConnect.sendData(gameFactory.getSaveData());
+        socket.send();
+        socket.receive();
     }
 
     private void doMoves(float delta) {
