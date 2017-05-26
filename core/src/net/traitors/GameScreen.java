@@ -46,7 +46,7 @@ public class GameScreen implements Screen {
             p = gameFactory.makePlayer(isMain);
         }
         if (isMain) {
-            Controls.setPlayerID(p.getID());
+            gameFactory.setPlayerID(p.getID());
         }
         p.setPoint(new Point(-4, 10));
         return p.getID();

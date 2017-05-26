@@ -102,7 +102,8 @@ public class Ship extends AbstractPlatform {
     public void dispose() {
         for (Tile[] column : grid) {
             for (Tile tile : column) {
-                tile.dispose();
+                if(tile != null)
+                    tile.dispose();
             }
         }
     }

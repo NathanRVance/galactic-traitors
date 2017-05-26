@@ -1,8 +1,6 @@
 package net.traitors.thing.tile.thrust;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,8 +11,8 @@ import net.traitors.thing.tile.Tile;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
-import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
+import net.traitors.util.TextureCreator;
 import net.traitors.util.save.SaveData;
 
 public class MainThrusterStrategy implements ThrustStrategy {
@@ -53,12 +51,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
     }
 
     private void setup() {
-        int coneDim = 100;
-        PixmapRotateRec pixmap = new PixmapRotateRec(coneDim, coneDim, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.GRAY);
-        pixmap.fillQuadrahedron(0, coneDim / 3, coneDim, 0, coneDim, coneDim, 0, coneDim * 2 / 3);
-        cone = new TextureRegion(new Texture(pixmap));
-
+        cone = TextureCreator.getCone();
         rotationStrategy = new RotationStrategy((float) Math.PI / 7);
     }
 

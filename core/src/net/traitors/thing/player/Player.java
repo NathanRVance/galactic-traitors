@@ -1,8 +1,6 @@
 package net.traitors.thing.player;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -19,6 +17,7 @@ import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
 import net.traitors.ui.ScreenElements.InventoryBar;
 import net.traitors.util.Point;
+import net.traitors.util.TextureCreator;
 import net.traitors.util.save.SaveData;
 
 public class Player extends AbstractThing {
@@ -26,7 +25,6 @@ public class Player extends AbstractThing {
     //Animation stuff
     private static final float BASE_ANIMATION_LENGTH = .5f; //seconds
     private static final float BASE_MOVE_SPEED = 2f; //meters per second
-    private static final int cycleLength = 200;
     private TextureRegion[] animation;
     private TextureRegion[] animationHolding;
     private float animationLength = 1; //Time, in seconds, it takes to run through the animation
@@ -49,7 +47,7 @@ public class Player extends AbstractThing {
         inventory.addItem(new Gun(layer, .1f, .1f));
 
         isMainPlayer = bar != null;
-        if(isMainPlayer) {
+        if (isMainPlayer) {
             bar.setPlayer(this);
             GalacticTraitors.getCamera().setTracking(this);
         }
@@ -60,8 +58,8 @@ public class Player extends AbstractThing {
     }
 
     private void generateAnimations() {
-        animation = getAnimation(colors[0], colors[1], colors[2], colors[3], colors[4], false);
-        animationHolding = getAnimation(colors[0], colors[1], colors[2], colors[3], colors[4], true);
+        animation = TextureCreator.getPlayerAnimation(colors);
+        animationHolding = TextureCreator.getPlayerAnimationHolding(colors);
     }
 
     @Override
@@ -85,7 +83,7 @@ public class Player extends AbstractThing {
         //Read inventory
         isMainPlayer = saveData.readBoolean();
         InventoryBar inventoryBar = isMainPlayer ? GameFactory.getInventoryBar() : null;
-        if(isMainPlayer) {
+        if (isMainPlayer) {
             inventoryBar.setPlayer(this);
             GalacticTraitors.getCamera().setTracking(this);
         }
@@ -137,8 +135,8 @@ public class Player extends AbstractThing {
     }
 
     private int getAnimationIndex() {
-        int ret = (int) (animationPoint / animationLength * cycleLength);
-        if (ret >= cycleLength) ret = cycleLength - 1;
+        int ret = (int) (animationPoint / animationLength * animation.length);
+        if (ret >= animation.length) ret = animation.length - 1;
         return ret;
     }
 
@@ -205,7 +203,7 @@ public class Player extends AbstractThing {
 
     @Override
     public void draw(Batch batch) {
-        if(animation == null) generateAnimations();
+        if (animation == null) generateAnimations();
         Point worldPointLowLeft = getWorldPoint().subtract(new Point(getWidth() / 2, getHeight() / 2));
         float rotation = getPlatform().getWorldRotation() + getRotation() + (float) Math.PI / 2;
         if (inventory.getHeld() == null) {
@@ -226,121 +224,7 @@ public class Player extends AbstractThing {
         }
     }
 
-    private TextureRegion[] getAnimation(Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, boolean armExtended) {
-        TextureRegion[] anim = new TextureRegion[cycleLength];
-        int torsoWidth = 100;
-        int torsoDepth = torsoWidth / 4;
-        int armWidth = torsoWidth / 5;
-        int handWidth = armWidth * 3 / 4;
-        int legWidth = torsoWidth * 3 / 10;
-        int maxExtension = armWidth * 2;
-        int backswingExtension = maxExtension / 2;
-
-        Appendage arms = new Appendage();
-        arms.colors = new Color[]{bodyColor, skinColor};
-        arms.widths = new int[]{armWidth, handWidth};
-        arms.maxForExt = new int[]{maxExtension / 3, maxExtension / 9};
-        arms.maxBackExt = new int[]{backswingExtension / 3, backswingExtension / 9};
-
-        Appendage legs = new Appendage();
-        legs.colors = new Color[]{pantsColor, shoesColor};
-        legs.widths = new int[]{legWidth, legWidth};
-        legs.maxForExt = new int[]{maxExtension * 3 / 4, maxExtension / 4};
-        legs.maxBackExt = new int[]{backswingExtension * 3 / 4, backswingExtension / 4};
-
-
-        for (int i = 0; i < cycleLength; i++) {
-            Pixmap pixmap = new Pixmap(torsoWidth, torsoDepth + maxExtension + backswingExtension, Pixmap.Format.RGBA4444);
-            //Torso
-            pixmap.setColor(bodyColor);
-            pixmap.fillRectangle(0, backswingExtension, torsoWidth, torsoDepth);
-
-            //Swinging appendages
-            boolean rightForward = i < cycleLength / 2;
-            int j = (i < cycleLength / 2) ? i : cycleLength - i;
-            j = (j < cycleLength / 4) ? j : cycleLength / 2 - j;
-            float fracToFullyExtended = j * 1.0f / (cycleLength / 4);
-
-            //Forearms
-            if (armExtended) {
-                int armLength = torsoWidth * 3 / 10;
-                int slitLength = armLength / 20;
-                int numSlits = 10;
-                for (int k = 0; k < numSlits; k++) {
-                    Color c = new Color(bodyColor);
-                    float darken = (float) (.5 + ((float) k) / (numSlits * 2));
-                    c.mul(darken, darken, darken, 1);
-                    pixmap.setColor(c);
-                    pixmap.fillRectangle(0, backswingExtension + torsoDepth + slitLength * k, armWidth, slitLength);
-                }
-                pixmap.fillRectangle(0, backswingExtension + torsoDepth + numSlits * slitLength, armWidth, armLength - numSlits * slitLength);
-                pixmap.setColor(skinColor);
-                pixmap.fillRectangle((armWidth - handWidth) / 2, backswingExtension + torsoDepth + armLength, handWidth, handWidth);
-            } else {
-                addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, arms, 0, fracToFullyExtended, rightForward);
-            }
-            addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, arms, torsoWidth - armWidth, fracToFullyExtended, !rightForward);
-
-            //Legs
-            addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, legs, armWidth, fracToFullyExtended, !rightForward);
-            addAppendage(pixmap, backswingExtension + torsoDepth, backswingExtension, legs, torsoWidth - armWidth * 2, fracToFullyExtended, rightForward);
-
-            //Hair
-            pixmap.setColor(hairColor);
-            int hairWidth = torsoWidth * 4 / 9;
-            int hairDepth = torsoDepth * 3 / 2;
-            pixmap.fillRectangle((torsoWidth - hairWidth) / 2, backswingExtension, hairWidth, hairDepth);
-
-            //Nose
-            pixmap.setColor(skinColor);
-            int noseWidth = torsoWidth / 10;
-            int noseDepth = noseWidth / 2;
-            pixmap.fillRectangle((torsoWidth - noseWidth) / 2, backswingExtension + hairDepth, noseWidth, noseDepth);
-
-            anim[i] = new TextureRegion(new Texture(pixmap));
-        }
-        return anim;
-    }
-
-    private void addAppendage(Pixmap pixmap, int forStart, int backStart, Appendage appendage, int startX, float fracToFullyExtended, boolean forward) {
-        for (int i = 0; i < appendage.colors.length; i++) {
-            Color c = new Color(appendage.colors[i]);
-            float darken = fracToFullyExtended * .5f;
-            c.mul(darken, darken, darken, 1);
-            pixmap.setColor(c);
-
-            int width = appendage.widths[i];
-            if (i > 0) {
-                //center it on the previous width
-                startX += (appendage.widths[i - 1] - width) / 2;
-            }
-            int maxForExt = appendage.maxForExt[i];
-            int maxBackExt = appendage.maxBackExt[i];
-            backStart -= maxBackExt * fracToFullyExtended - 1; //That 1 pixel can make a big difference
-
-            if (forward) {
-                pixmap.fillRectangle(startX, forStart, width, (int) (maxForExt * fracToFullyExtended));
-            } else {
-                pixmap.fillRectangle(startX, backStart, width, (int) (maxBackExt * fracToFullyExtended));
-            }
-            forStart += maxForExt * fracToFullyExtended;
-        }
-    }
-
     @Override
     public void dispose() {
-        for (TextureRegion textureRegion : animation) {
-            textureRegion.getTexture().dispose();
-        }
-        for (TextureRegion textureRegion : animationHolding) {
-            textureRegion.getTexture().dispose();
-        }
-    }
-
-    private static class Appendage {
-        Color[] colors;
-        int[] widths;
-        int[] maxForExt;
-        int[] maxBackExt;
     }
 }

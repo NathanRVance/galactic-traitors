@@ -1,8 +1,6 @@
 package net.traitors.thing.tile;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -16,6 +14,7 @@ import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
 import net.traitors.util.Point;
+import net.traitors.util.TextureCreator;
 import net.traitors.util.save.SaveData;
 
 public class GunTile extends AbstractThing implements ShipComponent {
@@ -55,18 +54,8 @@ public class GunTile extends AbstractThing implements ShipComponent {
 
     private void setup() {
         this.barrelLength = getHeight() * 3 / 4;
-        int domeExtent = 200;
-        int domeWidth = 400;
-        Pixmap pixmap = new Pixmap(domeExtent, domeWidth, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.GRAY);
-        pixmap.fillCircle(0, domeWidth / 2, domeExtent);
-        dome = new TextureRegion(new Texture(pixmap));
-
-        int barrelLen = 10;
-        pixmap = new Pixmap(barrelLen, barrelLen, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.DARK_GRAY);
-        pixmap.fill();
-        barrel = new TextureRegion(new Texture(pixmap));
+        dome = TextureCreator.getDome();
+        barrel = TextureCreator.getColorRec(Color.DARK_GRAY);
 
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {

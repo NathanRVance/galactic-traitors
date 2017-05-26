@@ -58,6 +58,7 @@ public class Menu extends AbstractPlatform implements MouseoverCallback {
             for (Menu menu : OTHERS) {
                 menu.dismiss();
             }
+            OTHERS.clear();
             OTHERS.add(this);
         }
     }

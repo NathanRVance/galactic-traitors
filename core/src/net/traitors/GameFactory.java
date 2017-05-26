@@ -2,6 +2,8 @@ package net.traitors;
 
 import com.badlogic.gdx.graphics.Color;
 
+import net.traitors.controls.Controls;
+import net.traitors.thing.Thing;
 import net.traitors.thing.platform.Platform;
 import net.traitors.thing.platform.UniverseTile;
 import net.traitors.thing.platform.ship.Ship;
@@ -22,6 +24,7 @@ public class GameFactory implements Savable {
     private static Layer screenLayer;
     private GameScreen gameScreen;
     private long ID; //Save ID
+    private long playerID;
 
     public GameFactory() {
         //Screen layer
@@ -78,6 +81,7 @@ public class GameFactory implements Savable {
         SaveData sd = new SaveData();
         sd.writeLong(ID++);
         sd.writeSaveData(worldLayer.getSaveData());
+        //Not saving playerID
         return sd;
     }
 
@@ -93,6 +97,12 @@ public class GameFactory implements Savable {
             return;
         }
         worldLayer.loadSaveData(saveData.readSaveData());
+        GalacticTraitors.getCamera().setTracking((Thing) worldLayer.findByID(playerID));
+    }
+
+    public void setPlayerID(long playerID) {
+        this.playerID = playerID;
+        Controls.setPlayerID(playerID);
     }
 
     public static InventoryBar getInventoryBar() {

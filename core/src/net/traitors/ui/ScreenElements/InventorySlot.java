@@ -12,6 +12,7 @@ import net.traitors.thing.item.Item;
 import net.traitors.thing.player.Player;
 import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
+import net.traitors.util.TextureCreator;
 
 class InventorySlot extends AbstractThing implements Selectable, MouseoverCallback {
 
@@ -40,10 +41,7 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
         pixmap.drawRectangle(0, 0, 100, 100, 4);
         selectedTexture = new Texture(pixmap);
 
-        pixmap = new PixmapRotateRec(100, 100, Pixmap.Format.RGBA4444);
-        pixmap.setColor(Color.RED.r, Color.RED.g, Color.RED.b, .5f);
-        pixmap.fill();
-        cooldown = new Texture(pixmap);
+        cooldown = TextureCreator.getColorRec(new Color(Color.RED.r, Color.RED.g, Color.RED.b, .5f)).getTexture();
     }
 
     public void setPlayer(Player player) {

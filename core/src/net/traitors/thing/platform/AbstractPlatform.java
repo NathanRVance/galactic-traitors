@@ -10,10 +10,6 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
     private float rotationalAcceleration = 0f;
     private float rotationalVelocity = 0f;
 
-    protected AbstractPlatform(Layer layer) {
-        super(layer, 0, 0, Float.MAX_VALUE);
-    }
-
     public AbstractPlatform(Layer layer, float width, float height) {
         //By default, assume 1 meter thick and a mass of 1000 kg / m^3
         super(layer, width, height, width * height * 1000);

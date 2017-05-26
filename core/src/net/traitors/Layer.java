@@ -34,4 +34,6 @@ public interface Layer extends Disposable, Savable {
 
     Thing getThingAt(Point point);
 
+    Actor findByID(long ID);
+
 }

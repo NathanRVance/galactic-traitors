@@ -23,22 +23,17 @@ public abstract class AbstractThing extends AbstractActor implements Thing {
     private Platform nullPlatform = new NullPlatform();
 
     public AbstractThing(Layer layer, float width, float height, float mass) {
-        this(layer);
+        super(layer);
         this.width = width;
         this.height = height;
         this.mass = mass;
     }
 
     public AbstractThing(Layer layer, float width, float height) {
-        this(layer);
+        super(layer);
         this.width = width;
         this.height = height;
         this.mass = width * height;
-    }
-
-    protected AbstractThing(Layer layer) {
-        //This must be followed by a call to loadSaveData
-        super(layer);
     }
 
     @Override

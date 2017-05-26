@@ -166,7 +166,7 @@ public class ShipComputer extends AbstractActor implements Savable, Actor {
     private static class VirtualUser extends AbstractThing {
 
         private VirtualUser(Layer layer, Point point, float rotation) {
-            super(layer);
+            super(layer, 0, 0);
             setPoint(point);
             setRotation(rotation);
         }

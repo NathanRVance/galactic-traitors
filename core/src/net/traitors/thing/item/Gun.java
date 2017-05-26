@@ -1,7 +1,6 @@
 package net.traitors.thing.item;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,15 +12,13 @@ import net.traitors.thing.Thing;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
-import net.traitors.util.PixmapRotateRec;
 import net.traitors.util.Point;
+import net.traitors.util.TextureCreator;
 import net.traitors.util.save.SaveData;
 
 public class Gun extends AbstractThing implements Item {
 
-    private final float kickbackTime = .05f;
-    private Texture inventoryImage;
-    private TextureRegion handImage;
+    private static final float kickbackTime = .05f;
     private ProjectileFactory projectileFactory;
     private Point kickbackForce = new Point(-2000, 0);
     private float kickingTimer = 0;
@@ -85,38 +82,17 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public Texture getInventoryImage() {
-        if (inventoryImage == null) {
-            int width = 100;
-            PixmapRotateRec pixmap = new PixmapRotateRec(width, width, Pixmap.Format.RGBA4444);
-            pixmap.setColor(Color.DARK_GRAY);
-            pixmap.fillRectangle(width / 10, width / 8, width / 5, width);
-            pixmap.fillRectangle(0, width / 8, width, width / 4);
-            pixmap.fillRectangle(width * 7 / 8, 0, width / 8, width / 8);
-            int x = width * 3 / 10;
-            int y = width * 3 / 8;
-            int thickness = width / 10;
-            int ext = width / 6;
-            pixmap.fillQuadrahedron(x, y, x, y + thickness, x + ext, y + ext + thickness, x + ext, y + ext);
-            inventoryImage = new Texture(pixmap);
-        }
-        return inventoryImage;
+        return TextureCreator.getGunInventoryImage();
     }
 
     @Override
     public TextureRegion getHandImage() {
-        if (handImage == null) {
-            int width = 10;
-            Pixmap pixmap = new Pixmap(width, width * 4, Pixmap.Format.RGBA4444);
-            pixmap.setColor(Color.DARK_GRAY);
-            pixmap.fill();
-            handImage = new TextureRegion(new Texture(pixmap));
-        }
-        return handImage;
+        return TextureCreator.getGunHandImage();
     }
 
     @Override
     public void use(Thing thing, Point touchPoint) {
-        if(projectileFactory.getCooldownPercent() == 1) {
+        if (projectileFactory.getCooldownPercent() == 1) {
             kickingTimer = kickbackTime;
             kicking = thing;
         }
@@ -145,9 +121,5 @@ public class Gun extends AbstractThing implements Item {
 
     @Override
     public void dispose() {
-        getInventoryImage().dispose();
-        inventoryImage = null; //Set to null so that if getInventoryImage is called, it returns the right thing.
-        getHandImage().getTexture().dispose();
-        handImage = null;
     }
 }

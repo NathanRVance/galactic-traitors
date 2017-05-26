@@ -13,7 +13,7 @@ public class MultiplayerConnect {
         if (connectIP != null) {
             System.out.println("Connecting");
             ClientSocket cliSock = new ClientSocket(connectIP, port, gameFactory);
-            Controls.setPlayerID(cliSock.getPlayerID());
+            gameFactory.setPlayerID(cliSock.getPlayerID());
             return cliSock;
         } else {
             System.out.println("Serving");
