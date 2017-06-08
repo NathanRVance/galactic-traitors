@@ -121,6 +121,7 @@ public class LayerLayer implements Layer {
         actors.remove(actor.getID());
         if (actor instanceof Thing) {
             stuff.remove(actor);
+            ((Thing) actor).setPlatform(null);
         }
     }
 

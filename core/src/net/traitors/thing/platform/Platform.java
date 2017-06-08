@@ -5,7 +5,6 @@ import net.traitors.util.Point;
 
 public interface Platform extends Thing {
 
-
     float getRotationalVelocity();
 
     void setRotationalVelocity(float velocity);
@@ -26,5 +25,7 @@ public interface Platform extends Thing {
      * @param position position on this platform that the force is applied, in platform coordinates
      */
     void applyPointForce(Point force, Point position);
+
+    Point applyFriction(Point translationalVelocity, float delta);
 
 }

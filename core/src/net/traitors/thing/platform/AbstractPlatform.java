@@ -101,4 +101,9 @@ public abstract class AbstractPlatform extends AbstractThing implements Platform
         //Translational component
         applyForce(force);
     }
+
+    @Override
+    public Point applyFriction(Point translationalVelocity, float delta) {
+        return new Point();
+    }
 }

@@ -3,6 +3,7 @@ package net.traitors.thing.platform;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 import net.traitors.Layer;
+import net.traitors.util.Point;
 
 public class UniverseTile extends AbstractPlatform {
 
@@ -10,6 +11,11 @@ public class UniverseTile extends AbstractPlatform {
 
     public UniverseTile(Layer layer) {
         super(layer, TILE_DIM, TILE_DIM);
+    }
+
+    @Override
+    public Point applyFriction(Point translationalVelocity, float delta) {
+        return translationalVelocity;
     }
 
     @Override

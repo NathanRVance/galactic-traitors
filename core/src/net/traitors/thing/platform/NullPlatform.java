@@ -65,6 +65,11 @@ public class NullPlatform implements Platform {
     }
 
     @Override
+    public Point applyFriction(Point translationalVelocity, float delta) {
+        return new Point();
+    }
+
+    @Override
     public Point getPoint() {
         throw new UnsupportedOperationException();
     }

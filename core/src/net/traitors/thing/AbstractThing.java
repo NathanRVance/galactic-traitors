@@ -42,7 +42,7 @@ public abstract class AbstractThing extends AbstractActor implements Thing {
         sd.writeFloat(width);
         sd.writeFloat(height);
         sd.writeFloat(mass);
-        sd.writePoint(point);
+        sd.writePoint(getWorldPoint()); //This thing will not have a platform immediately after loadSaveData is called
         sd.writePoint(lastWorldPoint);
         sd.writePoint(translationalVelocity);
         sd.writeFloat(rotation);
@@ -165,6 +165,7 @@ public abstract class AbstractThing extends AbstractActor implements Thing {
         setTranslationalVelocity(getTranslationalVelocity().add(translationalAcceleration.scale(delta)));
         translationalAcceleration = new Point();
         setPoint(getPoint().add(getTranslationalVelocity().scale(delta)));
+        setTranslationalVelocity(getPlatform().applyFriction(getTranslationalVelocity(), delta));
     }
 
     @Override

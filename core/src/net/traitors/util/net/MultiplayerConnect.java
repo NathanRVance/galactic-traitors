@@ -2,7 +2,6 @@ package net.traitors.util.net;
 
 import net.traitors.GameFactory;
 import net.traitors.GameScreen;
-import net.traitors.controls.Controls;
 
 public class MultiplayerConnect {
 
