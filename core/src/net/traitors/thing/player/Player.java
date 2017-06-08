@@ -71,7 +71,7 @@ public class Player extends AbstractThing {
         //Save colors
         sd.writeInt(colors.length);
         for (Color color : colors) {
-            sd.writeInt(color.toIntBits());
+            sd.writeInt(Color.rgba8888(color));
         }
 
         return sd;

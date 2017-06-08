@@ -38,7 +38,7 @@ public class Projectile extends AbstractThing {
             sd.writeBoolean(true);
             sd.writePoint(location);
         }
-        sd.writeInt(color.toIntBits());
+        sd.writeInt(Color.argb8888(color));
         return sd;
     }
 

@@ -9,8 +9,6 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.Layer;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
-import net.traitors.thing.platform.UniverseTile;
-import net.traitors.thing.platform.ship.Ship;
 import net.traitors.thing.usable.FloatStrategy;
 import net.traitors.thing.usable.PointStrategy;
 import net.traitors.thing.usable.ProjectileFactory;
@@ -113,11 +111,6 @@ public class Gun extends AbstractThing implements Item {
         if (kickingTimer > 0) {
             kickingTimer -= delta;
             kicking.applyForce(kickbackForce);
-        }
-        if(getPlatform() instanceof UniverseTile) {
-            System.out.println("Space!");
-        } else if (getPlatform() instanceof Ship) {
-            System.out.println("Not space!");
         }
     }
 

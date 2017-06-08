@@ -39,9 +39,7 @@ class ClientSocket implements Disposable, MultiplayerSocket {
             public void run() {
                 try {
                     while (!Thread.interrupted()) {
-                        System.out.println("Listening for game state");
                         data = new SaveData(inputStream.readLine());
-                        System.out.println("Received game state");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

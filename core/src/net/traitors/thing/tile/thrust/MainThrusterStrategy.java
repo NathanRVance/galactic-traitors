@@ -20,9 +20,9 @@ public class MainThrusterStrategy implements ThrustStrategy {
     private float rotation = 0;
     private transient Thing base;
     private Tile tile;
-    private transient TextureRegion cone;
-    private transient RotationStrategy rotationStrategy;
-    private transient ProjectileFactory projectileFactory;
+    private TextureRegion cone;
+    private RotationStrategy rotationStrategy;
+    private ProjectileFactory projectileFactory;
     private float forceMagnitude;
 
     private float initTimeToNextFire = 0;
@@ -152,6 +152,5 @@ public class MainThrusterStrategy implements ThrustStrategy {
     @Override
     public void dispose() {
         tile.dispose();
-        cone.getTexture().dispose();
     }
 }

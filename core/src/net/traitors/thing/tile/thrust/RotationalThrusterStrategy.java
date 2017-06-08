@@ -179,6 +179,5 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
     @Override
     public void dispose() {
         tile.dispose();
-        cone.getTexture().dispose();
     }
 }

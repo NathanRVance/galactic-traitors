@@ -43,7 +43,6 @@ class MultiServerSocket implements Disposable, MultiplayerSocket {
                         outputs.add(p);
                         //Tell the client what ID its player is
                         p.println(gameScreen.addPlayer(false));
-                        System.out.println("Told it");
                         final BufferedReader inputStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         new Thread(new Runnable() {
                             @Override
@@ -76,7 +75,6 @@ class MultiServerSocket implements Disposable, MultiplayerSocket {
                     @Override
                     public void run() {
                         out.println(data);
-                        System.out.println("Sent game state");
                     }
                 }).start();
             }
