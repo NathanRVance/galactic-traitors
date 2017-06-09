@@ -68,6 +68,7 @@ public class ThrusterTile extends AbstractThing implements ShipComponent {
     @Override
     public void setShip(Ship ship) {
         this.ship = ship;
+        setPlatform(ship);
     }
 
     public ThrustStrategy getThrustStrategy() {

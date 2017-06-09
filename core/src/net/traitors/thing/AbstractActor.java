@@ -10,6 +10,9 @@ public abstract class AbstractActor implements Actor {
 
     public AbstractActor(Layer layer) {
         this.layer = layer;
+        if(layer == null) {
+            throw new RuntimeException("Null layer!");
+        }
     }
 
     @Override

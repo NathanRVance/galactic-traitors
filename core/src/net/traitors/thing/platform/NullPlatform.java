@@ -81,7 +81,7 @@ public class NullPlatform implements Platform {
 
     @Override
     public Point getWorldPoint() {
-        throw new UnsupportedOperationException();
+        return new Point();
     }
 
     @Override

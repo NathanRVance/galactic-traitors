@@ -9,16 +9,20 @@ public class MultiplayerConnect {
     private static String connectIP;
 
     public static MultiplayerSocket start(GameScreen gameScreen, GameFactory gameFactory) {
-        if (connectIP != null) {
+        if (isServer()) {
+            return new MultiServerSocket(port, gameScreen, gameFactory);
+        } else {
             ClientSocket cliSock = new ClientSocket(connectIP, port, gameFactory);
             gameFactory.setPlayerID(cliSock.getPlayerID());
             return cliSock;
-        } else {
-            return new MultiServerSocket(port, gameScreen, gameFactory);
         }
     }
 
     public static void connectToServer(final String IP) {
         connectIP = IP;
+    }
+
+    public static boolean isServer() {
+        return connectIP == null;
     }
 }

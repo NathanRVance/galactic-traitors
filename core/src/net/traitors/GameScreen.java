@@ -33,7 +33,7 @@ public class GameScreen implements Screen {
 
         socket = MultiplayerConnect.start(this, gameFactory);
 
-        addPlayer(true);
+        addPlayer(MultiplayerConnect.isServer());
     }
 
     void addLayer(Layer layer) {

@@ -140,6 +140,7 @@ public class SaveData {
             if (unmatched == 0) {
                 SaveData ret = new SaveData(stringBuilder.substring(1, i));
                 stringBuilder.delete(0, i + 1);
+                ret.setLayer(layer);
                 return ret;
             }
         }

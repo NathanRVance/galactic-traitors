@@ -19,7 +19,7 @@ class ClientSocket implements Disposable, MultiplayerSocket {
     private GameFactory gameFactory;
     private Socket socket;
     private PrintStream outputStream;
-    private long playerID = 0;
+    private long playerID = -1;
     private SaveData data;
     private SaveData lastSent;
     private Thread sendThread = new Thread();
