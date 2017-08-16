@@ -1,13 +1,13 @@
 package net.traitors.ui.ScreenElements;
 
-import net.traitors.util.Point;
-
-public interface Selectable {
+interface Selectable {
 
     void select();
 
     void unselect();
 
     boolean isSelected();
+
+    boolean isHovered();
 
 }

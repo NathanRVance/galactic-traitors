@@ -51,6 +51,8 @@ public class Ship extends AbstractPlatform {
             grid[col] = new Tile[saveData.readInt()];
             for (int tile = 0; tile < grid[col].length; tile++) {
                 grid[col][tile] = (Tile) saveData.readSavable();
+                if(grid[col][tile] != null)
+                    grid[col][tile].setPlatform(this);
                 if (grid[col][tile] instanceof ShipComponent) {
                     ShipComponent component = (ShipComponent) grid[col][tile];
                     components.add(component);

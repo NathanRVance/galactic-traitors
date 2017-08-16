@@ -67,7 +67,6 @@ public class TextureCreator {
             pixmap.fill();
             colorRecs.put(color, new TextureRegion(new Texture(pixmap)));
         }
-
         return colorRecs.get(color);
     }
 

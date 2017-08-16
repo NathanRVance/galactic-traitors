@@ -33,6 +33,7 @@ public class BetterCamera extends OrthographicCamera implements Actor {
      */
     public void setTracking(Thing tracking) {
         this.tracking = tracking;
+        previousRotatingWith = getRotatingWith();
     }
 
     public Thing getTracking() {
@@ -65,7 +66,7 @@ public class BetterCamera extends OrthographicCamera implements Actor {
         rotateDepth = depth;
     }
 
-    public Thing getRotatingWith() {
+    private Thing getRotatingWith() {
         return getThingAtDepth(rotateDepth);
     }
 

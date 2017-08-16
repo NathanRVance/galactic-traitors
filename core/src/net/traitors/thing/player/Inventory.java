@@ -9,80 +9,87 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Inventory implements Savable {
+class Inventory implements Savable {
 
     private List<Item> inventory = new ArrayList<>();
-    private Item held;
+    private int held = -1;
     private InventoryBar bar;
 
     Inventory(InventoryBar bar) {
         this.bar = bar;
+        int capacity = 5;
+        if(bar != null)  capacity = bar.getCapacity();
+        for(int i = 0; i < capacity; i++) {
+            inventory.add(null);
+        }
     }
 
     @Override
     public SaveData getSaveData() {
         SaveData sd = new SaveData();
+        sd.writeInt(held);
         sd.writeList(inventory);
-        if(held != null) {
-            sd.writeBoolean(true);
-            sd.writeInt(inventory.indexOf(held));
-        } else {
-            sd.writeBoolean(false);
-        }
         return sd;
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        for (Item item : (List<Item>) saveData.readList()) {
-            inventory.add(item);
+        held = saveData.readInt();
+        List<Item> items = (List<Item>) saveData.readList();
+        //System.out.println("\nStuff:");
+        for(int i = 0; i < items.size(); i++) {
+            inventory.set(i, items.get(i));
+            //System.out.printf("%d: %s\n", i, items.get(i));
         }
-        if(saveData.readBoolean()) {
-            held = inventory.get(saveData.readInt());
-        }
+        update();
     }
 
     Item getHeld() {
-        return held;
+        if(held == -1) return null;
+        return inventory.get(held);
     }
 
-    void setHeld(Item item) {
-        if (item != null && !inventory.contains(item)) {
-            addItem(item);
-        }
-        held = item;
+    Item get(int index) {
+        return inventory.get(index);
+    }
+
+    void setHeld(int index) {
+        held = index;
     }
 
     void addItem(Item item) {
-        inventory.add(item);
+        for(int i = 0; i < inventory.size(); i++) {
+            if(inventory.get(i) == null) {
+                inventory.set(i, item);
+                break;
+            }
+        }
         update();
     }
 
-    void removeItem(Item item) {
-        inventory.remove(item);
+    void remove(int index) {
+        inventory.set(index, null);
         update();
     }
 
-    void swapItems(Item item1, Item item2) {
-        Collections.swap(inventory, inventory.indexOf(item1), inventory.indexOf(item2));
+    void swapItems(int item1, int item2) {
+        Collections.swap(inventory, item1, item2);
         update();
     }
 
     void updateCooldowns(float delta) {
         for (Item item : inventory) {
-            item.act(delta);
+            if(item != null)
+                item.act(delta);
         }
     }
 
     private void update() {
         if (bar == null) return;
-        for (int i = 0; i < inventory.size() && i < bar.getCapacity(); i++) {
+        for (int i = 0; i < inventory.size(); i++) {
             bar.setItemAt(inventory.get(i), i);
         }
-        for (int i = inventory.size(); i < bar.getCapacity(); i++) {
-            bar.setItemAt(null, i);
-        }
-        if (held != null) {
+        if (held != -1) {
             bar.setTapped(held);
         }
     }

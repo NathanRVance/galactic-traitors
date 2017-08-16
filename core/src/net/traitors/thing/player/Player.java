@@ -20,6 +20,8 @@ import net.traitors.util.Point;
 import net.traitors.util.TextureCreator;
 import net.traitors.util.save.SaveData;
 
+import java.util.Queue;
+
 public class Player extends AbstractThing {
 
     //Animation stuff
@@ -29,11 +31,10 @@ public class Player extends AbstractThing {
     private TextureRegion[] animationHolding;
     private float animationLength = 1; //Time, in seconds, it takes to run through the animation
     private float animationPoint = 0;
+    private boolean initLock = false;
 
     private Inventory inventory;
     private Color[] colors = new Color[5];
-
-    private boolean isMainPlayer;
 
     public Player(Layer layer, Color bodyColor, Color skinColor, Color hairColor, Color pantsColor, Color shoesColor, InventoryBar bar) {
         this(layer);
@@ -46,8 +47,8 @@ public class Player extends AbstractThing {
         //Populate with default inventory
         inventory.addItem(new Gun(layer, .1f, .1f));
 
-        isMainPlayer = bar != null;
-        if (isMainPlayer) {
+        if (bar != null) {
+            //This is the main character
             bar.setPlayer(this);
             GalacticTraitors.getCamera().setTracking(this);
         }
@@ -66,7 +67,6 @@ public class Player extends AbstractThing {
     public SaveData getSaveData() {
         SaveData sd = super.getSaveData();
         //Save inventory
-        sd.writeBoolean(isMainPlayer);
         sd.writeSaveData(inventory.getSaveData());
         //Save colors
         sd.writeInt(colors.length);
@@ -80,10 +80,10 @@ public class Player extends AbstractThing {
     @Override
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
-        //Read inventory
-        isMainPlayer = saveData.readBoolean();
-        InventoryBar inventoryBar = isMainPlayer ? GameFactory.getInventoryBar() : null;
-        if (isMainPlayer) {
+        initLock = true;
+        InventoryBar inventoryBar = Controls.ID == getID() ? GameFactory.getInventoryBar() : null;
+        if (inventoryBar != null) {
+            //This is the main character
             inventoryBar.setPlayer(this);
             GalacticTraitors.getCamera().setTracking(this);
         }
@@ -97,6 +97,7 @@ public class Player extends AbstractThing {
         if (animation == null) {
             generateAnimations();
         }
+        initLock = false;
     }
 
     private void rotateToFace(Point point) {
@@ -140,18 +141,62 @@ public class Player extends AbstractThing {
         return ret;
     }
 
-    public void setHolding(Item item) {
-        inventory.setHeld(item);
+    public void setHolding(int index) {
+        if (!initLock) {
+            SaveData sd = new SaveData();
+            sd.writeInt(index);
+            Controls.operationPerformed(Controls.Operation.HOLD, sd);
+        }
     }
 
-    public void dropItem(Item item) {
-        inventory.removeItem(item);
-        if (inventory.getHeld() == item) { //If we're holding the same instance of the item
-            inventory.setHeld(null);
+    public void drop(int index) {
+        if (!initLock) {
+            SaveData sd = new SaveData();
+            sd.writeInt(index);
+            Controls.operationPerformed(Controls.Operation.DROP, sd);
         }
-        item.setPlatform(getPlatform());
-        item.setPoint(getPoint());
-        getLayer().addActor(item);
+    }
+
+    public void swapItems(int item1, int item2) {
+        if (!initLock) {
+            SaveData sd = new SaveData();
+            sd.writeInt(item1);
+            sd.writeInt(item2);
+            Controls.operationPerformed(Controls.Operation.SWAP, sd);
+        }
+    }
+
+    private void processOperations(Queue<Controls.OperationStruct> operations) {
+        while (!operations.isEmpty()) {
+            Controls.OperationStruct opt = operations.remove();
+            SaveData data = opt.getData();
+            switch (opt.getOperation()) {
+                case SWAP:
+                    inventory.swapItems(data.readInt(), data.readInt());
+                    break;
+                case DROP:
+                    int index = data.readInt();
+                    Item item = inventory.get(index);
+                    if (inventory.getHeld() == item) { //If we're holding the same instance of the item
+                        inventory.setHeld(-1);
+                    }
+                    inventory.remove(index);
+                    if (item != null) {
+                        item.setPlatform(getPlatform());
+                        item.setPoint(getPoint());
+                        getLayer().addActor(item);
+                    }
+                    break;
+                case HOLD:
+                    inventory.setHeld(data.readInt());
+                    break;
+                case AUTOSTOP:
+                    // TODO: Implement me
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Override
@@ -159,6 +204,7 @@ public class Player extends AbstractThing {
         super.act(delta);
         inventory.updateCooldowns(delta);
         Controls.UserInput input = Controls.getInput(getID());
+        processOperations(input.operations);
         float x = 0;
         float y = 0;
         float speedMult = 1;

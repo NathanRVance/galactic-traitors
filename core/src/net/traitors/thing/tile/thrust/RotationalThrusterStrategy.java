@@ -23,18 +23,17 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
     private final float coneWidth = .5f;
     private final float coneLen = coneWidth / 2;
     private Thing base;
-    private TextureRegion cone;
+    private TextureRegion cone = TextureCreator.getCone();
     private Tile tile;
     private float forceMagnitude;
 
-    private RotationStrategy rotationStrategy;
+    private RotationStrategy rotationStrategy = new RotationStrategy(.1f);
     private ProjectileFactory projectileFactory;
     private float initTimeToNextFire = 0;
 
     public RotationalThrusterStrategy(Tile tile, float forceMagnitude) {
         this.tile = tile;
         this.forceMagnitude = forceMagnitude;
-        setup();
     }
 
     @Override
@@ -48,15 +47,9 @@ public class RotationalThrusterStrategy implements ThrustStrategy {
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        setup();
         tile = (Tile) saveData.readSavable();
         forceMagnitude = saveData.readFloat();
         initTimeToNextFire = saveData.readFloat();
-    }
-
-    private void setup() {
-        cone = TextureCreator.getCone();
-        rotationStrategy = new RotationStrategy(.1f);
     }
 
     @Override

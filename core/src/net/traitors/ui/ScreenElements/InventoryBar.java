@@ -30,13 +30,8 @@ public class InventoryBar extends AbstractThing {
         }
     }
 
-    public void setTapped(Item item) {
-        for(InventorySlot slot : selectableSwitch.getSelectables()) {
-            if(slot.getItem() == item) {
-                selectableSwitch.selectableTapped(slot, true);
-                break;
-            }
-        }
+    public void setTapped(int index) {
+        selectableSwitch.selectableTapped(selectableSwitch.getSelectables().get(index), true);
     }
 
     /**
@@ -48,7 +43,7 @@ public class InventoryBar extends AbstractThing {
      */
     public Item setItemAt(Item item, int index) {
         List<InventorySlot> slots = selectableSwitch.getSelectables();
-        if (index >= getCapacity()) throw new IllegalArgumentException("Bad index!");
+        if (index >= getCapacity()) throw new IllegalArgumentException("Bad index: " + index);
         Item ret = slots.get(index).getItem();
         slots.get(index).setItem(item);
         slots.get(index).unselect();
@@ -71,11 +66,15 @@ public class InventoryBar extends AbstractThing {
 
     @Override
     public void draw(Batch batch) {
-        //Forever, update ourselves to be to the right side of the layer
+        //Update ourselves to be to the right side of the layer
         setPoint(getLayer().getBotCorner().add(new Point(getLayer().getWidth() - getWidth() / 2, getHeight() / 2)));
         //Actually draw
         for(InventorySlot slot : selectableSwitch.getSelectables()) {
             slot.draw(batch);
+        }
+        //Then draw the items in the slots
+        for(InventorySlot slot : selectableSwitch.getSelectables()) {
+            slot.drawItem(batch);
         }
     }
 

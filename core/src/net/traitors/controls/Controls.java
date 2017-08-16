@@ -10,16 +10,28 @@ import net.traitors.util.save.SaveData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class Controls {
 
+    /**
+     * All high level operations must go through this class. This includes:
+     * - Player movement
+     * - Clicks in world
+     * - Menu operations
+     * - Inventory operations
+     */
+
     private static Map<Integer, Key> keymap = new HashMap<>();
     private static Set<Key> pressed = new HashSet<>();
+    private static Queue<OperationStruct> operations = new LinkedList<>();
+    private static Queue<OperationStruct> sendOpts = new LinkedList<>();
     private static Map<Long, UserInput> inputs = new HashMap<>();
-    private static long ID = -1;
+    public static long ID = -1;
 
     static {
         keymap.put(Input.Keys.COMMA, Key.UP);
@@ -50,15 +62,32 @@ public class Controls {
         pressed.remove(keymap.get(keycode));
     }
 
-    public static UserInput getUserInput() {
-        UserInput ret = new UserInput(ID);
-        ret.pointsTouched = GalacticTraitors.getInputProcessor().getWorldTouches();
-        ret.keysPressed = new HashSet<>(pressed);
-        return ret;
+    public static void operationPerformed(Operation opt, SaveData data) {
+        operations.add(new OperationStruct(opt, data));
+        sendOpts.add(new OperationStruct(opt, data));
+        if(sendOpts.size() > 100)
+            sendOpts.remove();
     }
 
-    public static void setInput(long ID, UserInput input) {
-        inputs.put(ID, input);
+    /*
+    Operations are perfromed locally and sent.
+    Each operation is performed exactly once locally, and zero or one times sent.
+    Keep operations in a queue:
+     - deliver once on update()
+     - deliver once on getInputToSend()
+     - enforce max queue length (push stale ops off)
+     */
+
+    public static void setInput(long userID, UserInput input) {
+        if (inputs.containsKey(userID) && inputs.get(userID).operations != input.operations) {
+            Queue<OperationStruct> newOpts = input.operations;
+            Queue<OperationStruct> oldOpts = inputs.get(userID).operations;
+            while (!newOpts.isEmpty()) {
+                oldOpts.add(newOpts.remove());
+            }
+            input.operations = oldOpts;
+        }
+        inputs.put(userID, input);
     }
 
     public static UserInput getInput(long ID) {
@@ -69,8 +98,25 @@ public class Controls {
         }
     }
 
+    private static UserInput getBaseInput() {
+        UserInput input = new UserInput(ID);
+        input.pointsTouched = GalacticTraitors.getInputProcessor().getWorldTouches();
+        input.keysPressed = new HashSet<>(pressed);
+        return input;
+    }
+
+    //Obtains input for sending
+    public static UserInput getInputToSend() {
+        UserInput input = getBaseInput();
+        input.operations = sendOpts;
+        sendOpts = new LinkedList<>();
+        return input;
+    }
+
     public static void update() {
-        inputs.put(ID, getUserInput());
+        UserInput input = getBaseInput();
+        input.operations = operations; //same instance
+        setInput(ID, input);
     }
 
     public enum Key {
@@ -81,10 +127,51 @@ public class Controls {
         SPRINT,
     }
 
+    public enum Operation {
+        SWAP,
+        DROP,
+        HOLD,
+        AUTOSTOP
+    }
+
+    public static class OperationStruct implements Savable {
+
+        private Operation operation;
+        private SaveData data;
+
+        OperationStruct(Operation operation, SaveData data) {
+            this.operation = operation;
+            this.data = data;
+        }
+
+        public Operation getOperation() {
+            return operation;
+        }
+
+        public SaveData getData() {
+            return new SaveData(data.toString());
+        }
+
+        @Override
+        public SaveData getSaveData() {
+            SaveData sd = new SaveData();
+            sd.writeString(operation.name());
+            sd.writeSaveData(data);
+            return sd;
+        }
+
+        @Override
+        public void loadSaveData(SaveData saveData) {
+            operation = Operation.valueOf(saveData.readString());
+            data = saveData.readSaveData();
+        }
+    }
+
     public static class UserInput implements Savable {
 
         public List<Point> pointsTouched = new ArrayList<>();
         public Set<Key> keysPressed = new HashSet<>();
+        public Queue<OperationStruct> operations = new LinkedList<>();
         public long ID; //ID of actor this input is for
 
         public UserInput(long ID) {
@@ -104,6 +191,10 @@ public class Controls {
             for (Key key : keysPressed) {
                 sd.writeString(key.name());
             }
+            sd.writeInt(operations.size());
+            while (!operations.isEmpty()) {
+                sd.writeSaveData(operations.remove().getSaveData());
+            }
             return sd;
         }
 
@@ -119,6 +210,13 @@ public class Controls {
             keysPressed = new HashSet<>(numKeys);
             for (int i = 0; i < numKeys; i++) {
                 keysPressed.add(Key.valueOf(saveData.readString()));
+            }
+            int numOpts = saveData.readInt();
+            operations = new LinkedList<>();
+            for (int i = 0; i < numOpts; i++) {
+                OperationStruct opt = new OperationStruct(null, null);
+                opt.loadSaveData(saveData.readSaveData());
+                operations.add(opt);
             }
         }
 

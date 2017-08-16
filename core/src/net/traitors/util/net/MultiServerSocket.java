@@ -52,7 +52,6 @@ class MultiServerSocket implements Disposable, MultiplayerSocket {
                                         Controls.UserInput input = new Controls.UserInput(-1);
                                         input.loadSaveData(new SaveData(inputStream.readLine()));
                                         Controls.setInput(input.ID, input);
-                                        System.out.println("Received user input");
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();

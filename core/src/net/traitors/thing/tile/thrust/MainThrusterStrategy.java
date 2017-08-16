@@ -17,11 +17,11 @@ import net.traitors.util.save.SaveData;
 
 public class MainThrusterStrategy implements ThrustStrategy {
 
-    private float rotation = 0;
+    private float rotation = (float) Math.PI * 3 / 2;
     private transient Thing base;
     private Tile tile;
-    private TextureRegion cone;
-    private RotationStrategy rotationStrategy;
+    private TextureRegion cone = TextureCreator.getCone();
+    private RotationStrategy rotationStrategy = new RotationStrategy((float) Math.PI / 7);
     private ProjectileFactory projectileFactory;
     private float forceMagnitude;
 
@@ -30,7 +30,6 @@ public class MainThrusterStrategy implements ThrustStrategy {
     public MainThrusterStrategy(Tile tile, float forceMagnitude) {
         this.tile = tile;
         this.forceMagnitude = forceMagnitude;
-        setup();
     }
 
     @Override
@@ -39,20 +38,16 @@ public class MainThrusterStrategy implements ThrustStrategy {
         sd.writeSavable(tile);
         sd.writeFloat(forceMagnitude);
         sd.writeFloat(projectileFactory.getTimeToNextFire());
+        sd.writeFloat(rotation);
         return sd;
     }
 
     @Override
     public void loadSaveData(SaveData saveData) {
-        setup();
         tile = (Tile) saveData.readSavable();
         forceMagnitude = saveData.readFloat();
         initTimeToNextFire = saveData.readFloat();
-    }
-
-    private void setup() {
-        cone = TextureCreator.getCone();
-        rotationStrategy = new RotationStrategy((float) Math.PI / 7);
+        rotation = saveData.readFloat();
     }
 
     @Override
@@ -100,7 +95,7 @@ public class MainThrusterStrategy implements ThrustStrategy {
     @Override
     public void setBase(final Thing base) {
         this.base = base;
-        rotation = this.base.getRotation();
+        //rotation = this.base.getRotation();
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
                     @Override

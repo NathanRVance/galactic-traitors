@@ -2,7 +2,6 @@ package net.traitors.thing.tile;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.traitors.Layer;
@@ -21,11 +20,9 @@ public class GunTile extends AbstractThing implements ShipComponent {
 
     private float barrelLength;
     private Tile base;
-    private transient TextureRegion dome;
-    private transient TextureRegion barrel;
     private float rotation = 0;
-    private transient ProjectileFactory projectileFactory;
-    private transient RotationStrategy rotationStrategy;
+    private ProjectileFactory projectileFactory;
+    private RotationStrategy rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 3);
     private Ship ship;
 
     public GunTile(float width, float height, float rotation, Layer layer, Tile base) {
@@ -42,6 +39,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
         SaveData sd = super.getSaveData();
         sd.writeSavable(base);
         sd.writeFloat(projectileFactory.getTimeToNextFire());
+        sd.writeFloat(rotation);
         return sd;
     }
 
@@ -49,13 +47,13 @@ public class GunTile extends AbstractThing implements ShipComponent {
     public void loadSaveData(SaveData saveData) {
         super.loadSaveData(saveData);
         base = (Tile) saveData.readSavable();
+        setup();
         projectileFactory.setTimeToNextFire(saveData.readFloat());
+        rotation = saveData.readFloat();
     }
 
     private void setup() {
         this.barrelLength = getHeight() * 3 / 4;
-        dome = TextureCreator.getDome();
-        barrel = TextureCreator.getColorRec(Color.DARK_GRAY);
 
         projectileFactory = new ProjectileFactory()
                 .setCooldown(new FloatStrategy() {
@@ -101,8 +99,6 @@ public class GunTile extends AbstractThing implements ShipComponent {
                         return 5;
                     }
                 });
-
-        rotationStrategy = new RotationStrategy((float) Math.PI * 2 / 3);
     }
 
     @Override
@@ -119,7 +115,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
         float drawLen = (projectileFactory.getCooldownPercent() * .1f + .9f) * barrelLength;
         Point barrelp = new Point(getWidth() / 2 * 1.2f, 0);
         barrelp = barrelp.rotate(rot);
-        batch.draw(barrel,
+        batch.draw(TextureCreator.getColorRec(Color.DARK_GRAY),
                 worldPoint.x + barrelp.x,
                 worldPoint.y + barrelp.y - barrelWidth / 2,
                 0,
@@ -130,7 +126,7 @@ public class GunTile extends AbstractThing implements ShipComponent {
         float domeWidth = getHeight();
         float domeExtent = domeWidth / 2;
         Point domep = new Point(getWidth() / 2, -domeWidth / 2);
-        batch.draw(dome,
+        batch.draw(TextureCreator.getDome(),
                 worldPoint.x + domep.x,
                 worldPoint.y + domep.y,
                 -domep.x,
@@ -159,12 +155,11 @@ public class GunTile extends AbstractThing implements ShipComponent {
     @Override
     public void dispose() {
         base.dispose();
-        dome.getTexture().dispose();
-        barrel.getTexture().dispose();
     }
 
     @Override
     public void setShip(Ship ship) {
         this.ship = ship;
+        setPlatform(ship);
     }
 }

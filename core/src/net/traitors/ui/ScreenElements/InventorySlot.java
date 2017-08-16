@@ -25,6 +25,7 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     private Point initialTap = new Point();
     private SelectableSwitch<InventorySlot> selectableSwitch;
     private Player player;
+    private boolean hovered = false;
 
     InventorySlot(Layer layer, SelectableSwitch<InventorySlot> selectableSwitch, float width, float height) {
         super(layer, width, height);
@@ -51,19 +52,22 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     @Override
     public void draw(Batch batch) {
         batch.draw(backgroundTexture, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2, getWidth(), getHeight());
+        if (selected) {
+            batch.draw(selectedTexture, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2,
+                    getWidth(), getHeight());
+        }
+    }
+
+    public void drawItem(Batch batch) {
         if (item != null) {
             float scale = .9f;
             batch.draw(item.getInventoryImage(), imageOffset.x + getWorldPoint().x - getWidth() / 2 + getWidth() * (1 - scale) / 2,
                     imageOffset.y + getWorldPoint().y - getHeight() / 2 + getHeight() * (1 - scale) / 2,
                     getWidth() * scale, getHeight() * scale);
             if (item.getCooldownPercent() < 1) {
-                batch.draw(cooldown, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2,
+                batch.draw(cooldown, imageOffset.x + getWorldPoint().x - getWidth() / 2, imageOffset.y + getWorldPoint().y - getHeight() / 2,
                         getWidth() * item.getCooldownPercent(), getHeight());
             }
-        }
-        if (selected) {
-            batch.draw(selectedTexture, getWorldPoint().x - getWidth() / 2, getWorldPoint().y - getHeight() / 2,
-                    getWidth(), getHeight());
         }
     }
 
@@ -85,13 +89,13 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     @Override
     public void select() {
         selected = true;
-        player.setHolding(getItem());
+        player.setHolding(selectableSwitch.getSelectables().indexOf(this));
     }
 
     @Override
     public void unselect() {
         if (selected) {
-            player.setHolding(null);
+            player.setHolding(-1);
         }
         selected = false;
     }
@@ -102,13 +106,18 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
     }
 
     @Override
-    public void mouseEnter() {
+    public boolean isHovered() {
+        return hovered;
+    }
 
+    @Override
+    public void mouseEnter() {
+        hovered = true;
     }
 
     @Override
     public void mouseExit() {
-
+        hovered = false;
     }
 
     @Override
@@ -132,9 +141,13 @@ class InventorySlot extends AbstractThing implements Selectable, MouseoverCallba
 
     @Override
     public boolean mouseUp() {
-        if (!imageOffset.isZero()) {
+        InventorySlot hovered = selectableSwitch.getHovered();
+        if(hovered != null && hovered != this) {
+            player.swapItems(selectableSwitch.getSelectables().indexOf(this), selectableSwitch.getSelectables().indexOf(hovered));
+            selectableSwitch.selectableTapped(hovered, true); //select the slot we're moving to
+        } else if (!imageOffset.isZero()) {
             selectableSwitch.selectableTapped(this, false); //unselect
-            player.dropItem(item);
+            player.drop(selectableSwitch.getSelectables().indexOf(this));
             item = null;
         }
         imageOffset = new Point();

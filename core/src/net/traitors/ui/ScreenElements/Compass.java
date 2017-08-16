@@ -16,6 +16,7 @@ import net.traitors.util.TextureCreator;
 class Compass extends AbstractThing implements Selectable, MouseoverCallback {
 
     private boolean selected = false;
+    private boolean hovered = false;
     private int trackDepth;
     private SelectableSwitch<Compass> selectableSwitch;
 
@@ -30,12 +31,12 @@ class Compass extends AbstractThing implements Selectable, MouseoverCallback {
 
     @Override
     public void mouseEnter() {
-
+        hovered = true;
     }
 
     @Override
     public void mouseExit() {
-
+        hovered = false;
     }
 
     @Override
@@ -99,6 +100,11 @@ class Compass extends AbstractThing implements Selectable, MouseoverCallback {
     @Override
     public boolean isSelected() {
         return selected;
+    }
+
+    @Override
+    public boolean isHovered() {
+        return hovered;
     }
 
 }

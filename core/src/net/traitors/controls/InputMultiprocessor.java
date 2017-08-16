@@ -6,24 +6,21 @@ import com.badlogic.gdx.graphics.Camera;
 import net.traitors.util.Point;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
     private Camera camera;
     private List<InputProcessor> inputs = new ArrayList<>();
     private List<MouseoverCallback> callbacks = new ArrayList<>();
-    private Map<MouseoverCallback, Boolean> wasIn = new HashMap<>();
+    private Set<MouseoverCallback> wasIn = new HashSet<>();
     private List<MouseoverCallback> asyncRemove = new ArrayList<>();
     private List<MouseoverCallback> asyncAdd = new ArrayList<>();
     //These are locations on screen
     private List<Point> points = new ArrayList<>();
     private List<MouseoverCallback> wantsDragCallback = new ArrayList<>();
-
-    private int currentX = 0;
-    private int currentY = 0;
 
     public InputMultiprocessor(Camera camera) {
         this.camera = camera;
@@ -46,7 +43,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
     }
 
     public void bump() {
-        mouseMoved(currentX, currentY);
+        resolveAsync();
     }
 
     private void resolveAsync() {
@@ -58,7 +55,6 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
         for (MouseoverCallback callback : asyncAdd) {
             callbacks.add(callback);
-            wasIn.put(callback, false);
         }
         asyncAdd.clear();
     }
@@ -143,8 +139,9 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
         }
 
         Point screenP = new Point(screenX, screenY);
+        if(wantsMouseUp != null && wantsMouseUp.mouseUp()) return true;
         for (MouseoverCallback callback : callbacks) {
-            if (callback == wantsMouseUp || callback.contains(callback.getLayer().screenToLayerCoords(screenP)))
+            if (callback.contains(callback.getLayer().screenToLayerCoords(screenP)))
                 if (callback.mouseUp()) return true;
         }
 
@@ -154,6 +151,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
     @Override
     public synchronized boolean touchDragged(int screenX, int screenY, int pointer) {
         //We're tracking it, and it moved!
+        mouseEnterExit(new Point(screenX, screenY));
         if (points.size() > pointer && points.get(pointer) != null) {
             points.set(pointer, new Point(screenX, screenY));
         }
@@ -174,30 +172,30 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
 
     @Override
     public synchronized boolean mouseMoved(int screenX, int screenY) {
-        currentX = screenX;
-        currentY = screenY;
         resolveAsync();
         for (InputProcessor processor : inputs) {
             if (processor.mouseMoved(screenX, screenY))
                 return true;
         }
+        mouseEnterExit(new Point(screenX, screenY));
 
-        Point screenLoc = new Point(screenX, screenY);
+        return false;
+    }
+
+    private void mouseEnterExit(Point screenLoc) {
         for (MouseoverCallback callback : callbacks) {
             if (callback.contains(callback.getLayer().screenToLayerCoords(screenLoc))) {
-                if (!wasIn.get(callback)) {
-                    wasIn.put(callback, true);
+                if (!wasIn.contains(callback)) {
+                    wasIn.add(callback);
                     callback.mouseEnter();
                 }
             } else {
-                if (wasIn.get(callback)) {
-                    wasIn.put(callback, false);
+                if (wasIn.contains(callback)) {
+                    wasIn.remove(callback);
                     callback.mouseExit();
                 }
             }
         }
-
-        return false;
     }
 
     @Override
@@ -209,7 +207,7 @@ public class InputMultiprocessor implements com.badlogic.gdx.InputProcessor {
         return false;
     }
 
-    private void incListSize(List list, int lastIndex) {
+    private void incListSize(List<?> list, int lastIndex) {
         for (int i = list.size(); i <= lastIndex; i++) {
             list.add(null);
         }

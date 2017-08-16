@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import net.traitors.GalacticTraitors;
 import net.traitors.GameFactory;
 import net.traitors.Layer;
+import net.traitors.controls.Controls;
 import net.traitors.menu.Menu;
 import net.traitors.thing.AbstractThing;
 import net.traitors.thing.Thing;
@@ -134,7 +135,8 @@ public class OverviewScreen extends AbstractThing implements ShipComponent {
 
     @Override
     public void use(Thing user, Point touchPoint) {
-        usable.use(user, touchPoint);
+        if(user.getID() == Controls.ID)
+            usable.use(user, touchPoint);
     }
 
     @Override

@@ -62,14 +62,13 @@ class ClientSocket implements Disposable, MultiplayerSocket {
 
     @Override
     public void send() {
-        final SaveData userInput = Controls.getUserInput().getSaveData();
+        final SaveData userInput = Controls.getInputToSend().getSaveData();
         if (userInput.equals(lastSent) || sendThread.isAlive()) return;
         lastSent = userInput;
         sendThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 outputStream.println(userInput.toString());
-                System.out.println("Sent data to server");
             }
         });
         sendThread.start();

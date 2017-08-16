@@ -31,4 +31,17 @@ public class SelectableSwitch<T extends Selectable> {
             selectable.select();
         }
     }
+
+    /**
+     * Gets the selectable that the mouse is hovering over
+     * @return the hovered selectable, or null
+     */
+    public T getHovered() {
+        for(T selectable : selectables) {
+            if(selectable.isHovered()) {
+                return selectable;
+            }
+        }
+        return null;
+    }
 }

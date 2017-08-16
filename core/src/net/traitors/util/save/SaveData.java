@@ -63,6 +63,36 @@ public class SaveData {
         return Float.parseFloat(getToDelimiter());
     }
 
+    public void writeintArray(int[] array) {
+        writeInt(array.length);
+        for(int i : array) {
+            writeInt(i);
+        }
+    }
+
+    public int[] readIntArray() {
+        int[] ret = new int[readInt()];
+        for(int i = 0; i < ret.length; i++) {
+            ret[i] = readInt();
+        }
+        return ret;
+    }
+
+    public void writeLongArray(long[] array) {
+        writeInt(array.length);
+        for(long l : array) {
+            writeLong(l);
+        }
+    }
+
+    public long[] readLongArray() {
+        long[] ret = new long[readInt()];
+        for(int i = 0; i < ret.length; i++) {
+            ret[i] = readLong();
+        }
+        return ret;
+    }
+
     public void writePoint(Point p) {
         if (p == null) {
             writeBoolean(false);

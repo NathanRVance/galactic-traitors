@@ -97,7 +97,6 @@ public class GameFactory implements Savable {
             return;
         }
         worldLayer.loadSaveData(saveData.readSaveData());
-        GalacticTraitors.getCamera().setTracking((Thing) worldLayer.findByID(playerID));
     }
 
     public void setPlayerID(long playerID) {
